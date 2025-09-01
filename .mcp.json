@@ -1,0 +1,53 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    },
+    "serena": {
+      "command": "/bin/sh",
+      "args": [
+        "-c",
+        "~/.local/bin/uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant"
+      ]
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
+      "env": {}
+    },
+    "kagi": {
+      "command": "uvx",
+      "args": [
+        "kagimcp"
+      ],
+      "env": {
+        "KAGI_API_KEY": "CHANGE ME",
+        "KAGI_SUMMARIZER_ENGINE": "cecil"
+      }
+    },
+    "deepwiki": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.deepwiki.com/sse"
+      ]
+    },
+    "sequentialthinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    }
+  }
+}
