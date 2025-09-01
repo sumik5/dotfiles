@@ -75,6 +75,8 @@ fi
 alias ll='ls -vl'
 alias greps='rg --hidden -p'
 alias claude='claude --dangerously-skip-permissions'
+alias brew="arch -arm64 brew"
+
 
 # -------------------------------------------------
 # user environment
@@ -116,6 +118,7 @@ path=(
   $HOME/dotfiles/bin             # original dotfiles bin
   $HOME/.cabal/bin               # haskel package manager
   $HOME/Dropbox/bin(N-/)
+  $HOME/.local/bin(N-/)
   /opt/homebrew/bin(N-/)
   /opt/homebrew/sbin(N-/)
   /opt/homebrew/share/google-cloud-sdk/path.zsh.inc
@@ -261,7 +264,6 @@ unction set_aws_profile() {
   fi
 }
 
-alias brew="arch -arm64 brew"
 
 # .local/bin/env（存在する場合のみ読み込み）
 if [ -f "$HOME/.local/bin/env" ]; then

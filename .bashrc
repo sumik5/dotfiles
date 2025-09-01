@@ -34,33 +34,25 @@ if [ -a $HOME/.git-completion.bash ]; then
   source $HOME/.git-completion.bash
 fi
 
-# -------------------------------------------------
-# etc
-
-# tmux start
-if [ -z "$TMUX" -a -z "$STY" ]; then
-    if type tmuxx >/dev/null 2>&1; then
-        tmuxx
-    elif type tmux >/dev/null 2>&1; then
-        if tmux has-session && tmux list-sessions | /usr/bin/grep -qE '.*]$'; then
-            tmux attach && echo "tmux attached session "
-        else
-            tmux new-session && echo "tmux created new session"
-        fi
-    elif type screen >/dev/null 2>&1; then
-        screen -rx || screen -D -RR
-    fi
-fi
-
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
-
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/Users/ikegami/.sdkman"
-[[ -s "/Users/ikegami/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/ikegami/.sdkman/bin/sdkman-init.sh"
-
-. "$HOME/.local/bin/env"
-
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 # End of LM Studio CLI section
 
+# =================================================
+# 環境別設定ファイルの読み込み（最後に読み込んで最優先）
+# =================================================
+# 優先順位（後から読み込まれるものが優先）:
+# 1. .bashrc.local   - ローカル環境固有の設定
+# 2. .bashrc.work    - 仕事環境用の設定
+# 3. .bashrc.home    - 自宅環境用の設定
+# 4. .bashrc.private - プライベートな設定（gitignoreに追加推奨）
+# 5. .bashrc.$(hostname -s) - ホスト名固有の設定
+
+# ベースとなる環境別設定
+for env_file in local work home private; do
+  if [ -f "$HOME/.bashrc.$env_file" ]; then
+    source "$HOME/.bashrc.$env_file"
+    # デバッグ用（必要に応じてコメントアウト）
+    # echo "Loaded: .bashrc.$env_file"
+  fi
+done
