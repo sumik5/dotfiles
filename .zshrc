@@ -120,6 +120,7 @@ path=(
   $HOME/Dropbox/bin(N-/)
   $HOME/.local/share/mise/shims(N-/)
   $HOME/.local/bin(N-/)
+  $HOME/idea/bin(N-/)
   /opt/homebrew/bin(N-/)
   /opt/homebrew/sbin(N-/)
   /opt/homebrew/share/google-cloud-sdk/path.zsh.inc
@@ -396,4 +397,3 @@ fi
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 # End of LM Studio CLI section
-

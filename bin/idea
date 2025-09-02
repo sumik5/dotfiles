@@ -1,3 +1,0 @@
-#!/bin/sh
-
-open -na "IntelliJ IDEA Ultimate.app" --args "$@"
