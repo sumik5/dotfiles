@@ -118,6 +118,7 @@ path=(
   $HOME/dotfiles/bin             # original dotfiles bin
   $HOME/.cabal/bin               # haskel package manager
   $HOME/Dropbox/bin(N-/)
+  $HOME/.local/share/mise/shims(N-/)
   $HOME/.local/bin(N-/)
   /opt/homebrew/bin(N-/)
   /opt/homebrew/sbin(N-/)

@@ -1,8 +1,17 @@
 {
   "mcpServers": {
+    "context7": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "${CONTEXT7_API_KEY}"
+      ],
+      "env": {}
+    },
     "serena": {
-      "type": "stdio",
-      "command": "/Users/sumik/.local/bin/uvx",
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
       "args": [
         "--from",
         "git+https://github.com/oraios/serena",
@@ -14,54 +23,38 @@
       "env": {}
     },
     "playwright": {
-      "type": "stdio",
       "command": "/Users/sumik/.local/share/mise/shims/npx",
       "args": ["-y", "@playwright/mcp@latest"],
       "env": {}
     },
-    "context7": {
-      "type": "stdio",
-      "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-      "env": {}
-    },
-    "jetbrains": {
-      "command": "/Users/sumik/Applications/IntelliJ IDEA Ultimate.app/Contents/jbr/Contents/Home/bin/java",
-      "args": [
-        "-classpath",
-        "/Users/sumik/Applications/IntelliJ IDEA Ultimate.app/Contents/plugins/mcpserver/lib/mcpserver-frontend.jar:/Users/sumik/Applications/IntelliJ IDEA Ultimate.app/Contents/lib/util-8.jar",
-        "com.intellij.mcpserver.stdio.McpStdioRunnerKt"
-      ],
-      "env": {
-        "IJ_MCP_SERVER_PORT": "64342"
-      }
-    },
     "kagi": {
-      "command": "/Users/sumik/.local/bin/uvx",
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
       "args": ["kagimcp"],
       "env": {
-        "KAGI_API_KEY": "",
-        "KAGI_SUMMARIZER_ENGINE": "cecil"
+        "KAGI_API_KEY": "${KAGI_API_KEY}",
+        "KAGI_SUMMARIZER_ENGINE": "cecil",
+        "UV_NATIVE_TLS": "true"
       }
     },
     "deepwiki": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["mcp-remote", "https://mcp.deepwiki.com/sse"]
+      "args": ["mcp-remote", "https://mcp.deepwiki.com/sse"],
+      "env": {}
     },
     "sequentialthinking": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
-    "cipher": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@byterover/cipher", "-- cipher --mode mcp"],
+    "docset": {
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "args": ["docsetmcp"],
       "env": {
-        "CIPHER_EMBEDDER": "local"
+        "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
+        "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
       }
     }
+  },
+  "preferences": {
+    "menuBarEnabled": false
   }
 }
