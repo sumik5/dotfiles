@@ -5,16 +5,28 @@
       "command": "npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp"
+        "@upstash/context7-mcp",
+        "--api-key",
+        "${CONTEXT7_API_KEY}"
       ],
       "env": {}
     },
     "serena": {
-      "command": "/bin/sh",
+      "command": "uvx",
       "args": [
-        "-c",
-        "~/.local/bin/uvx --from git+https://github.com/oraios/serena serena start-mcp-server --context ide-assistant"
-      ]
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "env": {
+        "UV_NATIVE_TLS": "true",
+        "SSL_CERT_FILE": "${SSL_CERT_FILE}",
+        "REQUESTS_CA_BUNDLE": "${REQUESTS_CA_BUNDLE}",
+        "PYTHONHTTPSVERIFY": "${PYTHONHTTPSVERIFY}"
+      }
     },
     "playwright": {
       "type": "stdio",
@@ -31,8 +43,10 @@
         "kagimcp"
       ],
       "env": {
-        "KAGI_API_KEY": "CHANGE ME",
-        "KAGI_SUMMARIZER_ENGINE": "cecil"
+        "KAGI_API_KEY": "${KAGI_API_KEY}",
+        "KAGI_SUMMARIZER_ENGINE": "cecil",
+        "UV_NATIVE_TLS": "true",
+        "SSL_CERT_FILE": "${SSL_CERT_FILE}"
       }
     },
     "deepwiki": {
@@ -40,7 +54,11 @@
       "args": [
         "mcp-remote",
         "https://mcp.deepwiki.com/sse"
-      ]
+      ],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "${NODE_EXTRA_CA_CERTS}",
+        "NODE_TLS_REJECT_UNAUTHORIZED": "1"
+      }
     },
     "sequentialthinking": {
       "command": "npx",
@@ -48,6 +66,16 @@
         "-y",
         "@modelcontextprotocol/server-sequential-thinking"
       ]
+    },
+    "docset": {
+      "command": "uvx",
+      "args": [
+        "docsetmcp"
+      ],
+      "env": {
+        "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
+        "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
+      }
     }
   }
 }
