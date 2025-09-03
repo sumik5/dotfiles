@@ -76,6 +76,15 @@
         "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
         "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
       }
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
     }
   }
 }

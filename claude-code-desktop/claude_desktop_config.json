@@ -24,12 +24,17 @@
     },
     "playwright": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["-y", "@playwright/mcp@latest"],
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ],
       "env": {}
     },
     "kagi": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
-      "args": ["kagimcp"],
+      "args": [
+        "kagimcp"
+      ],
       "env": {
         "KAGI_API_KEY": "${KAGI_API_KEY}",
         "KAGI_SUMMARIZER_ENGINE": "cecil",
@@ -38,20 +43,37 @@
     },
     "deepwiki": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["mcp-remote", "https://mcp.deepwiki.com/sse"],
+      "args": [
+        "mcp-remote",
+        "https://mcp.deepwiki.com/sse"
+      ],
       "env": {}
     },
     "sequentialthinking": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     },
     "docset": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
-      "args": ["docsetmcp"],
+      "args": [
+        "docsetmcp"
+      ],
       "env": {
         "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
         "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
       }
+    },
+    "terraform": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
     }
   },
   "preferences": {

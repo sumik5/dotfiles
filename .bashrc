@@ -36,6 +36,7 @@ fi
 
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/sumik/.lmstudio/bin"
+export PATH="$HOME/.local/share/mise/shims:$PATH"
 # End of LM Studio CLI section
 
 # =================================================
