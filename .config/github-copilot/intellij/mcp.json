@@ -55,6 +55,16 @@
         "@modelcontextprotocol/server-sequential-thinking"
       ]
     },
+    "docset": {
+      "command": "uvx",
+      "args": [
+        "docsetmcp"
+      ],
+      "env": {
+        "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
+        "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
+      }
+    },
     "terraform": {
       "command": "docker",
       "args": [
