@@ -69,4 +69,5 @@ token_count_estimator: TIKTOKEN_GPT4O
 # If you want to maintain full control of the project configuration, create the project.yml file manually and then
 # instruct Serena to activate the project by its path for first-time activation.
 # NOTE: Make sure there are no name collisions in the names of registered projects.
-projects: []
+projects:
+- /Users/sumik/repo/shivase/project-templates/nextjs

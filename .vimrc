@@ -89,6 +89,13 @@ Plug 'nathanaelkane/vim-indent-guides'
 " auto formatter
 Plug 'Chiel92/vim-autoformat'
 
+" JavaScript/TypeScript
+Plug 'leafgarland/typescript-vim '
+Plug 'pangloss/vim-javascript'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'vim-graphql'
+set re=0
+
 "----------------------------------------------------------
 " NERDTree の設定
 " ---------------------------------------------------------

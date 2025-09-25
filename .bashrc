@@ -57,3 +57,5 @@ for env_file in local work home private; do
     # echo "Loaded: .bashrc.$env_file"
   fi
 done
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
