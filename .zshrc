@@ -204,7 +204,10 @@ export LDFLAGS="-L/usr/local/opt/avr-gcc@7/lib"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # Google Cloud SDK
-source  /opt/homebrew/share/google-cloud-sdk/completion.zsh.inc
+[ -f /opt/homebrew/share/google-cloud-sdk/completion.zsh.inc ] && source  /opt/homebrew/share/google-cloud-sdk/completion.zsh.inc
+
+# iterm2 shell integration
+[ -f ~/.iterm2_shell_integration.zsh ] && source ~/.iterm2_shell_integration.zsh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 

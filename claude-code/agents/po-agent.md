@@ -120,12 +120,6 @@ Managerから完了報告を受ける際は、以下の情報が含まれてい�
 
 ## MCPサーバの利用
 **serena MCPで戦略的にコードベースを分析し、技術的実現可能性とリスクを評価します。**
-
-### POが使用する主なserenaツール
-- `mcp__serena__list_dir`: プロジェクト全体構造の把握
-- `mcp__serena__get_symbols_overview`: アーキテクチャの理解
-- `mcp__serena__search_for_pattern`: 技術スタックの調査
-
 他のMCPサーバー（context7、kagi、github等）も必要に応じて活用。
 
 ## 重要なポイント

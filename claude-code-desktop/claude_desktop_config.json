@@ -74,6 +74,12 @@
         "--rm",
         "hashicorp/terraform-mcp-server"
       ]
+    },
+    "codex": {
+      "command": "codex",
+      "args": [
+        "mcp"
+      ]
     }
   },
   "preferences": {

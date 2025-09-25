@@ -253,13 +253,6 @@ color: green
 
 ## MCPサーバの利用
 **serena MCPでコードベースを詳細分析し、依存関係を正確に把握してタスク配分します。**
-
-### Managerが使用する主なserenaツール
-- `mcp__serena__get_symbols_overview`: プロジェクト構造の把握
-- `mcp__serena__find_symbol`: 重要なクラス・関数の位置特定
-- `mcp__serena__find_referencing_symbols`: 依存関係の分析
-- `mcp__serena__search_for_pattern`: コードパターンの調査
-
 他のMCPサーバーも必要に応じて活用。
 
 ## 重要なポイント

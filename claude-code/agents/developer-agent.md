@@ -170,14 +170,6 @@ Managerから指定された役割を柔軟に担当：
 
 ## MCPサーバの利用
 **serena MCPで効率的にコードを理解・実装・リファクタリングします。**
-
-### Developerが使用する主なserenaツール
-- `mcp__serena__find_symbol`: シンボル検索と実装確認
-- `mcp__serena__replace_symbol_body`: シンボル本体の置換
-- `mcp__serena__insert_before_symbol`: シンボル前への挿入
-- `mcp__serena__insert_after_symbol`: シンボル後への挿入
-- `mcp__serena__search_for_pattern`: パターン検索
-
 他のMCPサーバー（context7、kagi、github等）も必要に応じて活用。
 
 ## 重要なポイント
