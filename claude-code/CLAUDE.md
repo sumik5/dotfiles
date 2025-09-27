@@ -198,6 +198,157 @@ mcp__serena__write_memory(
 mcp__serena__read_memory(memory_file_name="architecture_decisions.md")
 ```
 
+## 🤖 Agent System Usage - 階層的エージェント管理
+
+### 🎯 必須: PO→Manager→Developerの階層的Agentシステム
+**小さな修正以外は、必ずPO→Manager→Developerの階層的Agentシステムを使用してください。**
+
+#### 📂 Agent定義ファイルの場所
+```
+agents/
+├── po-agent.md        # PO Agent定義
+├── manager-agent.md   # Manager Agent定義
+└── developer-agent.md # Developer Agent定義
+```
+
+#### 📋 実行順序の厳守
+
+##### 1. PO Agent起動（戦略決定）
+```python
+# agents/po-agent.mdの内容を読み込んで使用
+Task(
+    subagent_type="po-agent",
+    description="PO Agent - 戦略決定",
+    prompt="""
+    [agents/po-agent.mdの内容を含める]
+
+    ユーザー要求：{user_request}
+
+    戦略を決定し、Managerへの指示を作成してください。
+    """
+)
+```
+
+##### 2. Manager Agent起動（タスク配分）
+```python
+# agents/manager-agent.mdの内容を読み込んで使用
+Task(
+    subagent_type="manager-agent",
+    description="Manager Agent - タスク配分",
+    prompt="""
+    [agents/manager-agent.mdの内容を含める]
+
+    POからの指示：{po_instructions}
+
+    タスク配分計画を作成してください。
+    """
+)
+```
+
+##### 3. Developer Agents並列起動（実装）
+```python
+# agents/developer-agent.mdの内容を読み込んで使用
+# Managerの計画に基づいて必ず並列起動（1つのメッセージで同時に）
+[
+    Task(
+        subagent_type="developer-agent",
+        description="Developer1 - {役割}",
+        prompt="""
+        [agents/developer-agent.mdの内容を含める]
+
+        あなたはdev1です。
+        タスク：{task1}
+        """
+    ),
+    Task(
+        subagent_type="developer-agent",
+        description="Developer2 - {役割}",
+        prompt="""
+        [agents/developer-agent.mdの内容を含める]
+
+        あなたはdev2です。
+        タスク：{task2}
+        """
+    ),
+    # dev3, dev4も同様に並列起動
+]
+```
+
+### 🚀 並列実行の鉄則
+- **Developer起動は必ず1つのメッセージで同時実行**
+- **独立タスクは絶対に並列化**
+- **段階的実行でも各段階内は並列化**
+
+### 📊 Manager計画の実行方法
+
+#### 【並列実行可能】の場合
+```python
+# 4つの独立したタスクを同時起動
+[Task(dev1), Task(dev2), Task(dev3), Task(dev4)]  # 1メッセージで同時
+```
+
+#### 【段階的実行】の場合
+```python
+# 第1段階: dev1,dev2を同時起動
+[Task(dev1), Task(dev2)]  # 1メッセージで同時
+
+# 完了後、第2段階: dev3,dev4を同時起動
+[Task(dev3), Task(dev4)]  # 1メッセージで同時
+```
+
+#### 【順次実行】の場合（稀）
+```python
+# 強い依存関係がある場合のみ順次実行
+Task(dev1)  # 完了後
+Task(dev2)  # 完了後
+Task(dev3)
+```
+
+### ✅ 直接実装可能な例外
+- 単純なファイル読み込み（1-2ファイル）
+- 1行程度の簡単な修正
+- 単純な質問への回答
+- ファイル一覧表示
+
+### ❌ 必ずAgentを使用すべきケース
+- 新機能実装
+- 複数ファイルのバグ修正
+- リファクタリング
+- テスト実装
+- ドキュメント作成（複数ファイル）
+- 複雑な調査・分析
+
+### 🔑 各Agentの役割と責任
+
+#### PO Agent（戦略決定者）
+- **責任**: プロジェクト全体の戦略と方向性
+- **使用ツール**: serena MCP（俯瞰的分析）、sequentialthinking、kagi
+- **禁止**: 実装、ファイル編集、Developer起動
+
+#### Manager Agent（タスク管理者）
+- **責任**: タスク分割と依存関係管理、配分計画作成
+- **使用ツール**: serena MCP（詳細分析）、sequentialthinking
+- **禁止**: 実装、ファイル編集、Developer起動（計画のみ返す）
+- **重要**: Developerの起動はClaude Codeが実行
+
+#### Developer Agent（実装者）
+- **責任**: 実際の作業実行
+- **使用ツール**: 全てのツール（Write、Edit、Bash等）
+- **特性**: dev1-4それぞれが異なる専門性を持つ
+
+### 📝 Agent間のコンテキスト管理
+- **PO→Manager**: 戦略的指示とユーザー要求を伝達
+- **Manager→Claude Code**: タスク配分計画を返す
+- **Claude Code→Developer**: 計画に基づいてDeveloperを起動
+- **Developer→Manager**: 完了報告
+- **Manager→PO**: プロジェクト完了報告
+
+### ⚡ パフォーマンス最適化のポイント
+1. **Agent定義ファイルは最初に1回だけ読み込む**
+2. **複数Developerは必ず同時起動**
+3. **不要な往復を避ける（明確な指示）**
+4. **serena MCPで効率的にコード分析**
+
 ## ⚠️ 重要な注意事項
 
 ### 必須ルール

@@ -21,6 +21,9 @@ color: green
 ## 基本的な動作フロー
 1. POからの指示を受信・分析
 2. **serena MCPツールでコードベースを調査・理解**
+   - `mcp__serena__find_symbol`: シンボル検索と依存関係
+   - `mcp__serena__find_referencing_symbols`: 参照先分析
+   - `mcp__serena__search_for_pattern`: パターン検索
 3. 高度なプロジェクト分析とタスク依存関係の自動検出
 4. DAGベースの依存関係グラフ生成
 5. プロジェクトを具体的なタスクに分割
@@ -242,18 +245,76 @@ color: green
   - その他のファイル変更・作業実行ツール
 
 ## ✅ Manager使用許可ツール（情報収集・管理用）
+
+### 基本ツール
 - Read（ファイル読み込み）- 適切な指示のための情報収集
 - Bash（コマンド実行）- 現状確認・情報収集のみ
 - Glob（ファイル検索）- プロジェクト構造の把握
 - Grep（テキスト検索）- コードベースの理解
-- LS（ディレクトリ一覧）- プロジェクト構造の確認
-- プロジェクト管理・計画
+
+### MCPツール（タスク分析用）
+- **serena MCP**（最重要）
+  - `mcp__serena__get_symbols_overview`: ファイル概要取得
+  - `mcp__serena__find_symbol`: シンボル検索と構造分析
+  - `mcp__serena__find_referencing_symbols`: 依存関係分析
+  - `mcp__serena__search_for_pattern`: パターン検索
+  - `mcp__serena__read_memory`: プロジェクト知識参照
+  - `mcp__serena__write_memory`: タスク計画記録
+
+- **sequentialthinking MCP**（複雑なタスク分割）
+  - `mcp__sequentialthinking__sequentialthinking`: 段階的タスク分析
+
+- **context7 MCP**（技術調査）
+  - `mcp__context7__get_library_docs`: ライブラリドキュメント
 
 **注意: TaskツールはManagerでは使用しません。タスク配分計画を返し、実際のDeveloper起動はClaude Codeが行います。**
 
-## MCPサーバの利用
-**serena MCPでコードベースを詳細分析し、依存関係を正確に把握してタスク配分します。**
-他のMCPサーバーも必要に応じて活用。
+## 🎯 MCPサーバの活用方法
+
+### 1. タスク分析時（必須）
+```python
+# コードベースの構造分析
+mcp__serena__get_symbols_overview(relative_path="src/main.ts")
+
+# 依存関係の調査
+mcp__serena__find_referencing_symbols(
+    name_path="MainComponent",
+    relative_path="src/components/Main.tsx"
+)
+
+# 既存パターンの検索
+mcp__serena__search_for_pattern(
+    substring_pattern="async.*await",
+    restrict_search_to_code_files=True
+)
+```
+
+### 2. タスク分割時
+```python
+# 複雑なタスクの段階的分析
+mcp__sequentialthinking__sequentialthinking(
+    thought="タスク間の依存関係と最適実行順序",
+    total_thoughts=4
+)
+
+# タスク計画の記録
+mcp__serena__write_memory(
+    memory_name="task_execution_plan",
+    content="タスク配分と実行計画"
+)
+```
+
+### 3. 技術調査時
+```python
+# ライブラリドキュメント参照
+mcp__context7__resolve_library_id(
+    libraryName="react"
+)
+mcp__context7__get_library_docs(
+    context7CompatibleLibraryID="/facebook/react",
+    topic="hooks"
+)
+```
 
 ## 重要なポイント
 - **Manager AgentはDeveloperを直接起動せず、タスク配分計画を返す**
@@ -265,6 +326,12 @@ color: green
 - プロジェクト全体の進捗を常に把握する
 - POへの報告は完了時に必ず行う
 - 固定概念にとらわれず、柔軟な発想で役割分担を行う
+
+## ⚠️ パフォーマンス最適化
+- **MCP検索の範囲限定**: 大規模プロジェクトではrelative_pathを活用
+- **段階的検索**: まず概要、次に詳細を取得
+- **キャッシュ活用**: メモリに重要情報を保存
+- **並列処理**: 独立したタスクは必ず並列化
 
 ## クリーンアップ処理
 **プロジェクト完了時に一時ファイルを削除し、報告に含めてください。**
