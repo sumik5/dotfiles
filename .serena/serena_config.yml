@@ -70,4 +70,6 @@ token_count_estimator: TIKTOKEN_GPT4O
 # instruct Serena to activate the project by its path for first-time activation.
 # NOTE: Make sure there are no name collisions in the names of registered projects.
 projects:
+- /Users/sumik/repo/catenas-g/catenas-intra-service-terraform
+- /Users/sumik/repo/catenas-g/catenas-intra-service-terraform/06-strapi/docker
 - /Users/sumik/repo/shivase/project-templates/nextjs

@@ -106,6 +106,7 @@ export GITHUB_URL=https://github.com/
 source $ZPLUG_HOME/init.zsh
 export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
 export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+export COPILOT_MODEL=gpt-5
 
 
 if [[ -z "$LANG" ]]; then
