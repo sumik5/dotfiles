@@ -1,0 +1,109 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "local",
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "-y",
+        "@playwright/mcp@latest"
+      ]
+    },
+    "context7": {
+      "type": "local",
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "-y",
+        "@upstash/context7-mcp",
+        "--api-key",
+        "${CONTEXT7_API_KEY}"
+      ]
+    },
+    "serena": {
+      "type": "local",
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "tools": [
+        "*"
+      ],
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--context",
+        "ide-assistant"
+      ],
+      "env": {}
+    },
+    "kagi": {
+      "type": "local",
+      "tools": [
+        "*"
+      ],
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "args": [
+        "kagimcp"
+      ],
+      "env": {
+        "KAGI_API_KEY": "${KAGI_API_KEY}",
+        "KAGI_SUMMARIZER_ENGINE": "cecil",
+        "UV_NATIVE_TLS": "true"
+      }
+    },
+    "deepwiki": {
+      "type": "local",
+      "tools": [
+        "*"
+      ],
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "mcp-remote",
+        "https://mcp.deepwiki.com/sse"
+      ],
+      "env": {}
+    },
+    "sequentialthinking": {
+      "type": "local",
+      "tools": [
+        "*"
+      ],
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "docset": {
+      "type": "local",
+      "tools": [
+        "*"
+      ],
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "args": [
+        "docsetmcp"
+      ],
+      "env": {
+        "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
+        "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
+      }
+    },
+    "terraform": {
+      "type": "local",
+      "tools": [
+        "*"
+      ],
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
+    }
+  }
+}
