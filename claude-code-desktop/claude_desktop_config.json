@@ -38,7 +38,8 @@
       "env": {
         "KAGI_API_KEY": "${KAGI_API_KEY}",
         "KAGI_SUMMARIZER_ENGINE": "cecil",
-        "UV_NATIVE_TLS": "true"
+        "UV_NATIVE_TLS": "false",
+        "PYTHONHTTPSVERIFY": "0"
       }
     },
     "deepwiki": {
