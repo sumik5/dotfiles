@@ -80,6 +80,12 @@
       "args": [
         "mcp"
       ]
+    },
+    "chrome-devtools": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "chrome-devtools-mcp@latest"
+      ]
     }
   },
   "preferences": {

@@ -72,4 +72,5 @@ token_count_estimator: TIKTOKEN_GPT4O
 projects:
 - /Users/sumik/repo/catenas-g/catenas-intra-service-terraform
 - /Users/sumik/repo/catenas-g/catenas-intra-service-terraform/06-strapi/docker
+- /Users/sumik/repo/shivase/llm-translate
 - /Users/sumik/repo/shivase/project-templates/nextjs
