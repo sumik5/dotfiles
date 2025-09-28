@@ -402,14 +402,187 @@ agents/
 | テスト自動化 | playwright | 20% |
 | パフォーマンス分析 | chrome-devtools | 15% |
 
+## 🌳 Git Worktree を使用した並行開発
+
+### 基本概念と制約
+Git Worktreeは複数のブランチを同時に作業できる仕組みです。ただし、**Claude Codeは親ディレクトリ（`..`）にアクセスできない**ため、通常とは異なる方法で運用します。
+
+### ⚠️ 重要な制約
+- **親ディレクトリへのアクセス不可**: Claude Codeは`../`にアクセスできません
+- **解決策**: メインリポジトリ内のサブディレクトリとしてworktreeを作成
+
+### 📁 推奨ディレクトリ構造
+```
+your-project/              # メインリポジトリ（main/masterブランチ）
+├── src/                   # ソースコード
+├── tests/                 # テスト
+├── wt-feat/              # worktreeディレクトリ（プレフィックス: wt-）
+│   ├── feature-a/        # feature/feature-aブランチ
+│   └── bugfix-123/       # bugfix/issue-123ブランチ
+└── wt-hotfix/            # 緊急修正用worktree
+    └── critical-fix/     # hotfix/critical-fixブランチ
+```
+
+### 🎯 Worktree作成の命名規則
+
+#### 基本フォーマット
+```bash
+git worktree add wt-{カテゴリ}/{ブランチ名} {実際のブランチパス}
+```
+
+#### カテゴリ別の命名例
+```bash
+# 機能開発
+git worktree add wt-feat/user-auth feature/user-authentication
+git worktree add wt-feat/8838-add-option feat/8838-add-keep-filler-option
+
+# バグ修正
+git worktree add wt-fix/memory-leak bugfix/memory-leak-issue
+git worktree add wt-fix/issue-456 bugfix/issue-456
+
+# ホットフィックス
+git worktree add wt-hotfix/critical hotfix/critical-security-patch
+
+# 実験的開発
+git worktree add wt-exp/new-architecture experimental/new-architecture
+
+# リリース準備
+git worktree add wt-release/v2.0.0 release/v2.0.0
+```
+
+### 📋 Worktree操作ガイド
+
+#### 1. 新規Worktree作成
+```bash
+# まず作業ディレクトリを確認
+pwd  # メインリポジトリのルートであることを確認
+
+# 既存のworktreeを確認
+git worktree list
+
+# 新しいworktreeを作成（既存ブランチから）
+git worktree add wt-feat/payment feature/payment-integration
+
+# 新しいworktreeを作成（新規ブランチ作成と同時に）
+git worktree add -b feature/new-feature wt-feat/new-feature
+
+# リモートブランチから作成
+git worktree add wt-feat/remote-branch origin/feature/remote-branch
+```
+
+#### 2. Worktreeでの作業
+```bash
+# worktreeに移動
+cd wt-feat/payment
+
+# 通常通り開発作業を実施
+git status
+git add .
+git commit -m "feat: implement payment gateway"
+git push origin feature/payment-integration
+
+# メインリポジトリに戻る
+cd ../..
+```
+
+#### 3. Worktreeの管理
+```bash
+# 全worktreeの一覧表示
+git worktree list
+
+# 不要なworktreeの削除（作業完了後）
+git worktree remove wt-feat/payment
+
+# 強制削除（未コミットの変更がある場合）
+git worktree remove --force wt-feat/payment
+
+# 削除済みworktreeのクリーンアップ
+git worktree prune
+```
+
+### ⚡ ベストプラクティス
+
+#### DO（推奨事項）
+- ✅ **プレフィックス使用**: 必ず`wt-`プレフィックスを使用してworktreeを識別
+- ✅ **カテゴリ分け**: feat/fix/hotfix等でディレクトリを整理
+- ✅ **定期的なクリーンアップ**: 使用済みworktreeは削除
+- ✅ **ブランチ名の一貫性**: worktreeディレクトリ名とブランチ名を対応させる
+- ✅ **作業前の確認**: `git worktree list`で既存worktreeを確認
+
+#### DON'T（避けるべき事項）
+- ❌ **親ディレクトリへの作成**: `../`にworktreeを作成しない
+- ❌ **ネストしたworktree**: worktree内にworktreeを作成しない
+- ❌ **同じブランチの複数worktree**: 1つのブランチに複数のworktreeを作成しない
+- ❌ **長期間の放置**: 使用しないworktreeを残さない
+
+### 🔍 トラブルシューティング
+
+#### worktreeが作成できない場合
+```bash
+# エラー: ブランチが既に別のworktreeで使用中
+git worktree list  # 既存のworktreeを確認
+git worktree remove {既存のworktree}  # 不要なworktreeを削除
+
+# エラー: ディレクトリが既に存在
+rm -rf wt-feat/existing-dir  # 既存ディレクトリを削除
+git worktree add wt-feat/existing-dir feature/branch
+```
+
+#### worktreeが削除できない場合
+```bash
+# 未コミットの変更を確認
+cd wt-feat/branch
+git status
+git stash  # 変更を一時保存
+
+# メインディレクトリに戻って削除
+cd ../..
+git worktree remove wt-feat/branch
+```
+
+#### worktreeの状態がおかしくなった場合
+```bash
+# worktreeの修復
+git worktree repair
+
+# 全worktreeの検証と修復
+git worktree repair --all
+
+# 無効なworktreeの削除
+git worktree prune
+```
+
+### 📊 Worktree使用時のserena連携
+
+Worktreeで作業する場合、serenaの再初期化が必要です：
+
+```bash
+# worktreeに移動
+cd wt-feat/new-feature
+
+# serenaを再初期化（worktreeごとに必要）
+mcp__serena__activate_project(project=".")
+
+# 開発作業を実施
+# ...
+
+# メインリポジトリに戻る
+cd ../..
+
+# メインリポジトリのserenaを再アクティベート
+mcp__serena__activate_project(project=".")
+```
+
 ## 🔄 定期メンテナンス
 
 ### 日次
 - serenaプロジェクトの再アクティベート（大規模変更後）
+- 使用済みworktreeの削除（`git worktree prune`）
 
 ### 週次
 - メモリファイルの整理と更新
 - 未使用のMCPリソースのクリーンアップ
+- worktree一覧の確認と整理（`git worktree list`）
 
 ### 月次
 - MCPサーバーの更新確認

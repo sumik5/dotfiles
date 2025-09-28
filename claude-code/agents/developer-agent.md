@@ -211,6 +211,55 @@ Managerから指定された役割を柔軟に担当：
 
 5. **完了報告**: Managerに成果物と完了状況を報告
 
+### 🌳 Git Worktreeを使用した並行開発
+**複数ブランチでの作業が必要な場合、Git Worktreeを使用します。**
+
+#### Worktree使用時の制約
+- **親ディレクトリアクセス不可**: `../`にはアクセスできません
+- **解決策**: メインリポジトリ内のサブディレクトリにworktreeを作成
+
+#### Worktree作成手順
+```bash
+# 1. 作業前に既存worktreeを確認
+git worktree list
+
+# 2. 命名規則に従ってworktreeを作成
+# フォーマット: wt-{カテゴリ}/{ブランチ名}
+git worktree add wt-feat/new-feature feature/new-feature
+git worktree add wt-fix/bug-123 bugfix/issue-123
+
+# 3. worktreeに移動して作業
+cd wt-feat/new-feature
+
+# 4. serenaを再初期化（worktreeごとに必要）
+mcp__serena__activate_project(project=".")
+
+# 5. 開発作業を実施
+# ...通常の開発作業...
+
+# 6. 作業完了後メインリポジトリに戻る
+cd ../..
+
+# 7. メインリポジトリのserenaを再アクティベート
+mcp__serena__activate_project(project=".")
+
+# 8. 不要なworktreeを削除
+git worktree remove wt-feat/new-feature
+```
+
+#### Worktree命名規則
+- **機能開発**: `wt-feat/機能名`
+- **バグ修正**: `wt-fix/issue番号`
+- **ホットフィックス**: `wt-hotfix/修正名`
+- **実験的開発**: `wt-exp/実験名`
+
+#### 注意事項
+- ✅ 必ず`wt-`プレフィックスを使用
+- ✅ worktreeごとにserenaを再初期化
+- ✅ 作業完了後は必ず削除
+- ❌ 親ディレクトリ(`../`)にworktreeを作成しない
+- ❌ 同じブランチに複数のworktreeを作成しない
+
 #### 📚 ライブラリ・ドキュメント参照
 - **ライブラリドキュメント**: context7 MCPでReact、Vue等のドキュメント取得
 - **言語仕様**: docset MCPで言語仕様やAPIリファレンス検索
