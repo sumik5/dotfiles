@@ -101,9 +101,53 @@ mcp__serena__get_symbols_overview()
   - ポリシー管理 (`search_policies`)
 - **使用場面**: AWS/Azure/GCPのインフラ構築
 
+#### 🐳 **docker** - コンテナ管理
+```
+プレフィックス: mcp__docker__
+```
+- **主要機能**:
+  - コンテナ操作 (`list_containers`, `start_container`, `stop_container`)
+  - イメージ管理 (`list_images`, `pull_image`, `build_image`)
+  - ボリューム管理 (`list_volumes`, `create_volume`)
+  - ネットワーク管理 (`list_networks`, `create_network`)
+  - ログ取得 (`get_container_logs`)
+- **使用場面**:
+  - Dockerコンテナの起動・停止・管理
+  - Docker Composeプロジェクトの管理
+  - コンテナログの確認とデバッグ
+  - 開発環境の構築と管理
+- **必須使用条件**:
+  - Dockerfileの作成・編集時
+  - docker-compose.ymlの設定時
+  - コンテナベースの開発環境構築
+  - マイクロサービスのローカル実行
+
+#### 🎨 **puppeteer** - ヘッドレスブラウザ制御
+```
+プレフィックス: mcp__puppeteer__
+```
+- **主要機能**:
+  - ページナビゲーション (`navigate`, `goto`)
+  - スクリーンショット取得 (`screenshot`)
+  - PDF生成 (`pdf`)
+  - 要素操作 (`click`, `type`, `select`)
+  - JavaScript実行 (`evaluate`)
+  - ページ情報取得 (`content`, `title`, `url`)
+- **使用場面**:
+  - Webページの自動スクリーンショット取得
+  - PDFレポート生成
+  - Webサイトのクローリング・スクレイピング
+  - フォーム自動入力とテスト
+  - SPAアプリケーションのE2Eテスト
+- **必須使用条件**:
+  - 軽量なブラウザ自動化が必要な場合
+  - Node.js環境でのブラウザ制御
+  - CI/CD環境でのヘッドレステスト
+  - パフォーマンス重視のスクレイピング
+
 ### 4. ブラウザ自動化系
 
-#### 🎭 **playwright** - ブラウザ自動化
+#### 🎭 **playwright** - フルブラウザ自動化
 ```
 プレフィックス: mcp__playwright__
 ```
@@ -111,7 +155,15 @@ mcp__serena__get_symbols_overview()
   - ページ操作 (`browser_navigate`, `browser_click`)
   - フォーム入力 (`browser_fill_form`)
   - スクリーンショット (`browser_take_screenshot`)
-- **使用場面**: E2Eテスト、Webスクレイピング
+  - マルチブラウザ対応（Chrome, Firefox, Safari）
+- **使用場面**:
+  - E2Eテスト実装
+  - クロスブラウザテスト
+  - 複雑なWebアプリケーションの自動化
+- **優先使用条件**:
+  - マルチブラウザ対応が必要な場合
+  - 複雑なE2Eテストシナリオ
+  - TypeScript/JavaScript以外の言語からの利用
 
 #### 🌐 **chrome-devtools** - Chrome DevTools制御
 ```
@@ -121,7 +173,15 @@ mcp__serena__get_symbols_overview()
   - ページ分析 (`take_snapshot`)
   - パフォーマンス計測 (`performance_start_trace`)
   - ネットワーク監視 (`list_network_requests`)
-- **使用場面**: Webアプリデバッグ、パフォーマンス分析
+  - リアルタイムデバッグ
+- **使用場面**:
+  - Webアプリデバッグ
+  - パフォーマンス分析
+  - ネットワーク問題の診断
+- **優先使用条件**:
+  - Chrome特有の機能が必要な場合
+  - 詳細なパフォーマンス分析
+  - DevToolsプロトコルの直接利用
 
 ## 🚀 タスク別MCP利用ガイド
 
@@ -145,58 +205,70 @@ graph TD
 4. **言語仕様**: `docset` → ローカルリファレンス
 5. **一般情報**: `kagi` → Web検索
 
-### 複雑なタスクの分解
-```python
-# 1. 問題分析
-mcp__sequentialthinking__sequentialthinking(
-    thought="問題の本質を理解",
-    total_thoughts=5
-)
-
-# 2. コード調査
-mcp__serena__find_symbol(name_path="TargetClass")
-mcp__serena__find_referencing_symbols(...)
-
-# 3. 実装
-mcp__serena__replace_symbol_body(...)
+### ブラウザ自動化の選択基準
+```mermaid
+graph TD
+    A[ブラウザ自動化タスク] --> B{要件分析}
+    B --> C{軽量・高速?}
+    C -->|Yes| D[Puppeteer]
+    C -->|No| E{マルチブラウザ?}
+    E -->|Yes| F[Playwright]
+    E -->|No| G{詳細分析?}
+    G -->|Yes| H[Chrome DevTools]
+    G -->|No| I[Puppeteer/Playwright]
 ```
+
+### コンテナ操作フロー
+```mermaid
+graph TD
+    A[Docker作業] --> B{作業内容}
+    B -->|開発環境構築| C[docker MCP]
+    B -->|Dockerfile作成| D[serena + docker MCP]
+    B -->|コンテナ管理| E[docker MCP]
+    B -->|ログ分析| F[docker MCP → get_container_logs]
+```
+
+### 複雑なタスクの分解
+1. **問題分析**: sequentialthinking MCPで段階的に問題を分解
+2. **コード調査**: serena MCPでシンボル検索と依存関係を分析
+3. **実装**: serena MCPでシンボル単位の編集を実施
 
 ## 💡 ベストプラクティス
 
 ### serenaの効果的な活用
-```python
-# ❌ 悪い例：ファイル全体を読む
-Read(file_path="/path/to/file.ts")
-
-# ✅ 良い例：必要な部分だけ読む
-mcp__serena__get_symbols_overview(relative_path="file.ts")
-mcp__serena__find_symbol(
-    name_path="specificFunction",
-    include_body=True
-)
-```
+- **❌ 悪い例**: ファイル全体を読み込む（Readツール使用）
+- **✅ 良い例**: serena MCPで必要なシンボルだけを検索・読込
 
 ### 並列処理の活用
-```python
-# 複数のMCP操作を同時実行
-[
-    mcp__context7__get_library_docs(library="react"),
-    mcp__kagi__kagi_search_fetch(queries=["react best practices"]),
-    mcp__serena__find_symbol(name_path="Component")
-]
-```
+- 複数のMCP操作を同時実行して効率化
+- context7でライブラリドキュメント取得
+- kagiでWeb検索
+- serenaでシンボル検索
+- これらを並列実行可能
 
 ### メモリ管理
-```python
-# プロジェクト知識の永続化
-mcp__serena__write_memory(
-    memory_name="architecture_decisions",
-    content="技術選定の理由と設計方針"
-)
+- **永続化**: serena MCPのwrite_memoryでプロジェクト知識を保存
+- **参照**: serena MCPのread_memoryで後から情報を取得
 
-# 後で参照
-mcp__serena__read_memory(memory_file_name="architecture_decisions.md")
-```
+### Docker環境の効率的な管理
+- **状態確認**: docker MCPでコンテナ一覧を確認してから操作
+- **環境構築**: Docker Composeで開発環境を一括起動
+- **ログ監視**: コンテナログを継続的に監視してデバッグ
+- **イメージ管理**: 必要に応じてイメージをビルド・管理
+
+### ブラウザ自動化の使い分け
+- **軽量タスク**: Puppeteer MCPを使用
+  - スクリーンショット取得
+  - PDF生成
+  - 簡単なWebスクレイピング
+- **複雑なE2Eテスト**: Playwright MCPを使用
+  - マルチブラウザテスト
+  - 複雑なフォーム操作
+  - 高度なE2Eテストシナリオ
+- **パフォーマンス分析**: Chrome DevTools MCPを使用
+  - 詳細なパフォーマンス計測
+  - ネットワーク分析
+  - Chrome特有の機能利用
 
 ## 🤖 Agent System Usage - 階層的エージェント管理
 
@@ -214,65 +286,21 @@ agents/
 #### 📋 実行順序の厳守
 
 ##### 1. PO Agent起動（戦略決定）
-```python
-# agents/po-agent.mdの内容を読み込んで使用
-Task(
-    subagent_type="po-agent",
-    description="PO Agent - 戦略決定",
-    prompt="""
-    [agents/po-agent.mdの内容を含める]
-
-    ユーザー要求：{user_request}
-
-    戦略を決定し、Managerへの指示を作成してください。
-    """
-)
-```
+- agents/po-agent.mdの定義を使用
+- ユーザー要求を分析し、戦略を決定
+- Managerへの指示を作成
 
 ##### 2. Manager Agent起動（タスク配分）
-```python
-# agents/manager-agent.mdの内容を読み込んで使用
-Task(
-    subagent_type="manager-agent",
-    description="Manager Agent - タスク配分",
-    prompt="""
-    [agents/manager-agent.mdの内容を含める]
-
-    POからの指示：{po_instructions}
-
-    タスク配分計画を作成してください。
-    """
-)
-```
+- agents/manager-agent.mdの定義を使用
+- POからの指示を受けてタスク分析
+- Developer向けの配分計画を作成
+- 実際のDeveloper起動はClaude Codeが実行
 
 ##### 3. Developer Agents並列起動（実装）
-```python
-# agents/developer-agent.mdの内容を読み込んで使用
-# Managerの計画に基づいて必ず並列起動（1つのメッセージで同時に）
-[
-    Task(
-        subagent_type="developer-agent",
-        description="Developer1 - {役割}",
-        prompt="""
-        [agents/developer-agent.mdの内容を含める]
-
-        あなたはdev1です。
-        タスク：{task1}
-        """
-    ),
-    Task(
-        subagent_type="developer-agent",
-        description="Developer2 - {役割}",
-        prompt="""
-        [agents/developer-agent.mdの内容を含める]
-
-        あなたはdev2です。
-        タスク：{task2}
-        """
-    ),
-    # dev3, dev4も同様に並列起動
-]
-```
+- agents/developer-agent.mdの定義を使用
+- Managerの計画に基づいて必ず並列起動
+- 各Developerに異なる役割とタスクを割り当て
+- dev1〜dev4まで最大4つの並列実行
 
 ### 🚀 並列実行の鉄則
 - **Developer起動は必ず1つのメッセージで同時実行**
@@ -282,27 +310,18 @@ Task(
 ### 📊 Manager計画の実行方法
 
 #### 【並列実行可能】の場合
-```python
-# 4つの独立したタスクを同時起動
-[Task(dev1), Task(dev2), Task(dev3), Task(dev4)]  # 1メッセージで同時
-```
+- 4つの独立したタスクを1メッセージで同時起動
+- dev1〜dev4を並列実行
 
 #### 【段階的実行】の場合
-```python
-# 第1段階: dev1,dev2を同時起動
-[Task(dev1), Task(dev2)]  # 1メッセージで同時
-
-# 完了後、第2段階: dev3,dev4を同時起動
-[Task(dev3), Task(dev4)]  # 1メッセージで同時
-```
+- 第1段階: dev1,dev2を同時起動（1メッセージで）
+- 第1段階完了後、第2段階: dev3,dev4を同時起動（1メッセージで）
+- 各段階内では必ず並列実行
 
 #### 【順次実行】の場合（稀）
-```python
-# 強い依存関係がある場合のみ順次実行
-Task(dev1)  # 完了後
-Task(dev2)  # 完了後
-Task(dev3)
-```
+- 強い依存関係がある場合のみ使用
+- dev1完了後にdev2、dev2完了後にdev3という順序
+- できる限り避けて並列化を検討
 
 ### ✅ 直接実装可能な例外
 - 単純なファイル読み込み（1-2ファイル）
@@ -333,8 +352,11 @@ Task(dev3)
 
 #### Developer Agent（実装者）
 - **責任**: 実際の作業実行
-- **使用ツール**: 全てのツール（Write、Edit、Bash等）
+- **使用ツール**: 全てのツール（Write、Edit、Bash、docker、puppeteer等）
 - **特性**: dev1-4それぞれが異なる専門性を持つ
+- **Docker/Puppeteer使用**:
+  - Docker環境構築時は docker MCPを活用
+  - ブラウザ自動化時は puppeteer/playwright MCPを選択
 
 ### 📝 Agent間のコンテキスト管理
 - **PO→Manager**: 戦略的指示とユーザー要求を伝達
@@ -374,8 +396,11 @@ Task(dev3)
 | コード編集 | serena | 90% |
 | ライブラリ調査 | context7 | 70% |
 | 問題解決 | sequentialthinking | 40% |
+| Docker環境管理 | docker | 40% |
 | Web検索 | kagi | 30% |
+| ブラウザ自動化 | puppeteer | 25% |
 | テスト自動化 | playwright | 20% |
+| パフォーマンス分析 | chrome-devtools | 15% |
 
 ## 🔄 定期メンテナンス
 

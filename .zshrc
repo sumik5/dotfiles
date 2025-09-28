@@ -401,3 +401,9 @@ fi
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 # End of LM Studio CLI section
+
+# The following lines have been added by Docker Desktop to enable Docker CLI completions.
+fpath=($HOME/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# End of Docker CLI completions

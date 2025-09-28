@@ -154,8 +154,33 @@ Managerから指定された役割を柔軟に担当：
   - `mcp__kagi__kagi_search_fetch`: Web検索
   - `mcp__kagi__kagi_summarizer`: コンテンツ要約
 
-- **playwright/chrome-devtools MCP**（テスト自動化）
-  - ブラウザ操作・E2Eテスト用
+- **docker MCP**（コンテナ管理）
+  - `mcp__docker__list_containers`: コンテナ一覧
+  - `mcp__docker__start_container`: コンテナ起動
+  - `mcp__docker__stop_container`: コンテナ停止
+  - `mcp__docker__build_image`: イメージビルド
+  - `mcp__docker__compose_up`: Docker Compose起動
+  - `mcp__docker__get_container_logs`: ログ取得
+
+- **puppeteer MCP**（軽量ブラウザ自動化）
+  - `mcp__puppeteer__navigate`: ページ遷移
+  - `mcp__puppeteer__screenshot`: スクリーンショット
+  - `mcp__puppeteer__pdf`: PDF生成
+  - `mcp__puppeteer__click`: 要素クリック
+  - `mcp__puppeteer__type`: テキスト入力
+  - `mcp__puppeteer__evaluate`: JavaScript実行
+
+- **playwright MCP**（高機能ブラウザ自動化）
+  - `mcp__playwright__browser_navigate`: ページ遷移
+  - `mcp__playwright__browser_click`: クリック
+  - `mcp__playwright__browser_fill_form`: フォーム入力
+  - `mcp__playwright__browser_take_screenshot`: スクリーンショット
+  - マルチブラウザ対応（Chrome, Firefox, Safari）
+
+- **chrome-devtools MCP**（Chrome詳細分析）
+  - `mcp__chrome-devtools__take_snapshot`: ページ分析
+  - `mcp__chrome-devtools__performance_start_trace`: パフォーマンス計測
+  - `mcp__chrome-devtools__list_network_requests`: ネットワーク監視
 
 - **sequentialthinking MCP**（複雑な問題解決）
   - `mcp__sequentialthinking__sequentialthinking`: 段階的思考
@@ -171,32 +196,14 @@ Managerから指定された役割を柔軟に担当：
 1. **タスク受信**: Managerから具体的なタスクと要件を受信
 
 2. **serena MCPでのコード分析**:
-   ```python
-   # ファイル概要を取得
-   mcp__serena__get_symbols_overview(relative_path="src/main.ts")
-
-   # 必要なシンボルを検索・読込
-   mcp__serena__find_symbol(
-       name_path="TargetClass/method",
-       include_body=True
-   )
-   ```
+   - ファイル概要の取得（get_symbols_overview）
+   - 必要なシンボルの検索・読込（find_symbol）
+   - 依存関係の分析（find_referencing_symbols）
 
 3. **serena MCPでの効率的編集**:
-   ```python
-   # シンボル単位での置換
-   mcp__serena__replace_symbol_body(
-       name_path="Component",
-       relative_path="src/Component.tsx",
-       body="新しい実装"
-   )
-
-   # インポート文の挿入
-   mcp__serena__insert_before_symbol(
-       name_path="FirstSymbol",
-       body="import { NewDep } from 'dep';"
-   )
-   ```
+   - シンボル単位での置換（replace_symbol_body）
+   - インポート文の挿入（insert_before_symbol）
+   - 新規コードの追加（insert_after_symbol）
 
 4. **品質確認**:
    - Bashでテスト実行
@@ -205,23 +212,9 @@ Managerから指定された役割を柔軟に担当：
 5. **完了報告**: Managerに成果物と完了状況を報告
 
 #### 📚 ライブラリ・ドキュメント参照
-```python
-# ライブラリドキュメントの参照
-mcp__context7__resolve_library_id(libraryName="react")
-mcp__context7__get_library_docs(
-    context7CompatibleLibraryID="/facebook/react",
-    topic="hooks"
-)
-
-# 言語仕様の参照
-mcp__docset__search_docs(
-    query="async/await",
-    docset="javascript"
-)
-
-# チートシートの参照
-mcp__docset__fetch_cheatsheet(cheatsheet="git")
-```
+- **ライブラリドキュメント**: context7 MCPでReact、Vue等のドキュメント取得
+- **言語仕様**: docset MCPで言語仕様やAPIリファレンス検索
+- **チートシート**: docset MCPでGit、Docker等のチートシート参照
 
 #### 実装品質の確保
 - 既存のコーディング規約に従う
@@ -230,26 +223,37 @@ mcp__docset__fetch_cheatsheet(cheatsheet="git")
 - コメントとドキュメントを更新
 
 #### 🎯 複雑な問題解決
-```python
-# アルゴリズム設計やデバッグ時
-mcp__sequentialthinking__sequentialthinking(
-    thought="パフォーマンスボトルネックの原因分析",
-    total_thoughts=5
-)
-```
+- **sequentialthinking MCP**: アルゴリズム設計やデバッグ時の段階的分析
+- パフォーマンスボトルネックの原因分析
+- 複雑な問題の分解と解決
 
 #### 🔧 インフラ構築
-```python
-# Terraformモジュール検索
-mcp__terraform__search_modules(
-    module_query="aws ec2 instance"
-)
+- **terraform MCP**: モジュール検索とインフラコード作成
+- AWS/Azure/GCPリソースの構築
+- IaCベストプラクティスの適用
 
-# モジュール詳細取得
-mcp__terraform__get_module_details(
-    module_id="terraform-aws-modules/ec2-instance/aws"
-)
-```
+#### 🐳 Docker環境構築
+- **docker MCP**: コンテナ管理と環境構築
+- コンテナ状態確認とライフサイクル管理
+- Docker Composeでの複数コンテナ管理
+- ログ監視とデバッグ
+- イメージビルドと管理
+
+#### 🎨 ブラウザ自動化
+**軽量タスク（Puppeteer推奨）**:
+- スクリーンショット取得
+- PDF生成
+- 簡単なWebスクレイピング
+
+**複雑なE2Eテスト（Playwright推奨）**:
+- マルチブラウザテスト
+- 複雑なフォーム操作
+- 高度なE2Eテストシナリオ
+
+**パフォーマンス分析（Chrome DevTools）**:
+- 詳細なパフォーマンス計測
+- ネットワーク分析
+- Chrome特有の機能利用
 
 ## 🎯 MCPサーバの最適活用
 
@@ -261,8 +265,11 @@ mcp__terraform__get_module_details(
 | ライブラリ調査 | context7 | React、Vue、Next.jsドキュメント |
 | 言語仕様 | docset | Python、JavaScriptリファレンス |
 | Web検索 | kagi | 最新情報、ベストプラクティス |
+| コンテナ管理 | docker | Docker環境構築、コンテナ操作 |
+| 軽量ブラウザ自動化 | puppeteer | スクリーンショット、PDF生成 |
+| 高機能テスト自動化 | playwright | E2Eテスト、クロスブラウザテスト |
+| Chrome詳細分析 | chrome-devtools | パフォーマンス計測、デバッグ |
 | 複雑な問題 | sequentialthinking | アルゴリズム、デバッグ |
-| テスト自動化 | playwright | E2Eテスト、UIテスト |
 | インフラ | terraform | AWS/Azure/GCP構築 |
 
 ### 効率化のためのベストプラクティス
@@ -270,6 +277,11 @@ mcp__terraform__get_module_details(
 2. **並列MCP呼び出し**: 複数のMCPを同時実行
 3. **メモリ活用**: 作業メモをserenaに保存
 4. **段階的検索**: 概要→詳細の順で情報取得
+5. **ブラウザ自動化の使い分け**:
+   - 軽量・高速処理 → puppeteer
+   - マルチブラウザ対応 → playwright
+   - 詳細分析 → chrome-devtools
+6. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 - 作業完了時は必ずManagerに報告する

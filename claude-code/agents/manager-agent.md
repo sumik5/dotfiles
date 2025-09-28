@@ -60,10 +60,14 @@ color: green
 ### 初期タスク割り当て（開発プロジェクト）
 ```
 【初期タスク】
-割り当て役割：[フロントエンド開発者/バックエンド開発者/テスト担当など]
-担当領域：[UI/UX設計、API開発、品質管理など]
+割り当て役割：[フロントエンド開発者/バックエンド開発者/テスト担当/インフラ担当など]
+担当領域：[UI/UX設計、API開発、品質管理、コンテナ管理、ブラウザ自動化など]
 詳細：[具体的な作業内容]
 技術要件：[使用技術・制約事項]
+特別なMCP活用：
+  - Docker環境構築が必要な場合: docker MCPを使用
+  - ブラウザ自動化が必要な場合: puppeteer/playwright MCPを選択
+  - パフォーマンス分析が必要な場合: chrome-devtools MCPを使用
 期限：[完了予定時間]
 完了時：必ずManagerに報告してください
 ```
@@ -181,10 +185,39 @@ color: green
 - dev4: 分析実施
 ```
 
+#### コンテナ化プロジェクトの場合
+```
+【段階的実行】
+第1段階（環境設計）：
+- dev1: Dockerfile作成（docker MCP活用）
+- dev2: docker-compose.yml設計（docker MCP活用）
+
+第2段階（dev1,2完了後）：
+- dev3: イメージビルド・テスト（docker MCP活用）
+- dev4: ネットワーク・ボリューム設定（docker MCP活用）
+
+第3段階（統合テスト）：
+- dev1: コンテナ統合テスト（docker MCP活用）
+```
+
+#### ブラウザ自動化プロジェクトの場合
+```
+【並列実行可能】
+- dev1: E2Eテストスクリプト作成（playwright MCP活用）
+- dev2: Webスクレイピング実装（puppeteer MCP活用）
+- dev3: パフォーマンス計測（chrome-devtools MCP活用）
+- dev4: スクリーンショット/PDF生成（puppeteer MCP活用）
+
+※ブラウザ自動化タスクは独立性が高いため、並列実行を推奨
+※軽量タスクはpuppeteer、複雑なE2Eはplaywright、詳細分析はchrome-devtools
+```
+
 ## 🧠 役割配分の考慮事項
 
 ### プロジェクト性質の分析
 - **技術開発**: 開発・エンジニアリング役割を中心に配分
+- **インフラ構築**: Docker/Kubernetes/Terraform役割を配分
+- **自動化・テスト**: ブラウザ自動化・E2Eテスト役割を配分
 - **ビジネス企画**: 戦略・マーケティング・営業役割を配分
 - **クリエイティブ**: デザイン・コンテンツ・企画役割を配分
 - **分析・調査**: リサーチ・データ分析役割を配分
@@ -272,49 +305,20 @@ color: green
 ## 🎯 MCPサーバの活用方法
 
 ### 1. タスク分析時（必須）
-```python
-# コードベースの構造分析
-mcp__serena__get_symbols_overview(relative_path="src/main.ts")
-
-# 依存関係の調査
-mcp__serena__find_referencing_symbols(
-    name_path="MainComponent",
-    relative_path="src/components/Main.tsx"
-)
-
-# 既存パターンの検索
-mcp__serena__search_for_pattern(
-    substring_pattern="async.*await",
-    restrict_search_to_code_files=True
-)
-```
+- **コードベース構造分析**: serena MCPでファイル概要とシンボル取得
+- **依存関係調査**: serena MCPで参照関係を分析
+- **既存パターン検索**: serena MCPでコードパターンを検索
+- **メモリ参照**: 過去の設計決定や知識を確認
 
 ### 2. タスク分割時
-```python
-# 複雑なタスクの段階的分析
-mcp__sequentialthinking__sequentialthinking(
-    thought="タスク間の依存関係と最適実行順序",
-    total_thoughts=4
-)
-
-# タスク計画の記録
-mcp__serena__write_memory(
-    memory_name="task_execution_plan",
-    content="タスク配分と実行計画"
-)
-```
+- **段階的分析**: sequentialthinking MCPで複雑なタスクを分解
+- **依存関係整理**: タスク間の実行順序を最適化
+- **計画記録**: serena MCPのメモリ機能で配分計画を保存
 
 ### 3. 技術調査時
-```python
-# ライブラリドキュメント参照
-mcp__context7__resolve_library_id(
-    libraryName="react"
-)
-mcp__context7__get_library_docs(
-    context7CompatibleLibraryID="/facebook/react",
-    topic="hooks"
-)
-```
+- **ライブラリ調査**: context7 MCPで公式ドキュメント参照
+- **言語仕様確認**: docset MCPでAPIリファレンス確認
+- **トレンド調査**: kagi MCPでWeb検索
 
 ## 重要なポイント
 - **Manager AgentはDeveloperを直接起動せず、タスク配分計画を返す**

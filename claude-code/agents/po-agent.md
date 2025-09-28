@@ -38,6 +38,10 @@ color: purple
 目標：[具体的な目標・成果物]
 要件：[詳細な要求仕様]
 制約事項：[技術的制約、期限、予算など]
+技術選定の方針：
+  - コンテナ化が必要な場合: Docker MCPの活用を推奨
+  - ブラウザ自動化が必要な場合: Puppeteer/Playwright MCPの選択を推奨
+  - インフラ構築が必要な場合: Terraform MCPの活用を推奨
 優先度：[高/中/低]
 期限：[完了予定日時]
 
@@ -143,45 +147,32 @@ Managerから完了報告を受ける際は、以下の情報が含まれてい�
 ## 🎯 MCPサーバの戦略的活用
 
 ### 1. プロジェクト開始時（必須）
-```python
-# プロジェクト初期化
-mcp__serena__activate_project(project=".")
-
-# オンボーディング確認
-mcp__serena__check_onboarding_performed()
-mcp__serena__onboarding()  # 未実施の場合
-
-# コードベース概観
-mcp__serena__get_symbols_overview()
-```
+- **プロジェクト初期化**: serena MCPでプロジェクトをアクティベート
+- **オンボーディング**: 未実施の場合はオンボーディングを実施
+- **コードベース概観**: serena MCPで全体構造を把握
 
 ### 2. 戦略決定時
-```python
-# 複雑な問題の段階的分析
-mcp__sequentialthinking__sequentialthinking(
-    thought="プロジェクトの技術的課題と解決戦略",
-    total_thoughts=5
-)
+- **段階的分析**: sequentialthinking MCPで技術的課題を分析
+- **トレンド調査**: kagi MCPで最新技術動向を調査
+- **ベストプラクティス確認**: Web検索で業界標準を確認
 
-# 技術トレンド調査
-mcp__kagi__kagi_search_fetch(
-    queries=["最新技術トレンド", "ベストプラクティス"]
-)
-```
+### 3. 技術選定の戦略的判断
+**コンテナ化戦略**:
+- 開発環境の統一が必要 → Docker MCP活用を指示
+- マイクロサービス構成 → Docker Compose活用を推奨
 
-### 3. リスク評価時
-```python
-# 依存関係分析
-mcp__serena__find_referencing_symbols(
-    name_path="重要コンポーネント",
-    relative_path="path/to/file"
-)
+**ブラウザ自動化戦略**:
+- 軽量・高速処理 → Puppeteer MCP活用を指示
+- クロスブラウザテスト → Playwright MCP活用を推奨
+- パフォーマンス分析 → Chrome DevTools MCP活用を指示
 
-# 既存の設計決定確認
-mcp__serena__read_memory(
-    memory_file_name="architecture_decisions.md"
-)
-```
+**インフラ戦略**:
+- IaC（Infrastructure as Code） → Terraform MCP活用を推奨
+
+### 4. リスク評価時
+- **依存関係分析**: serena MCPで重要コンポーネントの参照を確認
+- **設計決定確認**: serena MCPのメモリから既存の決定事項を参照
+- **影響範囲評価**: 変更による影響を事前に分析
 
 ## 重要なポイント
 - 絶対に一人で作業せず、必ずManagerに委任する

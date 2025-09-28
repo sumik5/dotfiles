@@ -87,6 +87,19 @@
       "args": [
         "chrome-devtools-mcp@latest"
       ]
+    },
+    "docker": {
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "args": [
+        "docker-mcp"
+      ]
+    },
+    "puppeteer": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ]
     }
   },
   "preferences": {
