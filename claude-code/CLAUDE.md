@@ -89,7 +89,30 @@ mcp__serena__get_symbols_overview()
   - Q&A (`ask_question`)
 - **使用場面**: オープンソースプロジェクトの理解
 
-### 3. インフラ・DevOps系
+### 3. ファイル・システム操作系
+
+#### 📂 **filesystem** - ファイルシステム操作
+```
+プレフィックス: mcp__filesystem__
+```
+- **主要機能**:
+  - ファイル読み込み (`read_file`)
+  - ファイル書き込み (`write_file`)
+  - ファイル編集 (`edit_file`)
+  - ディレクトリ操作 (`list_directory`, `create_directory`)
+  - ファイル移動・コピー (`move_file`)
+  - ファイル検索 (`search_files`)
+  - ファイル情報取得 (`get_file_info`)
+- **使用場面**:
+  - 大量のファイル操作が必要な場合
+  - ディレクトリ構造の管理
+  - ファイルの一括処理
+  - バックアップやコピー作業
+- **serenaとの使い分け**:
+  - **serena優先**: コード解析・編集の場合
+  - **filesystem優先**: 非コードファイル操作、大量ファイル処理の場合
+
+### 4. インフラ・DevOps系
 
 #### 🏗️ **terraform** - Infrastructure as Code
 ```
@@ -145,7 +168,7 @@ mcp__serena__get_symbols_overview()
   - CI/CD環境でのヘッドレステスト
   - パフォーマンス重視のスクレイピング
 
-### 4. ブラウザ自動化系
+### 5. ブラウザ自動化系
 
 #### 🎭 **playwright** - フルブラウザ自動化
 ```
@@ -205,6 +228,19 @@ graph TD
 4. **言語仕様**: `docset` → ローカルリファレンス
 5. **一般情報**: `kagi` → Web検索
 
+### ファイル操作の選択基準
+```mermaid
+graph TD
+    A[ファイル操作タスク] --> B{操作内容}
+    B --> C{コード編集?}
+    C -->|Yes| D[serena MCP]
+    C -->|No| E{大量ファイル?}
+    E -->|Yes| F[filesystem MCP]
+    E -->|No| G{単純読み書き?}
+    G -->|Yes| H[Read/Write tool]
+    G -->|No| I[filesystem MCP]
+```
+
 ### ブラウザ自動化の選択基準
 ```mermaid
 graph TD
@@ -249,6 +285,12 @@ graph TD
 ### メモリ管理
 - **永続化**: serena MCPのwrite_memoryでプロジェクト知識を保存
 - **参照**: serena MCPのread_memoryで後から情報を取得
+
+### ファイル操作の効率化
+- **コード編集**: serena MCPのシンボル単位編集
+- **一括処理**: filesystem MCPで複数ファイル操作
+- **バックアップ**: filesystem MCPでディレクトリ単位のコピー
+- **検索**: filesystem MCPのsearch_filesで高速検索
 
 ### Docker環境の効率的な管理
 - **状態確認**: docker MCPでコンテナ一覧を確認してから操作
@@ -352,11 +394,13 @@ agents/
 
 #### Developer Agent（実装者）
 - **責任**: 実際の作業実行
-- **使用ツール**: 全てのツール（Write、Edit、Bash、docker、puppeteer等）
+- **使用ツール**: 全てのツール（Write、Edit、Bash、docker、puppeteer、filesystem等）
 - **特性**: dev1-4それぞれが異なる専門性を持つ
-- **Docker/Puppeteer使用**:
-  - Docker環境構築時は docker MCPを活用
-  - ブラウザ自動化時は puppeteer/playwright MCPを選択
+- **MCP使用の優先順位**:
+  - コード編集: serena MCP優先
+  - ファイル操作: filesystem MCPを活用
+  - Docker環境構築: docker MCPを活用
+  - ブラウザ自動化: puppeteer/playwright MCPを選択
 
 ### 📝 Agent間のコンテキスト管理
 - **PO→Manager**: 戦略的指示とユーザー要求を伝達
@@ -397,6 +441,7 @@ agents/
 | ライブラリ調査 | context7 | 70% |
 | 問題解決 | sequentialthinking | 40% |
 | Docker環境管理 | docker | 40% |
+| ファイル操作 | filesystem | 35% |
 | Web検索 | kagi | 30% |
 | ブラウザ自動化 | puppeteer | 25% |
 | テスト自動化 | playwright | 20% |

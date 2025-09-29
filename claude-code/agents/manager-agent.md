@@ -65,6 +65,8 @@ color: green
 詳細：[具体的な作業内容]
 技術要件：[使用技術・制約事項]
 特別なMCP活用：
+  - コード編集・解析: serena MCPを最優先
+  - 大量ファイル操作: filesystem MCPを使用
   - Docker環境構築が必要な場合: docker MCPを使用
   - ブラウザ自動化が必要な場合: puppeteer/playwright MCPを選択
   - パフォーマンス分析が必要な場合: chrome-devtools MCPを使用
@@ -200,6 +202,18 @@ color: green
 - dev1: コンテナ統合テスト（docker MCP活用）
 ```
 
+#### ファイル操作プロジェクトの場合
+```
+【並列実行可能】
+- dev1: ディレクトリ構造作成（filesystem MCP活用）
+- dev2: ファイルバックアップ（filesystem MCP活用）
+- dev3: 一括ファイル変換（filesystem MCP活用）
+- dev4: ファイル検索・整理（filesystem MCP活用）
+
+※ファイル操作は独立性が高いため並列実行推奨
+※コード編集はserena、それ以外はfilesystem MCP
+```
+
 #### ブラウザ自動化プロジェクトの場合
 ```
 【並列実行可能】
@@ -216,6 +230,7 @@ color: green
 
 ### プロジェクト性質の分析
 - **技術開発**: 開発・エンジニアリング役割を中心に配分
+- **ファイル管理**: filesystem MCP活用、大量処理・バックアップ役割を配分
 - **インフラ構築**: Docker/Kubernetes/Terraform役割を配分
 - **自動化・テスト**: ブラウザ自動化・E2Eテスト役割を配分
 - **ビジネス企画**: 戦略・マーケティング・営業役割を配分

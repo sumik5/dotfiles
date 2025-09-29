@@ -133,7 +133,7 @@ Managerから指定された役割を柔軟に担当：
 - TodoWrite（タスク管理）
 
 ### MCPツール（効率的実装用）
-- **serena MCP**（最重要）
+- **serena MCP**（最重要 - コード編集）
   - `mcp__serena__get_symbols_overview`: ファイル概要取得
   - `mcp__serena__find_symbol`: シンボル検索・読込
   - `mcp__serena__replace_symbol_body`: シンボル置換
@@ -141,6 +141,16 @@ Managerから指定された役割を柔軟に担当：
   - `mcp__serena__insert_after_symbol`: シンボル後挿入
   - `mcp__serena__search_for_pattern`: パターン検索
   - `mcp__serena__write_memory`: 作業メモ保存
+
+- **filesystem MCP**（ファイル操作）
+  - `mcp__filesystem__read_file`: ファイル読み込み
+  - `mcp__filesystem__write_file`: ファイル書き込み
+  - `mcp__filesystem__edit_file`: ファイル編集
+  - `mcp__filesystem__list_directory`: ディレクトリ一覧
+  - `mcp__filesystem__create_directory`: ディレクトリ作成
+  - `mcp__filesystem__move_file`: ファイル移動・コピー
+  - `mcp__filesystem__search_files`: ファイル検索
+  - `mcp__filesystem__get_file_info`: ファイル情報取得
 
 - **context7 MCP**（ライブラリドキュメント）
   - `mcp__context7__resolve_library_id`: ライブラリID解決
@@ -311,6 +321,7 @@ git worktree remove wt-feat/new-feature
 | タスク種別 | 推奨MCP | 使用例 |
 |---------|---------|--------|
 | コード編集 | serena | シンボル置換、挿入、検索 |
+| ファイル操作 | filesystem | 大量ファイル処理、バックアップ |
 | ライブラリ調査 | context7 | React、Vue、Next.jsドキュメント |
 | 言語仕様 | docset | Python、JavaScriptリファレンス |
 | Web検索 | kagi | 最新情報、ベストプラクティス |
@@ -322,15 +333,16 @@ git worktree remove wt-feat/new-feature
 | インフラ | terraform | AWS/Azure/GCP構築 |
 
 ### 効率化のためのベストプラクティス
-1. **serena優先**: ファイル全体読込よりシンボル単位で操作
-2. **並列MCP呼び出し**: 複数のMCPを同時実行
-3. **メモリ活用**: 作業メモをserenaに保存
-4. **段階的検索**: 概要→詳細の順で情報取得
-5. **ブラウザ自動化の使い分け**:
+1. **serena優先**: コード編集はserenaのシンボル単位操作
+2. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
+3. **並列MCP呼び出し**: 複数のMCPを同時実行
+4. **メモリ活用**: 作業メモをserenaに保存
+5. **段階的検索**: 概要→詳細の順で情報取得
+6. **ブラウザ自動化の使い分け**:
    - 軽量・高速処理 → puppeteer
    - マルチブラウザ対応 → playwright
    - 詳細分析 → chrome-devtools
-6. **Docker活用**: 開発環境はコンテナ化して管理
+7. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 - 作業完了時は必ずManagerに報告する
