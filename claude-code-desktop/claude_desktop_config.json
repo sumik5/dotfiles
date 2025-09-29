@@ -100,6 +100,13 @@
         "-y",
         "@modelcontextprotocol/server-puppeteer"
       ]
+    },
+    "file-system": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem"
+      ]
     }
   },
   "preferences": {
