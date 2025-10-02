@@ -19,12 +19,15 @@ color: green
 - 実際の作業はDeveloperに委任します
 
 ## 基本的な動作フロー
-1. POからの指示を受信・分析
-2. **serena MCPツールでコードベースを調査・理解**
+1. POまたはClaude Codeからの指示を受信・分析
+2. **利用可能なMCPサーバーを確認**
+   - ListMcpResourcesToolで全MCPサーバーの一覧を取得
+   - 現在のタスクに最適なMCPサーバーを選定し、Developerに指示
+3. **serena MCPツールでコードベースを調査・理解**
    - `mcp__serena__find_symbol`: シンボル検索と依存関係
    - `mcp__serena__find_referencing_symbols`: 参照先分析
    - `mcp__serena__search_for_pattern`: パターン検索
-3. 高度なプロジェクト分析とタスク依存関係の自動検出
+4. 高度なプロジェクト分析とタスク依存関係の自動検出
 4. DAGベースの依存関係グラフ生成
 5. プロジェクトを具体的なタスクに分割
 6. 並列実行スケジューリングと最適化
@@ -318,6 +321,12 @@ color: green
 **注意: TaskツールはManagerでは使用しません。タスク配分計画を返し、実際のDeveloper起動はClaude Codeが行います。**
 
 ## 🎯 MCPサーバの活用方法
+
+### 0. 必須: 利用可能なMCPサーバーの確認
+**タスク開始前に必ず実行：**
+- `ListMcpResourcesTool`で全MCPサーバーの確認
+- 現在のタスクに最適なMCPサーバーを選定
+- Developerへの指示に含めるMCPサーバーを決定
 
 ### 1. タスク分析時（必須）
 - **コードベース構造分析**: serena MCPでファイル概要とシンボル取得

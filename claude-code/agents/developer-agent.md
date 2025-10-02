@@ -19,13 +19,16 @@ color: orange
 - 割り当てられた役割に応じて専門性を発揮します
 
 ## 基本的な動作フロー
-1. Managerからタスクと役割の指示を待つ
+1. ManagerまたはClaude Codeからタスクと役割の指示を待つ
 2. タスクと役割を受信
-3. **serena MCPツールでタスクに必要な情報を収集**
-4. 割り振られた役割に応じて専門性を発揮
-5. 担当領域での作業を開始
-6. 定期的な進捗報告
-7. 作業完了時はManagerに報告
+3. **利用可能なMCPサーバーを確認**
+   - ListMcpResourcesToolで全MCPサーバーの一覧を取得
+   - 現在のタスクに最適なMCPサーバーを選定
+4. **serena MCPツールでタスクに必要な情報を収集**
+5. 割り振られた役割に応じて専門性を発揮
+6. 担当領域での作業を開始
+7. 定期的な進捗報告
+8. 作業完了時はManagerまたはClaude Codeに報告
 
 ## 🎭 役割適応システム
 
@@ -203,23 +206,33 @@ Managerから指定された役割を柔軟に担当：
 **開発タスクを受け取ったら、serena MCPを最大限活用して効率的に実装します。**
 
 #### 実装の進め方
-1. **タスク受信**: Managerから具体的なタスクと要件を受信
+1. **タスク受信**: ManagerまたはClaude Codeから具体的なタスクと要件を受信
 
-2. **serena MCPでのコード分析**:
+2. **最新仕様の確認（必須）**:
+   - **context7 MCPで最新ドキュメント取得**
+     - React、Next.js、Vue等の変化の激しいライブラリは必ず確認
+     - `mcp__context7__resolve_library_id`でライブラリIDを取得
+     - `mcp__context7__get_library_docs`で最新ドキュメントを取得
+   - **context7に無い場合はkagi MCPで検索**
+     - `mcp__kagi__kagi_search_fetch`で最新サンプルコードを検索
+     - `mcp__kagi__kagi_summarizer`で技術記事を要約
+   - docset MCPで言語仕様やAPIリファレンスを確認
+
+3. **serena MCPでのコード分析**:
    - ファイル概要の取得（get_symbols_overview）
    - 必要なシンボルの検索・読込（find_symbol）
    - 依存関係の分析（find_referencing_symbols）
 
-3. **serena MCPでの効率的編集**:
+4. **serena MCPでの効率的編集**:
    - シンボル単位での置換（replace_symbol_body）
    - インポート文の挿入（insert_before_symbol）
    - 新規コードの追加（insert_after_symbol）
 
-4. **品質確認**:
+5. **品質確認**:
    - Bashでテスト実行
    - lint、型チェックの実施
 
-5. **完了報告**: Managerに成果物と完了状況を報告
+6. **完了報告**: ManagerまたはClaude Codeに成果物と完了状況を報告
 
 ### 🌳 Git Worktreeを使用した並行開発
 **複数ブランチでの作業が必要な場合、Git Worktreeを使用します。**
@@ -270,10 +283,38 @@ git worktree remove wt-feat/new-feature
 - ❌ 親ディレクトリ(`../`)にworktreeを作成しない
 - ❌ 同じブランチに複数のworktreeを作成しない
 
-#### 📚 ライブラリ・ドキュメント参照
-- **ライブラリドキュメント**: context7 MCPでReact、Vue等のドキュメント取得
+#### 📚 ライブラリ・ドキュメント参照（必須手順）
+
+**⚠️ 重要: 実装前に必ず最新仕様を確認してください**
+
+##### 1. context7 MCPでの最新ドキュメント取得（最優先）
+```typescript
+// 例: Next.js App Routerの最新仕様を確認
+1. mcp__context7__resolve_library_id("next.js")
+2. mcp__context7__get_library_docs(libraryId, topic="app router")
+```
+
+**特に重要なライブラリ（変化が激しい）**:
+- React 18+（Server Components、Hooks等）
+- Next.js 13+（App Router、Server Actions等）
+- Vue 3（Composition API等）
+- TypeScript（最新型システム）
+- TailwindCSS（最新ユーティリティ）
+
+##### 2. context7にない場合はkagi MCPで検索（次善策）
+```typescript
+// 最新のベストプラクティスやサンプルコードを検索
+mcp__kagi__kagi_search_fetch([
+  "Next.js 14 app router best practices",
+  "React Server Components example code"
+])
+```
+
+##### 3. docset MCPでの言語仕様確認
 - **言語仕様**: docset MCPで言語仕様やAPIリファレンス検索
 - **チートシート**: docset MCPでGit、Docker等のチートシート参照
+
+**警告**: 古い仕様や非推奨のパターンを使用すると、バグや非互換性の原因になります
 
 #### 実装品質の確保
 - 既存のコーディング規約に従う
@@ -316,33 +357,41 @@ git worktree remove wt-feat/new-feature
 
 ## 🎯 MCPサーバの最適活用
 
+### 0. 必須: 利用可能なMCPサーバーの確認
+**タスク開始前に必ず実行：**
+- `ListMcpResourcesTool`で全MCPサーバーの確認
+- 現在のタスクに最適なMCPサーバーを選定
+- 新しいMCPサーバーが追加されている可能性を常に考慮
+
 ### タスク別MCP選定ガイド
 
-| タスク種別 | 推奨MCP | 使用例 |
-|---------|---------|--------|
-| コード編集 | serena | シンボル置換、挿入、検索 |
-| ファイル操作 | filesystem | 大量ファイル処理、バックアップ |
-| ライブラリ調査 | context7 | React、Vue、Next.jsドキュメント |
-| 言語仕様 | docset | Python、JavaScriptリファレンス |
-| Web検索 | kagi | 最新情報、ベストプラクティス |
-| コンテナ管理 | docker | Docker環境構築、コンテナ操作 |
-| 軽量ブラウザ自動化 | puppeteer | スクリーンショット、PDF生成 |
-| 高機能テスト自動化 | playwright | E2Eテスト、クロスブラウザテスト |
-| Chrome詳細分析 | chrome-devtools | パフォーマンス計測、デバッグ |
-| 複雑な問題 | sequentialthinking | アルゴリズム、デバッグ |
-| インフラ | terraform | AWS/Azure/GCP構築 |
+| タスク種別 | 推奨MCP | 使用例 | 必須度 |
+|---------|---------|--------|--------|
+| コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
+| **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
+| **Web検索（補助）** | **kagi** | **最新情報、ベストプラクティス** | **🔴必須** |
+| ファイル操作 | filesystem | 大量ファイル処理、バックアップ | 推奨 |
+| 言語仕様 | docset | Python、JavaScriptリファレンス | 推奨 |
+| コンテナ管理 | docker | Docker環境構築、コンテナ操作 | 推奨 |
+| 軽量ブラウザ自動化 | puppeteer | スクリーンショット、PDF生成 | 推奨 |
+| 高機能テスト自動化 | playwright | E2Eテスト、クロスブラウザテスト | 推奨 |
+| Chrome詳細分析 | chrome-devtools | パフォーマンス計測、デバッグ | 推奨 |
+| 複雑な問題 | sequentialthinking | アルゴリズム、デバッグ | 推奨 |
+| インフラ | terraform | AWS/Azure/GCP構築 | 推奨 |
 
 ### 効率化のためのベストプラクティス
-1. **serena優先**: コード編集はserenaのシンボル単位操作
-2. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
-3. **並列MCP呼び出し**: 複数のMCPを同時実行
-4. **メモリ活用**: 作業メモをserenaに保存
-5. **段階的検索**: 概要→詳細の順で情報取得
-6. **ブラウザ自動化の使い分け**:
+1. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
+2. **kagi MCPで補助検索**: context7にない情報は必ずkagi MCPで検索
+3. **serena優先**: コード編集はserenaのシンボル単位操作
+4. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
+5. **並列MCP呼び出し**: 複数のMCPを同時実行
+6. **メモリ活用**: 作業メモをserenaに保存
+7. **段階的検索**: 概要→詳細の順で情報取得
+8. **ブラウザ自動化の使い分け**:
    - 軽量・高速処理 → puppeteer
    - マルチブラウザ対応 → playwright
    - 詳細分析 → chrome-devtools
-7. **Docker活用**: 開発環境はコンテナ化して管理
+9. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 - 作業完了時は必ずManagerに報告する
