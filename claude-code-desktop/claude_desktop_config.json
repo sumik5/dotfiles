@@ -2,12 +2,7 @@
   "mcpServers": {
     "context7": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp",
-        "--api-key",
-        "${CONTEXT7_API_KEY}"
-      ],
+      "args": ["-y", "@upstash/context7-mcp", "--api-key", "${CONTEXT7_API_KEY}"],
       "env": {}
     },
     "serena": {
@@ -24,17 +19,12 @@
     },
     "playwright": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest"
-      ],
+      "args": ["-y", "@playwright/mcp@latest"],
       "env": {}
     },
     "kagi": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
-      "args": [
-        "kagimcp"
-      ],
+      "args": ["kagimcp"],
       "env": {
         "KAGI_API_KEY": "${KAGI_API_KEY}",
         "KAGI_SUMMARIZER_ENGINE": "cecil",
@@ -44,24 +34,16 @@
     },
     "deepwiki": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "mcp-remote",
-        "https://mcp.deepwiki.com/sse"
-      ],
+      "args": ["mcp-remote", "https://mcp.deepwiki.com/sse"],
       "env": {}
     },
     "sequentialthinking": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     },
     "docset": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
-      "args": [
-        "docsetmcp"
-      ],
+      "args": ["docsetmcp"],
       "env": {
         "DOCSET_PATH": "~/Library/Application Support/Dash/DocSets",
         "CHEATSHEET_PATH": "~/Library/Application Support/Dash/Cheat Sheets"
@@ -69,44 +51,56 @@
     },
     "terraform": {
       "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "hashicorp/terraform-mcp-server"
-      ]
+      "args": ["run", "-i", "--rm", "hashicorp/terraform-mcp-server"]
     },
     "codex": {
       "command": "codex",
-      "args": [
-        "mcp"
-      ]
+      "args": ["mcp"]
     },
     "chrome-devtools": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "chrome-devtools-mcp@latest"
-      ]
+      "args": ["chrome-devtools-mcp@latest"]
     },
     "docker": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
-      "args": [
-        "docker-mcp"
-      ]
+      "args": ["docker-mcp"]
     },
     "puppeteer": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-puppeteer"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-puppeteer"]
     },
     "file-system": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem"]
+    },
+    "firecrawl-mcp": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}",
+        "FIRECRAWL_RETRY_MAX_ATTEMPTS": "5",
+        "FIRECRAWL_RETRY_INITIAL_DELAY": "2000",
+        "FIRECRAWL_RETRY_MAX_DELAY": "30000",
+        "FIRECRAWL_RETRY_BACKOFF_FACTOR": "3",
+        "FIRECRAWL_CREDIT_WARNING_THRESHOLD": "2000",
+        "FIRECRAWL_CREDIT_CRITICAL_THRESHOLD": "500"
+      }
+    },
+    "mcp-pandoc": {
+      "command": "/Users/sumik/.local/share/mise/shims/uvx",
+      "args": ["mcp-pandoc"],
+      "env": {}
+    },
+    "youtube": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
+      "args": ["-y", "@anaisbetts/mcp-youtube"]
+    },
+    "markdownify": {
+      "command": "/Users/sumik/.local/share/mise/shims/node",
+      "args": ["/Users/sumik/dotfiles/claude-code/tools/markdownify-mcp/dist/index.js"],
+      "env": {
+        "UV_PATH": "/Users/sumik/.local/share/mise/shims/uv"
+      }
     }
   },
   "preferences": {
