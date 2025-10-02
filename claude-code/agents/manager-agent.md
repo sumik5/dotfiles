@@ -342,7 +342,9 @@ color: green
 ### 3. 技術調査時
 - **ライブラリ調査**: context7 MCPで公式ドキュメント参照
 - **言語仕様確認**: docset MCPでAPIリファレンス確認
-- **トレンド調査**: kagi MCPでWeb検索
+- **最新情報・トレンド調査**: kagi MCPでWeb検索
+- **複数ページ調査**: firecrawl MCPで競合サイト分析やディープリサーチ
+- **動画コンテンツ分析**: youtube MCPで技術カンファレンスや解説動画分析
 
 ## 重要なポイント
 - **Manager AgentはDeveloperを直接起動せず、タスク配分計画を返す**

@@ -163,9 +163,28 @@ Managerから指定された役割を柔軟に担当：
   - `mcp__docset__search_docs`: ドキュメント検索
   - `mcp__docset__search_cheatsheet`: チートシート参照
 
-- **kagi MCP**（Web検索・情報収集）
+- **kagi MCP**（Web検索・最新情報）
   - `mcp__kagi__kagi_search_fetch`: Web検索
   - `mcp__kagi__kagi_summarizer`: コンテンツ要約
+
+- **firecrawl MCP**（高度なWebクロール・分析）
+  - `mcp__firecrawl__scrape`: Webスクレイピング
+  - `mcp__firecrawl__crawl`: 複数ページクロール
+  - `mcp__firecrawl__search`: キーワード検索
+  - `mcp__firecrawl__batch`: 複数URL一括処理
+
+- **markdownify MCP**（ファイル変換・保存）
+  - `mcp__markdownify__convert`: Web/PDF/Office/画像/音声をMarkdown変換
+  - `mcp__markdownify__bulk_convert`: 一括変換
+  - `mcp__markdownify__youtube`: YouTube字幕取得
+
+- **pandoc MCP**（ドキュメント形式変換）
+  - `mcp__pandoc__convert`: 文書形式変換（Markdown↔Word/ePub/PDF/HTML）
+
+- **youtube MCP**（動画分析）
+  - `mcp__youtube__get_transcript`: 字幕取得
+  - `mcp__youtube__summarize`: 動画要約
+  - `mcp__youtube__translate`: 翻訳
 
 - **docker MCP**（コンテナ管理）
   - `mcp__docker__list_containers`: コンテナ一覧
@@ -301,13 +320,53 @@ git worktree remove wt-feat/new-feature
 - TypeScript（最新型システム）
 - TailwindCSS（最新ユーティリティ）
 
-##### 2. context7にない場合はkagi MCPで検索（次善策）
+##### 2. context7にない場合の情報収集戦略
+
+**A. 最新情報・時事問題 → kagi MCP（最優先）**
 ```typescript
 // 最新のベストプラクティスやサンプルコードを検索
 mcp__kagi__kagi_search_fetch([
   "Next.js 14 app router best practices",
   "React Server Components example code"
 ])
+```
+
+**B. 複数ページの包括的調査 → firecrawl MCP**
+```typescript
+// 競合サイト分析、技術トレンド調査、ディープリサーチ
+mcp__firecrawl__crawl({
+  url: "https://example.com",
+  maxDepth: 3,
+  limit: 50
+})
+
+// キーワード検索で関連情報を収集
+mcp__firecrawl__search({
+  query: "React Server Components best practices"
+})
+```
+
+**C. 動画コンテンツの分析 → youtube MCP**
+```typescript
+// 技術解説動画やカンファレンス動画から情報収集
+mcp__youtube__get_transcript("https://youtube.com/watch?v=...")
+mcp__youtube__summarize("https://youtube.com/watch?v=...")
+```
+
+**D. ドキュメント変換・保存 → markdownify/pandoc MCP**
+```typescript
+// WebページやPDFを構造化されたMarkdownに変換
+mcp__markdownify__convert({
+  url: "https://docs.example.com/guide",
+  format: "markdown"
+})
+
+// ドキュメント形式の変換（Markdown → Word/PDF等）
+mcp__pandoc__convert({
+  input: "README.md",
+  output: "document.docx",
+  format: "docx"
+})
 ```
 
 ##### 3. docset MCPでの言語仕様確認
@@ -370,6 +429,9 @@ mcp__kagi__kagi_search_fetch([
 | コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
 | **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
 | **Web検索（補助）** | **kagi** | **最新情報、ベストプラクティス** | **🔴必須** |
+| **複数ページ調査** | **firecrawl** | **Webクロール、競合分析、ディープリサーチ** | **推奨** |
+| **動画分析** | **youtube** | **技術解説動画、カンファレンス分析** | **推奨** |
+| **ファイル変換** | **markdownify/pandoc** | **文書変換、ドキュメント保存** | **推奨** |
 | ファイル操作 | filesystem | 大量ファイル処理、バックアップ | 推奨 |
 | 言語仕様 | docset | Python、JavaScriptリファレンス | 推奨 |
 | コンテナ管理 | docker | Docker環境構築、コンテナ操作 | 推奨 |
@@ -380,18 +442,30 @@ mcp__kagi__kagi_search_fetch([
 | インフラ | terraform | AWS/Azure/GCP構築 | 推奨 |
 
 ### 効率化のためのベストプラクティス
+
+#### 情報収集の最適化
 1. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
-2. **kagi MCPで補助検索**: context7にない情報は必ずkagi MCPで検索
-3. **serena優先**: コード編集はserenaのシンボル単位操作
-4. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
-5. **並列MCP呼び出し**: 複数のMCPを同時実行
-6. **メモリ活用**: 作業メモをserenaに保存
-7. **段階的検索**: 概要→詳細の順で情報取得
-8. **ブラウザ自動化の使い分け**:
-   - 軽量・高速処理 → puppeteer
-   - マルチブラウザ対応 → playwright
-   - 詳細分析 → chrome-devtools
-9. **Docker活用**: 開発環境はコンテナ化して管理
+2. **Web情報収集の使い分け**:
+   - 単一ページ → WebFetch tool（軽量・安定）
+   - 最新情報・時事問題 → kagi MCP（検索特化）
+   - 複数ページ調査 → firecrawl MCP（クロール・分析）
+   - ファイル変換保存 → markdownify MCP（多様な形式対応）
+3. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
+
+#### コード編集の最適化
+4. **serena優先**: コード編集はserenaのシンボル単位操作
+5. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
+6. **並列MCP呼び出し**: 複数のMCPを同時実行
+
+#### 開発環境の最適化
+7. **メモリ活用**: 作業メモをserenaに保存
+8. **段階的検索**: 概要→詳細の順で情報取得
+9. **ドキュメント変換**: pandoc/markdownify MCPで文書形式を柔軟に変換
+10. **ブラウザ自動化の使い分け**:
+    - 軽量・高速処理 → puppeteer
+    - マルチブラウザ対応 → playwright
+    - 詳細分析 → chrome-devtools
+11. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 - 作業完了時は必ずManagerに報告する

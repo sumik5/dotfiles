@@ -151,9 +151,16 @@ Managerから完了報告を受ける際は、以下の情報が含まれてい�
 - **sequentialthinking MCP**（複雑な戦略決定）
   - `mcp__sequentialthinking__sequentialthinking`: 段階的思考
 
-- **kagi MCP**（市場調査・技術トレンド）
+- **kagi MCP**（市場調査・技術トレンド・最新情報）
   - `mcp__kagi__kagi_search_fetch`: Web検索
   - `mcp__kagi__kagi_summarizer`: コンテンツ要約
+
+- **firecrawl MCP**（複数ページ調査・競合分析）
+  - `mcp__firecrawl__crawl`: 複数ページクロール
+  - `mcp__firecrawl__search`: キーワード検索
+
+- **youtube MCP**（動画コンテンツ分析）
+  - `mcp__youtube__summarize`: 動画要約
 
 - **deepwiki MCP**（オープンソース調査）
   - `mcp__deepwiki__ask_question`: リポジトリ質問
