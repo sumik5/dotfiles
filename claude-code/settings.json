@@ -4,15 +4,7 @@
   },
   "permissions": {
     "allow": [
-      "Bash(rg:*)",
-      "Bash(tmux list-sessions:*)",
-      "Bash(tmux show-options:*)",
-      "Bash(tmux set-window-option:*)",
-      "Bash(tmux list-panes:*)",
-      "Bash(tmux show-window-options:*)",
-      "Bash(tmux bind-key:*)",
-      "Bash(tmux list-windows:*)",
-      "Bash(tmux rename-window:*)"
+      "Bash(rg:*)"
     ],
     "deny": [
       "Bash(sudo:*)",
@@ -21,9 +13,7 @@
       "Bash(git commit:*)",
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
-      "Read(.env.*)",
-      "Bash(kill:*)",
-      "WebSearch"
+      "Bash(kill:*)"
     ]
   },
   "statusLine": {

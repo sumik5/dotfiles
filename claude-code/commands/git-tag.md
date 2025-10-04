@@ -168,6 +168,44 @@ CHANGELOG.mdから該当バージョンのエントリーを抽出してくだ�
 → 処理を終了
 ```
 
+#### 抽出コマンド
+
+以下のbashコマンドでCHANGELOGエントリーを抽出してください：
+
+```bash
+# バージョン番号を抽出（vプレフィックスを除く）
+VERSION_NUMBER=$(echo "$TAG_NAME" | sed 's/^v//')
+
+# CHANGELOGエントリーを抽出
+# 該当バージョンの見出しから次の見出しの直前まで抽出
+CHANGELOG_ENTRY=$(sed -n "/^## \[v\?${VERSION_NUMBER}\]/,/^## \[v/p" CHANGELOG.md | sed '$d')
+
+# 最後のセクションの場合（次の見出しがない場合）の処理
+if [ -z "$CHANGELOG_ENTRY" ]; then
+  CHANGELOG_ENTRY=$(sed -n "/^## \[v\?${VERSION_NUMBER}\]/,\$p" CHANGELOG.md)
+fi
+
+# 末尾の空行を削除
+CHANGELOG_ENTRY=$(echo "$CHANGELOG_ENTRY" | sed -e :a -e '/^\n*$/{$d;N;ba' -e '}')
+
+# エントリーが空でないか確認
+if [ -z "$CHANGELOG_ENTRY" ]; then
+  echo "エラー: CHANGELOG.mdに $TAG_NAME のエントリーが見つかりません"
+  exit 1
+fi
+
+# 抽出結果を表示（デバッグ用）
+echo "抽出されたエントリー:"
+echo "$CHANGELOG_ENTRY"
+```
+
+**注意**:
+- `sed -n "/^## \[v\?${VERSION_NUMBER}\]/,/^## \[v/p"` で該当セクションを抽出
+- `\[v\?` により、`[v1.2.0]` と `[1.2.0]` の両方に対応
+- `sed '$d'` で最後の行（次のセクションのヘッダー）を削除
+- CHANGELOGの最後のセクションの場合は、ファイル末尾（`$`）までを抽出
+- 変数置換（`${VERSION_NUMBER}`）を使用して柔軟に対応
+
 #### 実装例
 
 CHANGELOG.mdの例:

@@ -116,21 +116,29 @@
 
 ```bash
 # 最新のタグを取得（セマンティックバージョニング対応）
-git tag -l "v*" --sort=-version:refname | head -n 1
+LATEST_TAG=$(git tag -l "v*" --sort=-version:refname | head -n 1)
 
-# タグから現在までのコミット履歴を取得
-git log --oneline <最新タグ>..HEAD
+# タグの有無を確認して適切なコマンドを実行
+if [ -z "$LATEST_TAG" ]; then
+  # タグが存在しない場合（初回リリース）
+  echo "タグが見つかりません。全コミット履歴を取得します。"
+  git log --oneline HEAD
+  git diff --name-status $(git rev-list --max-parents=0 HEAD)..HEAD
+else
+  # タグが存在する場合
+  echo "最新タグ: $LATEST_TAG"
+  git log --oneline ${LATEST_TAG}..HEAD
+  git diff --name-status ${LATEST_TAG} HEAD
+fi
 
-# タグから現在までのファイル差分を取得
-git diff --name-status <最新タグ> HEAD
-
-# ステージングエリアの変更を取得
+# ステージングエリアの変更を取得（タグの有無に関わらず常に実行）
 git diff --cached --name-status
 ```
 
 **注意**:
 - `--sort=-version:refname`により、v1.0.0形式のタグをバージョン番号順にソートし、最新バージョンを取得します
-- タグが存在しない場合（初回リリース）は、全コミット履歴を取得: `git log --oneline HEAD`
+- タグが存在しない場合（初回リリース）は、リポジトリの最初のコミットから現在までのすべての変更を取得します
+- 変数置換（`${LATEST_TAG}`）を使用してタグが空の場合の構文エラーを防止します
 - すべての情報を次のステップで使用するため、出力を保持してください
 
 ### ステップ2: CHANGELOGエントリーの生成
