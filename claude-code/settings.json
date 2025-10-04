@@ -4,7 +4,9 @@
   },
   "permissions": {
     "allow": [
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Read(~/.claude/agents/*)",
+      "Read(~/repo/*)"
     ],
     "deny": [
       "Bash(sudo:*)",
