@@ -24,8 +24,8 @@
 以下のbashコマンドを実行して情報を収集してください:
 
 ```bash
-# 最新のタグを取得
-git describe --tags --abbrev=0
+# 最新のタグを取得（セマンティックバージョニング対応）
+git tag -l "v*" --sort=-version:refname | head -n 1
 
 # タグから現在までのコミット履歴を取得
 git log --oneline <最新タグ>..HEAD
@@ -38,6 +38,7 @@ git diff --cached --name-status
 ```
 
 **注意**:
+- `--sort=-version:refname`により、v1.0.0形式のタグをバージョン番号順にソートし、最新バージョンを取得します
 - タグが存在しない場合（初回リリース）は、全コミット履歴を取得: `git log --oneline HEAD`
 - すべての情報を次のステップで使用するため、出力を保持してください
 
