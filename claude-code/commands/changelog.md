@@ -37,8 +37,19 @@
 ```bash
 # 正しい使用例
 /changelog v1.2.0
+# → CHANGELOG.md: [v1.2.0]
+# → package.json: "version": "1.2.0"
+# → pyproject.toml: version = "1.2.0"
+
 /changelog v2.0.0
+# → CHANGELOG.md: [v2.0.0]
+# → package.json: "version": "2.0.0"
+# → pyproject.toml: version = "2.0.0"
+
 /changelog v0.1.0-beta.1
+# → CHANGELOG.md: [v0.1.0-beta.1]
+# → package.json: "version": "0.1.0-beta.1"
+# → pyproject.toml: version = "0.1.0-beta.1"
 
 # 誤った使用例（エラーになる）
 /changelog          # 引数なし
@@ -48,18 +59,26 @@
 
 ## 実行内容
 
-1. **変更の収集**: 以下の情報を収集します
+1. **引数の検証**: バージョン番号の形式を検証し、変数に保存します
+   - NEW_VERSION: `v1.2.0` 形式（CHANGELOG.md用）
+   - VERSION_NUMBER: `1.2.0` 形式（プロジェクトファイル用）
+
+2. **変更の収集**: 以下の情報を収集します
    - 最新のgitタグを取得
    - タグから現在(HEAD)までのコミット履歴
    - タグから現在までのファイル差分
    - ステージングエリアの変更（まだコミットされていない変更も含む）
 
-2. **CHANGELOG生成**: 収集した情報を基に、Keep a Changelog形式でエントリーを生成します
+3. **CHANGELOG生成**: 収集した情報を基に、Keep a Changelog形式でエントリーを生成します
    - フォーマット: https://keepachangelog.com/ja/1.1.0/
    - 日付形式: ISO 8601 (YYYY-MM-DD)
    - セクション: 追加/変更/非推奨/削除/修正/セキュリティ
 
-3. **ファイル更新**: 生成したエントリーをCHANGELOG.mdの先頭に挿入します
+4. **プロジェクトファイルの更新**: バージョン番号を以下のファイルに反映します
+   - package.json（存在する場合）: `"version": "1.2.0"`
+   - pyproject.toml（存在する場合）: `version = "1.2.0"`
+
+5. **CHANGELOG.mdの更新**: 生成したエントリーをCHANGELOG.mdの先頭に挿入します
 
 ## 手順
 
@@ -86,7 +105,8 @@
 3. **バージョン番号を変数に保存**
    ```
    検証が成功した場合:
-   → 引数で渡されたバージョン番号を変数 NEW_VERSION に保存
+   → 引数で渡されたバージョン番号を変数 NEW_VERSION に保存（例: v1.2.0）
+   → vプレフィックスを除いた番号を VERSION_NUMBER に保存（例: 1.2.0）
    → 次のステップへ進む
    ```
 
@@ -150,7 +170,57 @@ git diff --cached --name-status
 - 技術的な詳細よりも、ユーザーへの影響を重視
 - 前置きや説明文は一切含めず、CHANGELOGエントリー本文のみを出力
 
-### ステップ3: CHANGELOG.mdの更新
+### ステップ3: プロジェクトファイルのバージョン更新
+
+VERSION_NUMBER（vプレフィックスを除いた番号）を使用して、プロジェクトのバージョン管理ファイルを更新してください：
+
+#### package.jsonの更新
+
+1. **ファイルの存在確認**
+   ```bash
+   test -f package.json && echo "package.json found"
+   ```
+
+2. **package.jsonが存在する場合の更新**
+   - ファイルを読み込む
+   - `"version": "現在のバージョン",` の行を探す
+   - `"version": "VERSION_NUMBER",` に置き換える
+
+   **更新例**:
+   ```json
+   {
+     "name": "my-project",
+     "version": "1.2.0",
+     "description": "..."
+   }
+   ```
+
+#### pyproject.tomlの更新
+
+1. **ファイルの存在確認**
+   ```bash
+   test -f pyproject.toml && echo "pyproject.toml found"
+   ```
+
+2. **pyproject.tomlが存在する場合の更新**
+   - ファイルを読み込む
+   - `[project]` セクション内の `version = "現在のバージョン"` の行を探す
+   - `version = "VERSION_NUMBER"` に置き換える
+
+   **更新例**:
+   ```toml
+   [project]
+   name = "my-project"
+   version = "1.2.0"
+   description = "..."
+   ```
+
+**注意事項**:
+- 両方のファイルが存在する場合は、両方を更新する
+- どちらのファイルも存在しない場合は、このステップをスキップ
+- バージョン番号は必ず VERSION_NUMBER（vなし）を使用する
+
+### ステップ4: CHANGELOG.mdの更新
 
 生成したエントリーを以下の位置に挿入してください:
 
@@ -180,10 +250,16 @@ git diff --cached --name-status
 ...
 ```
 
-### ステップ4: 確認
+### ステップ5: 確認
 
-- 生成されたエントリーをユーザーに表示して確認を求める
-- 問題なければCHANGELOG.mdを更新
+以下の変更内容をユーザーに表示して確認を求める：
+
+1. **生成されたCHANGELOGエントリー**
+2. **更新されたプロジェクトファイル**（該当する場合）
+   - package.json: `"version": "VERSION_NUMBER"`
+   - pyproject.toml: `version = "VERSION_NUMBER"`
+
+問題なければ、すべてのファイルを更新する
 
 ## Keep a Changelog形式の詳細
 
