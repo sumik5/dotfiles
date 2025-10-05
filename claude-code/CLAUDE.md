@@ -513,6 +513,14 @@ graph TD
 - **永続化**: serena MCPのwrite_memoryでプロジェクト知識を保存
 - **参照**: serena MCPのread_memoryで後から情報を取得
 
+### コマンド実行の原則
+- **❌ 悪い例**: Bashツールで`grep`、`find`、`cat`などのコマンドを使用
+- **✅ 良い例**: 専用ツール（Grep、Glob、Read）を使用
+- **検索**: 必ずGrepツール（ripgrep）を使用 - `grep`コマンドより高速
+- **ファイル検索**: Globツールを使用 - `find`コマンドより効率的
+- **ファイル読込**: Readツールを使用 - `cat`コマンドより最適化
+- **理由**: 専用ツールはClaude Code用に最適化され、より高速で効率的
+
 ### ファイル操作の効率化
 - **コード編集**: serena MCPのシンボル単位編集
 - **一括処理**: filesystem MCPで複数ファイル操作

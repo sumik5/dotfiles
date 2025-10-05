@@ -249,6 +249,14 @@ Managerから指定された役割を柔軟に担当：
 - WebFetch（Web情報取得）
 - TodoWrite（タスク管理）
 
+#### ⚡ コマンド実行の原則（重要）
+- **❌ 悪い例**: Bashツールで`grep`、`find`、`cat`などのコマンドを使用
+- **✅ 良い例**: 専用ツール（Grep、Glob、Read）を使用
+- **検索**: 必ずGrepツール（ripgrep）を使用 - `grep`コマンドより高速
+- **ファイル検索**: Globツールを使用 - `find`コマンドより効率的
+- **ファイル読込**: Readツールを使用 - `cat`コマンドより最適化
+- **理由**: 専用ツールはClaude Code用に最適化され、より高速で効率的
+
 ### MCPツール（効率的実装用）
 - **serena MCP**（最重要 - コード編集）
   - `mcp__serena__get_symbols_overview`: ファイル概要取得
