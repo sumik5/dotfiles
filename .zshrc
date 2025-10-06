@@ -159,12 +159,6 @@ zplug "modules/osx", from:prezto, if:"[[ $OSTYPE == *darwin* ]]"
 zplug "lib/clipboard", from:oh-my-zsh, if:"[[ $OSTYPE == *darwin* ]]"
 zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
 
-# Wakatimeプラグイン（仕事環境では無効化）
-# .zshrc.workが存在する場合は読み込まない
-if [ ! -f "$HOME/.zshrc.work" ]; then
-  zplug 'sobolevn/wakatime-zsh-plugin'
-fi
-
 if ! zplug check; then
   zplug install
 fi
@@ -274,11 +268,6 @@ unction set_aws_profile() {
 # .local/bin/env（存在する場合のみ読み込み）
 if [ -f "$HOME/.local/bin/env" ]; then
   . "$HOME/.local/bin/env"
-fi
-
-# wakatime（仕事環境では無効化）
-if [ ! -f "$HOME/.zshrc.work" ]; then
-  export ZSH_WAKATIME_PROJECT_DETECTION=true
 fi
 
 #############################################
