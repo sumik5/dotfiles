@@ -30,7 +30,7 @@ CLAUDE.mdファイル（`$HOME/.claude/CLAUDE.md`）を読み込み、その内�
 **特に重要な遵守事項：**
 - **Agent System**: コード修正は必ずPO→Manager→Developerの階層で実行
 - **MCP使用**: serena優先、context7でライブラリ調査、専用ツール使用
-- **コマンド実行**: Grep/Glob/Read等の専用ツールを使用（bashコマンド禁止）
+- **コマンド実行**: grep/find/cat等はBashツールではなく専用ツール（Grep/Glob/Read）を使用
 - **設計原則**: SOLID原則、クリーンコード、テストファーストを徹底
 
 読み込み後、「CLAUDE.mdの指示を確認しました。以降これに従って動作します。」と応答してください。
