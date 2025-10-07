@@ -10,16 +10,33 @@
 1. **複雑な修正が必要な場合**
    - PO Agent → Manager Agent → Developer Agents（並列処理）の順で実行
    - 高速化のため複数のDeveloper Agentを並列起動
+   - **PO AgentがWorktree管理を担当**
 
 2. **軽微な修正・単純な修正の場合**
    - 複雑でなくても、コードの修正については自身で**絶対に**行わない
    - 必ずDeveloper Agentに指示し、Developer Agentが実行
    - PO Agent経由でも、直接Developer Agentへの指示でも可
+   - **Developer Agentに直接指示する場合は、現在のworktree情報を渡すこと**
 
 3. **例外（自分で実行可能）**
    - ファイル一覧表示
    - 単純なファイル読み込み（コード修正を伴わない）
    - 質問への回答（情報提供のみ）
+
+### 🌳 Worktree管理の原則
+
+#### Claude Code本体の責任
+1. **新規作業の判断**
+   - 新しい、既存作業と関係ない作業か判断
+   - 新規作業の場合、ユーザーに確認してworktree作成を提案
+
+2. **Worktree情報の伝達**
+   - **PO Agent使用時**: worktree作成をPO Agentに任せる
+   - **Developer Agent直接使用時**: 現在のworktree名をDeveloper Agentに渡す
+
+3. **絶対禁止事項**
+   - 勝手にworktreeを作成しない（必ずユーザー確認）
+   - 勝手にworktreeを削除しない
 
 ### 判断基準フローチャート
 ```
@@ -29,14 +46,18 @@
     ├─ No → 自分で実行可能（Read、情報提供等）
     └─ Yes → 自分では絶対に実行しない
         ↓
+        新規作業か既存作業か？
+        ├─ 新規 → ユーザーに確認してworktree作成
+        └─ 既存 → 既存worktree名を把握
+        ↓
         複雑なタスク？
-        ├─ Yes → PO Agent起動（戦略決定）
+        ├─ Yes → PO Agent起動（戦略決定＋Worktree管理）
         │           ↓
-        │       Manager Agent起動（タスク配分計画）
+        │       Manager Agent起動（タスク配分計画＋Worktree情報伝達）
         │           ↓
-        │       複数Developer Agents並列起動（実装）
+        │       複数Developer Agents並列起動（Worktree配下で実装）
         │
-        └─ No（軽微）→ Developer Agent起動（直接実装）
+        └─ No（軽微）→ Developer Agent起動（Worktree情報を渡して直接実装）
 ```
 
 ## 🎯 Quick Start - 最初にやること
@@ -562,19 +583,22 @@ agents/
 
 #### 📋 実行順序の厳守
 
-##### 1. PO Agent起動（戦略決定）
+##### 1. PO Agent起動（戦略決定とWorktree管理）
 - agents/po-agent.mdの定義を使用
 - ユーザー要求を分析し、戦略を決定
-- Managerへの指示を作成
+- **新規作業の場合、ユーザーに確認してworktreeを作成**
+- **既存worktreeでの作業の場合、worktree名を把握**
+- Managerへの指示を作成（worktree情報を含める）
 
-##### 2. Manager Agent起動（タスク配分）
+##### 2. Manager Agent起動（タスク配分とWorktree情報の伝達）
 - agents/manager-agent.mdの定義を使用
-- POからの指示を受けてタスク分析
-- Developer向けの配分計画を作成
+- POからの指示とworktree情報を受けてタスク分析
+- Developer向けの配分計画を作成（worktree情報を含める）
 - 実際のDeveloper起動はClaude Codeが実行
 
 ##### 3. Developer Agents並列起動（実装）
 - agents/developer-agent.mdの定義を使用
+- **受け取ったworktree情報に基づき、必ずworktree配下で作業**
 - Managerの計画に基づいて必ず並列起動
 - 各Developerに異なる役割とタスクを割り当て
 - dev1〜dev4まで最大4つの並列実行
@@ -616,19 +640,27 @@ agents/
 
 ### 🔑 各Agentの役割と責任
 
-#### PO Agent（戦略決定者）
-- **責任**: プロジェクト全体の戦略と方向性
-- **使用ツール**: serena MCP（俯瞰的分析）、sequentialthinking、kagi
-- **禁止**: 実装、ファイル編集、Developer起動
+#### PO Agent（戦略決定者とWorktree管理者）
+- **責任**:
+  - プロジェクト全体の戦略と方向性
+  - **Worktree管理: 新規作業の判断と作成**
+  - **ユーザー確認: worktree作成前の承認取得**
+- **使用ツール**: serena MCP（俯瞰的分析）、sequentialthinking、kagi、Bash（worktree作成用）
+- **禁止**: 実装、ファイル編集、Developer起動、**勝手なworktree作成・削除**
 
-#### Manager Agent（タスク管理者）
-- **責任**: タスク分割と依存関係管理、配分計画作成
+#### Manager Agent（タスク管理者とWorktree情報伝達者）
+- **責任**:
+  - タスク分割と依存関係管理、配分計画作成
+  - **Worktree情報の伝達: DeveloperへのWorktree名の通知**
 - **使用ツール**: serena MCP（詳細分析）、sequentialthinking
-- **禁止**: 実装、ファイル編集、Developer起動（計画のみ返す）
+- **禁止**: 実装、ファイル編集、Developer起動（計画のみ返す）、**worktree作成・削除**
 - **重要**: Developerの起動はClaude Codeが実行
 
-#### Developer Agent（実装者）
-- **責任**: 実際の作業実行
+#### Developer Agent（実装者とWorktree作業者）
+- **責任**:
+  - 実際の作業実行
+  - **Worktree配下での作業: 必ず指定されたworktree内で作業**
+  - **環境設定: 必要に応じて.envファイルをコピー**
 - **使用ツール**: 全てのツール（Write、Edit、Bash、docker、puppeteer、filesystem等）
 - **特性**: dev1-4それぞれが異なる専門性を持つ
 - **MCP使用の優先順位**:
@@ -636,12 +668,13 @@ agents/
   - ファイル操作: filesystem MCPを活用
   - Docker環境構築: docker MCPを活用
   - ブラウザ自動化: puppeteer/playwright MCPを選択
+- **禁止**: **勝手なworktree作成・削除**、**メインリポジトリでの作業（worktree指定時）**
 
 ### 📝 Agent間のコンテキスト管理
-- **PO→Manager**: 戦略的指示とユーザー要求を伝達
-- **Manager→Claude Code**: タスク配分計画を返す
-- **Claude Code→Developer**: 計画に基づいてDeveloperを起動
-- **Developer→Manager**: 完了報告
+- **PO→Manager**: 戦略的指示とユーザー要求、**worktree情報**を伝達
+- **Manager→Claude Code**: タスク配分計画、**worktree情報**を返す
+- **Claude Code→Developer**: 計画と**worktree情報**に基づいてDeveloperを起動
+- **Developer→Manager**: 完了報告（worktree内での作業結果）
 - **Manager→PO**: プロジェクト完了報告
 
 ### ⚡ パフォーマンス最適化のポイント
@@ -742,50 +775,85 @@ Web情報が必要
 
 ## 🌳 Git Worktree を使用した並行開発
 
+### 🎯 基本原則：新規作業時のWorktree使用（最重要）
+
+#### ⚠️ 必須ルール
+**新しい、今までの作業と関係ない作業だと判断した場合：**
+
+1. **Worktreeを作成して作業を開始すること**
+2. **ただし、必ずユーザーに確認を取ってから実行すること**
+   - どういう名前のworktreeで作業するか提案
+   - ユーザーの承認を得てから作成
+   - 勝手にworktreeを作成して作業開始してはいけない
+3. **現在作業しているworktreeでの作業であれば確認不要**
+4. **このworktreeを使った作業フローは絶対に遵守すること**
+
+#### 判断基準
+```
+新しいタスク受信
+    ↓
+現在の作業と関連？
+    ├─ Yes → 現在のworktreeで作業継続（確認不要）
+    └─ No → 新規worktree必要
+        ↓
+        ユーザーに確認
+        「新しい作業のため、worktree `wt-feat/機能名` を作成しますか？」
+        ↓
+        承認後に作成・作業開始
+```
+
 ### 基本概念と制約
 Git Worktreeは複数のブランチを同時に作業できる仕組みです。ただし、**Claude Codeは親ディレクトリ（`..`）にアクセスできない**ため、通常とは異なる方法で運用します。
 
 ### ⚠️ 重要な制約
 - **親ディレクトリへのアクセス不可**: Claude Codeは`../`にアクセスできません
 - **解決策**: メインリポジトリ内のサブディレクトリとしてworktreeを作成
+- **作成場所**: 必ずプロジェクトフォルダ直下
+- **命名規則**: 必ず`wt-`プレフィックスを使用
 
 ### 📁 推奨ディレクトリ構造
 ```
 your-project/              # メインリポジトリ（main/masterブランチ）
 ├── src/                   # ソースコード
 ├── tests/                 # テスト
-├── wt-feat/              # worktreeディレクトリ（プレフィックス: wt-）
-│   ├── feature-a/        # feature/feature-aブランチ
-│   └── bugfix-123/       # bugfix/issue-123ブランチ
-└── wt-hotfix/            # 緊急修正用worktree
-    └── critical-fix/     # hotfix/critical-fixブランチ
+├── .env                   # 環境変数（必要に応じてworktreeにコピー）
+├── wt-feat-auth/         # 認証機能開発用worktree
+├── wt-feat-payment/      # 決済機能開発用worktree
+├── wt-fix-bug-123/       # バグ修正用worktree
+└── wt-hotfix-security/   # 緊急セキュリティ修正用worktree
 ```
 
 ### 🎯 Worktree作成の命名規則
 
 #### 基本フォーマット
 ```bash
-git worktree add wt-{カテゴリ}/{ブランチ名} {実際のブランチパス}
+# プロジェクトフォルダ直下にwt-プレフィックスで作成
+git worktree add -b feature/ブランチ名 wt-ワークツリー名 main
 ```
+
+**パラメータ説明：**
+- `feature/ブランチ名`: 作業内容に合わせた新しいブランチ名（バグ修正の場合は`hotfix/ブランチ名`）
+- `wt-ワークツリー名`: 作業内容に合わせたworktree名（必ず`wt-`プレフィックス）
+- `main`: 元となるブランチ名（指示がなければmainをデフォルト）
 
 #### カテゴリ別の命名例
 ```bash
 # 機能開発
-git worktree add wt-feat/user-auth feature/user-authentication
-git worktree add wt-feat/8838-add-option feat/8838-add-keep-filler-option
+git worktree add -b feature/user-auth wt-feat-user-auth main
+git worktree add -b feature/payment-integration wt-feat-payment main
 
 # バグ修正
-git worktree add wt-fix/memory-leak bugfix/memory-leak-issue
-git worktree add wt-fix/issue-456 bugfix/issue-456
+git worktree add -b hotfix/memory-leak wt-fix-memory-leak main
+git worktree add -b hotfix/issue-456 wt-fix-issue-456 main
 
-# ホットフィックス
-git worktree add wt-hotfix/critical hotfix/critical-security-patch
+# 緊急修正
+git worktree add -b hotfix/critical-security wt-hotfix-security main
 
 # 実験的開発
-git worktree add wt-exp/new-architecture experimental/new-architecture
+git worktree add -b experimental/new-arch wt-exp-new-arch main
 
 # リリース準備
-git worktree add wt-release/v2.0.0 release/v2.0.0
+git worktree add -b release/v2.0.0 wt-release-v2.0.0 main
 ```
 
 ### 📋 Worktree操作ガイド
@@ -798,20 +866,26 @@ pwd  # メインリポジトリのルートであることを確認
 # 既存のworktreeを確認
 git worktree list
 
-# 新しいworktreeを作成（既存ブランチから）
-git worktree add wt-feat/payment feature/payment-integration
-
 # 新しいworktreeを作成（新規ブランチ作成と同時に）
-git worktree add -b feature/new-feature wt-feat/new-feature
+git worktree add -b feature/payment-integration wt-feat-payment main
+
+# 既存ブランチからworktreeを作成
+git worktree add wt-feat-existing feature/existing-branch
 
 # リモートブランチから作成
-git worktree add wt-feat/remote-branch origin/feature/remote-branch
+git worktree add wt-feat-remote origin/feature/remote-branch
 ```
 
 #### 2. Worktreeでの作業
 ```bash
 # worktreeに移動
-cd wt-feat/payment
+cd wt-feat-payment
+
+# 必要に応じて環境変数ファイルをコピー
+cp ../.env .env
+
+# 親フォルダの.serenaをコピー（初期化より高速）
+cp -r ../.serena .serena
 
 # 通常通り開発作業を実施
 git status
@@ -820,7 +894,7 @@ git commit -m "feat: implement payment gateway"
 git push origin feature/payment-integration
 
 # メインリポジトリに戻る
-cd ../..
+cd ..
 ```
 
 #### 3. Worktreeの管理
@@ -841,17 +915,22 @@ git worktree prune
 ### ⚡ ベストプラクティス
 
 #### DO（推奨事項）
-- ✅ **プレフィックス使用**: 必ず`wt-`プレフィックスを使用してworktreeを識別
-- ✅ **カテゴリ分け**: feat/fix/hotfix等でディレクトリを整理
-- ✅ **定期的なクリーンアップ**: 使用済みworktreeは削除
-- ✅ **ブランチ名の一貫性**: worktreeディレクトリ名とブランチ名を対応させる
+- ✅ **ユーザー確認を取る**: 新規worktree作成時は必ずユーザーに確認
+- ✅ **プレフィックス使用**: 必ず`wt-`プレフィックスを使用
+- ✅ **プロジェクト直下に作成**: 親ディレクトリではなくプロジェクトフォルダ直下
+- ✅ **環境変数のコピー**: 必要に応じて`.env`ファイルをworktreeにコピー
+- ✅ **.serenaのコピー**: `cp -r ../.serena .serena`で親の.serenaをコピー（初期化不要）
 - ✅ **作業前の確認**: `git worktree list`で既存worktreeを確認
+- ✅ **定期的なクリーンアップ**: 使用済みworktreeは削除（ただしAgentは自動削除しない）
 
 #### DON'T（避けるべき事項）
+- ❌ **勝手にworktreeを作成**: 必ずユーザー確認を取る
+- ❌ **勝手にworktreeを削除**: Agentはworktreeを自動削除しない
 - ❌ **親ディレクトリへの作成**: `../`にworktreeを作成しない
 - ❌ **ネストしたworktree**: worktree内にworktreeを作成しない
 - ❌ **同じブランチの複数worktree**: 1つのブランチに複数のworktreeを作成しない
-- ❌ **長期間の放置**: 使用しないworktreeを残さない
+- ❌ **worktree外での作業**: 必ずworktree内部で作業する
+- ❌ **serenaの再初期化**: worktreeごとに初期化せず、.serenaをコピーする
 
 ### 🔍 トラブルシューティング
 
@@ -892,24 +971,47 @@ git worktree prune
 
 ### 📊 Worktree使用時のserena連携
 
-Worktreeで作業する場合、serenaの再初期化が必要です：
+Worktreeで作業する場合、親フォルダの.serenaをコピーして使用します：
 
 ```bash
 # worktreeに移動
-cd wt-feat/new-feature
+cd wt-feat-new-feature
 
-# serenaを再初期化（worktreeごとに必要）
-mcp__serena__activate_project(project=".")
+# 必要に応じて環境変数をコピー
+cp ../.env .env
+
+# 親フォルダの.serenaをコピー（初期化より高速）
+cp -r ../.serena .serena
 
 # 開発作業を実施
 # ...
 
 # メインリポジトリに戻る
-cd ../..
-
-# メインリポジトリのserenaを再アクティベート
-mcp__serena__activate_project(project=".")
+cd ..
 ```
+
+**重要**:
+- `.serena`をコピーすることで、毎回の初期化が不要になり時間を節約
+- 親プロジェクトで既にserenaが初期化されている必要があります
+- worktree内で`.serena`を変更しても親には影響しません
+
+### 🛠️ gwq（Git Worktree Quick）ツールの活用
+
+gwqは、git worktreeをより効率的に管理するためのツールです。利用可能な場合は積極的に使用してください。
+
+#### 基本的な使い方
+```bash
+# 一貫した命名規則で自動作成
+gwq add -b feature/auth-refactor
+
+# Fuzzy Finderでworktreeを選択してアクセス
+cd $(gwq get)  # 全worktreeから選択
+
+# 部分マッチで素早くアクセス
+cd $(gwq get auth)  # 'auth'を含むworktreeを検索
+```
+
+**注意**: gwqが利用できない環境では通常の`git worktree`コマンドを使用してください。
 
 ## 📝 テクニカルライティングガイドライン
 
