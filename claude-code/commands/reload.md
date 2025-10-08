@@ -29,6 +29,8 @@ CLAUDE.mdファイル（`$HOME/.claude/CLAUDE.md`）を読み込み、その内�
 
 **特に重要な遵守事項：**
 - **Agent System**: コード修正は必ずPO→Manager→Developerの階層で実行
+- **Worktree管理**: 新規作業時はユーザー確認後にworktree作成。PO AgentがWorktree管理を担当
+- **Git操作絶対禁止**: git add/commit/push等のGit操作は絶対に実行しない。Agentに任せる
 - **MCP使用**: serena優先、context7でライブラリ調査、専用ツール使用
 - **コマンド実行**: grep/find/cat等はBashツールではなく専用ツール（Grep/Glob/Read）を使用
 - **設計原則**: SOLID原則、クリーンコード、テストファーストを徹底

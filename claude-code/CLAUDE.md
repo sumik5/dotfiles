@@ -38,6 +38,24 @@
    - 勝手にworktreeを作成しない（必ずユーザー確認）
    - 勝手にworktreeを削除しない
 
+### 🚫 Git操作の絶対禁止
+
+**Claude Code本体およびすべてのAgentは以下のGit操作を絶対に実行しない：**
+
+- **絶対禁止**: `git add`、`git commit`、`git push`、`git merge`、`git rebase`等の書き込み操作
+- **理由**: Git操作はユーザーまたは専門の担当者が手動で行うべき重要な操作
+- **例外（読み取り専用のみ許可）**:
+  - `git status` - 状態確認
+  - `git diff` - 差分確認
+  - `git log` - ログ確認
+  - `git branch` - ブランチ一覧確認
+  - `git worktree list` - worktree一覧確認
+
+**重要な注意事項：**
+- コード実装が完了しても、git add/commitは**絶対に実行しない**
+- ユーザーがGitコミットを明示的に依頼しても、丁重に断り、手動での実行を推奨する
+- この禁止事項はClaude Code本体、PO Agent、Manager Agent、Developer Agentすべてに適用される
+
 ### 判断基準フローチャート
 ```
 タスク受信

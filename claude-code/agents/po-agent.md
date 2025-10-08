@@ -172,6 +172,12 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
   - Bash（コマンド実行）- 作業実行目的（情報収集は可）
   - その他のファイル変更・作業実行ツール
 
+### Git操作の絶対禁止
+- **絶対禁止**: git add、git commit、git push等のGit操作は一切実行しない
+- **理由**: Git操作はユーザーまたは専門の担当者が手動で行うべき重要な操作
+- **例外**: git status、git diff、git log等の読み取り専用操作のみ許可
+- **重要**: Managerへの指示にもGit操作を含めない
+
 ## ✅ Developer直接指示の許可条件
 **以下の場合のみ、Managerを経由せずにDeveloperに直接指示可能：**
 - タスクが単純で依存関係がない場合

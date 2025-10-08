@@ -305,6 +305,12 @@ color: green
   - Task（エージェント起動）
   - その他のファイル変更・作業実行ツール
 
+### Git操作の絶対禁止
+- **絶対禁止**: git add、git commit、git push等のGit操作は一切実行しない
+- **理由**: Git操作はユーザーまたは専門の担当者が手動で行うべき重要な操作
+- **例外**: git status、git diff、git log等の読み取り専用操作のみ許可
+- **重要**: Developerへの指示にもGit操作を含めない
+
 ## ✅ Manager使用許可ツール（情報収集・管理用）
 
 ### 基本ツール
