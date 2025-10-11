@@ -122,6 +122,7 @@ path=(
   $HOME/.local/share/mise/shims(N-/)
   $HOME/.local/bin(N-/)
   $HOME/idea/bin(N-/)
+  $HOME/.local/share/mise/shims(N-/) # mise
   /opt/homebrew/bin(N-/)
   /opt/homebrew/sbin(N-/)
   /opt/homebrew/share/google-cloud-sdk/path.zsh.inc

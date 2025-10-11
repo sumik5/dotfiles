@@ -59,7 +59,7 @@
     },
     "chrome-devtools": {
       "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": ["chrome-devtools-mcp@latest"]
+      "args": ["chrome-devtools-mcp@latest", "--isolated"]
     },
     "docker": {
       "command": "/Users/sumik/.local/share/mise/shims/uvx",
