@@ -189,9 +189,13 @@ export LESS='-F -g -i -M -R -S -w -X -z-4'
 
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+  FPATH=$HOME/.docker/completions:$FPATH
   source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
   autoload -Uz compinit && compinit
 fi
+
+autoload -Uz compinit
+compinit
 
 
 # for compile keyboard1
@@ -386,14 +390,3 @@ fi
 if ! command -v direnv &> /dev/null && [ -f "./.envrc" ]; then
   source "./.envrc"
 fi
-
-
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/sumik/.lmstudio/bin"
-# End of LM Studio CLI section
-
-# The following lines have been added by Docker Desktop to enable Docker CLI completions.
-fpath=($HOME/.docker/completions $fpath)
-autoload -Uz compinit
-compinit
-# End of Docker CLI completions
