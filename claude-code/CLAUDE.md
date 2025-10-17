@@ -593,7 +593,7 @@ graph TD
 
 #### 📂 Agent定義ファイルの場所
 ```
-agents/
+~/.claude/agents/
 ├── po-agent.md        # PO Agent定義
 ├── manager-agent.md   # Manager Agent定義
 └── developer-agent.md # Developer Agent定義
@@ -602,20 +602,20 @@ agents/
 #### 📋 実行順序の厳守
 
 ##### 1. PO Agent起動（戦略決定とWorktree管理）
-- agents/po-agent.mdの定義を使用
+- ~/.claude/agents/po-agent.mdの定義を使用
 - ユーザー要求を分析し、戦略を決定
 - **新規作業の場合、ユーザーに確認してworktreeを作成**
 - **既存worktreeでの作業の場合、worktree名を把握**
 - Managerへの指示を作成（worktree情報を含める）
 
 ##### 2. Manager Agent起動（タスク配分とWorktree情報の伝達）
-- agents/manager-agent.mdの定義を使用
+- ~/.claude/agents/manager-agent.mdの定義を使用
 - POからの指示とworktree情報を受けてタスク分析
 - Developer向けの配分計画を作成（worktree情報を含める）
 - 実際のDeveloper起動はClaude Codeが実行
 
 ##### 3. Developer Agents並列起動（実装）
-- agents/developer-agent.mdの定義を使用
+- ~/.claude/agents/developer-agent.mdの定義を使用
 - **受け取ったworktree情報に基づき、必ずworktree配下で作業**
 - Managerの計画に基づいて必ず並列起動
 - 各Developerに異なる役割とタスクを割り当て
