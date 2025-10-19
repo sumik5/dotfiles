@@ -285,6 +285,15 @@ Managerから指定された役割を柔軟に担当：
   - `mcp__context7__resolve_library_id`: ライブラリID解決
   - `mcp__context7__get_library_docs`: ドキュメント取得
 
+- **shadcn MCP**（React/Next.js UIコンポーネント管理）
+  - `mcp__shadcn__get_project_registries`: レジストリ名取得（components.json確認）
+  - `mcp__shadcn__list_items_in_registries`: コンポーネント一覧取得
+  - `mcp__shadcn__search_items_in_registries`: コンポーネント検索（ファジーマッチング）
+  - `mcp__shadcn__view_items_in_registries`: コンポーネント詳細表示
+  - `mcp__shadcn__get_item_examples_from_registries`: 使用例・デモコード取得
+  - `mcp__shadcn__get_add_command_for_items`: shadcn CLI addコマンド取得
+  - `mcp__shadcn__get_audit_checklist`: 品質チェックリスト取得
+
 - **docset MCP**（言語仕様・リファレンス）
   - `mcp__docset__search_docs`: ドキュメント検索
   - `mcp__docset__search_cheatsheet`: チートシート参照
@@ -465,6 +474,35 @@ Managerから指定された役割を柔軟に担当：
 - TypeScript（最新型システム）
 - TailwindCSS（最新ユーティリティ）
 
+##### 1-2. shadcn MCPでのUIコンポーネント管理（React/Next.js）
+```typescript
+// React/Next.jsプロジェクトでshadcn/uiを使用する場合
+
+// 1. プロジェクトレジストリの確認（components.json存在確認）
+mcp__shadcn__get_project_registries()
+
+// 2. 利用可能なコンポーネントを検索
+mcp__shadcn__search_items_in_registries({ query: "button" })
+
+// 3. コンポーネントの詳細情報を確認
+mcp__shadcn__view_items_in_registries({ items: ["button"] })
+
+// 4. 使用例とデモコードを取得
+mcp__shadcn__get_item_examples_from_registries({ items: ["button-demo"] })
+
+// 5. コンポーネント追加コマンドを取得
+mcp__shadcn__get_add_command_for_items({ items: ["button", "card"] })
+
+// 6. コンポーネント追加後の品質チェック
+mcp__shadcn__get_audit_checklist()
+```
+
+**shadcn MCP使用時の重要なポイント**:
+- **components.jsonが必要**: プロジェクトにcomponents.jsonがない場合は、まず `npx shadcn-ui@latest init` で初期化
+- **コンポーネント追加後は必ず品質チェック**: `get_audit_checklist`でチェックリストを取得し、動作確認を実施
+- **使用例の活用**: 実装前に`get_item_examples_from_registries`でデモコードを確認し、正しい使い方を理解
+- **複数コンポーネントの一括追加**: `get_add_command_for_items`で複数のコンポーネントを同時に追加可能
+
 ##### 2. context7にない場合の情報収集戦略
 
 **A. 最新情報・時事問題 → kagi MCP（最優先）**
@@ -602,6 +640,7 @@ mcp__pandoc__convert({
 |---------|---------|--------|--------|
 | コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
 | **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
+| **React/Next.js UI実装** | **shadcn** | **UIコンポーネント検索・追加・管理** | **🔴必須** |
 | **Web検索（補助）** | **kagi** | **最新情報、ベストプラクティス** | **🔴必須** |
 | **複数ページ調査** | **firecrawl** | **Webクロール、競合分析、ディープリサーチ** | **推奨** |
 | **動画分析** | **youtube** | **技術解説動画、カンファレンス分析** | **推奨** |
@@ -619,27 +658,28 @@ mcp__pandoc__convert({
 
 #### 情報収集の最適化
 1. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
-2. **Web情報収集の使い分け**:
+2. **shadcnでUIコンポーネント管理（React/Next.js）**: components.json確認、コンポーネント検索・追加、品質チェック
+3. **Web情報収集の使い分け**:
    - 単一ページ → WebFetch tool（軽量・安定）
    - 最新情報・時事問題 → kagi MCP（検索特化）
    - 複数ページ調査 → firecrawl MCP（クロール・分析）
    - ファイル変換保存 → markdownify MCP（多様な形式対応）
-3. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
+4. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
 
 #### コード編集の最適化
-4. **serena優先**: コード編集はserenaのシンボル単位操作
-5. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
-6. **並列MCP呼び出し**: 複数のMCPを同時実行
+5. **serena優先**: コード編集はserenaのシンボル単位操作
+6. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
+7. **並列MCP呼び出し**: 複数のMCPを同時実行
 
 #### 開発環境の最適化
-7. **メモリ活用**: 作業メモをserenaに保存
-8. **段階的検索**: 概要→詳細の順で情報取得
-9. **ドキュメント変換**: pandoc/markdownify MCPで文書形式を柔軟に変換
-10. **ブラウザ自動化の使い分け**:
+8. **メモリ活用**: 作業メモをserenaに保存
+9. **段階的検索**: 概要→詳細の順で情報取得
+10. **ドキュメント変換**: pandoc/markdownify MCPで文書形式を柔軟に変換
+11. **ブラウザ自動化の使い分け**:
     - 軽量・高速処理 → puppeteer
     - マルチブラウザ対応 → playwright
     - 詳細分析 → chrome-devtools
-11. **Docker活用**: 開発環境はコンテナ化して管理
+12. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 

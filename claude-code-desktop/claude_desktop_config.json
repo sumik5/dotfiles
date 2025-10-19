@@ -101,6 +101,10 @@
       "env": {
         "UV_PATH": "/Users/sumik/.local/share/mise/shims/uv"
       }
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
     }
   },
   "preferences": {
