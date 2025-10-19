@@ -239,6 +239,24 @@ color: green
 ※軽量タスクはpuppeteer、複雑なE2Eはplaywright、詳細分析はchrome-devtools
 ```
 
+#### AWSインフラ構築プロジェクトの場合
+```
+【段階的実行】
+第1段階（要件・設計フェーズ）：
+- dev1: AWSドキュメント調査（awslabs.aws-documentation MCP活用）
+- dev2: アーキテクチャ設計とWell-Architected Review（awslabs.aws-documentation MCP活用）
+
+第2段階（dev1,2完了後 - IaC実装フェーズ）：
+- dev3: AWS Terraformコード作成（awslabs.terraform MCP活用、セキュリティ重視）
+- dev4: Terraform State管理設定（awslabs.terraform MCP活用）
+
+第3段階（統合テスト）：
+- dev1: インフラのデプロイテストとバリデーション（awslabs.terraform MCP活用）
+
+※AWSプロジェクトは必ずawslabs MCPを優先使用
+※マルチクラウドの場合は汎用terraform MCPも併用
+```
+
 ## 🧠 役割配分の考慮事項
 
 ### プロジェクト性質の分析
@@ -341,6 +359,20 @@ color: green
 
 - **context7 MCP**（技術調査）
   - `mcp__context7__get_library_docs`: ライブラリドキュメント
+
+- **awslabs.aws-documentation MCP**（AWSドキュメント・ベストプラクティス）
+  - AWS公式ドキュメントの検索と参照
+  - AWSアーキテクチャパターンとベストプラクティス
+  - AWS Well-Architected Frameworkの活用
+
+- **awslabs.terraform MCP**（AWS Terraform専門）
+  - AWS特化のTerraformベストプラクティス
+  - セキュアなAWSインフラのコード化
+  - AWSプロバイダー最新ドキュメント
+
+- **terraform MCP**（汎用Terraform）
+  - マルチクラウド環境のIaC実装
+  - Azure、GCP等のインフラ構築
 
 **注意: TaskツールはManagerでは使用しません。タスク配分計画を返し、実際のDeveloper起動はClaude Codeが行います。**
 

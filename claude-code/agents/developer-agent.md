@@ -352,8 +352,21 @@ Managerから指定された役割を柔軟に担当：
 - **sequentialthinking MCP**（複雑な問題解決）
   - `mcp__sequentialthinking__sequentialthinking`: 段階的思考
 
-- **terraform MCP**（インフラ構築）
-  - インフラコードの作成・管理
+- **awslabs.aws-documentation MCP**（AWSドキュメント専門）
+  - AWS公式ドキュメントの検索と参照
+  - AWSベストプラクティスとアーキテクチャパターン
+  - AWS Well-Architected Framework参照
+  - セキュリティ、コンプライアンス、コスト最適化ガイド
+
+- **awslabs.terraform MCP**（AWS Terraform専門）
+  - AWS特化のTerraformベストプラクティス
+  - AWSプロバイダー（aws、awscc）の最新ドキュメント
+  - セキュリティ重視のTerraformワークフロー
+  - AWS State管理のベストプラクティス
+
+- **terraform MCP**（汎用Terraform - マルチクラウド）
+  - Azure、GCP等のインフラコード作成
+  - マルチクラウド環境の管理
 
 ## 🛠️ 開発タスクの実行方法
 ### 重要: serena MCPを活用した効率的実装
@@ -599,8 +612,22 @@ mcp__pandoc__convert({
 - 複雑な問題の分解と解決
 
 #### 🔧 インフラ構築
-- **terraform MCP**: モジュール検索とインフラコード作成
-- AWS/Azure/GCPリソースの構築
+
+**AWSインフラ構築（AWS特化）**:
+- **awslabs.aws-documentation MCP**:
+  - AWSサービスの公式ドキュメント確認
+  - ベストプラクティスとアーキテクチャパターン取得
+  - AWS Well-Architected Frameworkの参照
+  - セキュリティ・コンプライアンス・コスト最適化のガイドライン
+- **awslabs.terraform MCP**:
+  - AWS特化のTerraformベストプラクティス適用
+  - セキュリティ重視のワークフロー実装
+  - AWSプロバイダー（aws、awscc）の最新ドキュメント参照
+  - Terraform State管理のAWSベストプラクティス適用
+
+**マルチクラウド/汎用インフラ構築**:
+- **terraform MCP**: Azure、GCP等のインフラコード作成
+- マルチクラウド環境の統一管理
 - IaCベストプラクティスの適用
 
 #### 🐳 Docker環境構築
@@ -641,6 +668,8 @@ mcp__pandoc__convert({
 | コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
 | **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
 | **React/Next.js UI実装** | **shadcn** | **UIコンポーネント検索・追加・管理** | **🔴必須** |
+| **AWSドキュメント参照** | **awslabs.aws-documentation** | **AWSベストプラクティス、Well-Architected** | **🔴AWS必須** |
+| **AWS Terraform実装** | **awslabs.terraform** | **AWS特化IaC、セキュリティ重視** | **🔴AWS必須** |
 | **Web検索（補助）** | **kagi** | **最新情報、ベストプラクティス** | **🔴必須** |
 | **複数ページ調査** | **firecrawl** | **Webクロール、競合分析、ディープリサーチ** | **推奨** |
 | **動画分析** | **youtube** | **技術解説動画、カンファレンス分析** | **推奨** |
@@ -652,7 +681,7 @@ mcp__pandoc__convert({
 | 高機能テスト自動化 | playwright | E2Eテスト、クロスブラウザテスト | 推奨 |
 | Chrome詳細分析 | chrome-devtools | パフォーマンス計測、デバッグ | 推奨 |
 | 複雑な問題 | sequentialthinking | アルゴリズム、デバッグ | 推奨 |
-| インフラ | terraform | AWS/Azure/GCP構築 | 推奨 |
+| マルチクラウドインフラ | terraform | Azure/GCP構築 | 推奨 |
 
 ### 効率化のためのベストプラクティス
 

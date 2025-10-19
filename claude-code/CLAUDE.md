@@ -347,7 +347,7 @@ mcp__serena__get_symbols_overview()
 
 ### 🛠️ インフラ・DevOps系
 
-#### **terraform** - Infrastructure as Code
+#### **terraform** - Infrastructure as Code（汎用）
 - **用途**:
   - クラウドインフラ（AWS、Azure、GCP）の設計と構築
   - インフラストラクチャのバージョン管理と変更追跡
@@ -355,7 +355,34 @@ mcp__serena__get_symbols_overview()
   - モジュールを使用した再利用可能なインフラコンポーネント作成
   - プロバイダーの最新機能と非推奨機能の確認
   - セキュリティとコンプライアンスのポリシー実装
-- **使用場面**: クラウドインフラの構築、DevOps実装、IaCベストプラクティスの適用
+- **使用場面**: マルチクラウド環境、AWS以外のクラウドプロバイダー（Azure、GCP等）
+
+#### **awslabs.aws-documentation-mcp-server** - AWSドキュメント専門
+- **用途**:
+  - AWSサービスの公式ドキュメントへの直接アクセス
+  - AWSベストプラクティスとアーキテクチャパターンの取得
+  - AWS Well-Architected Frameworkの参照
+  - AWSサービス固有の設定ガイドと推奨事項
+  - セキュリティ、コンプライアンス、コスト最適化のガイドライン
+- **使用場面**:
+  - **AWS特化の開発・構築時（最優先）**
+  - AWSサービスの正確な仕様確認
+  - AWSアーキテクチャ設計の意思決定
+  - AWS Well-Architected Reviewの実施
+
+#### **awslabs.terraform-mcp-server** - AWS Terraform専門
+- **用途**:
+  - AWS特化のTerraformベストプラクティス提供
+  - AWSプロバイダー（aws、awscc）の最新ドキュメント
+  - セキュリティ重視のTerraformワークフロー
+  - AWSリソースのIaC実装パターン
+  - Terraform State管理のAWSベストプラクティス
+  - AWS固有のモジュール設計とリソース最適化
+- **使用場面**:
+  - **AWS環境のTerraform実装時（AWS特化、最優先）**
+  - セキュアなAWSインフラのコード化
+  - AWSマネージドサービスのTerraform化
+  - AWS Control TowerやOrganizationsとの統合
 
 #### **docker** - コンテナ管理
 - **用途**:
@@ -476,7 +503,10 @@ mcp__serena__get_symbols_overview()
 ### 2. 開発タスクの優先順位
 1. **コード解析・編集**: `serena` を必須使用（正確な変更）
 2. **React/Next.js UI実装**: `shadcn` を使用（コンポーネント管理）
-3. **インフラ設定**: `terraform` を使用（IaC実装）
+3. **AWSインフラ設定**:
+   - **AWSドキュメント参照**: `awslabs.aws-documentation-mcp-server` を最優先（ベストプラクティス確認）
+   - **AWS Terraform実装**: `awslabs.terraform-mcp-server` を使用（セキュアなIaC）
+   - **マルチクラウド/汎用Terraform**: `terraform` を使用（Azure、GCP等）
 4. **Web自動化・テスト**: `playwright` を使用（UI操作）
 
 ### 3. 問題解決アプローチ
@@ -799,10 +829,13 @@ Web情報が必要
 | コード編集 | serena | 90% |
 | ライブラリ調査 | context7 | 70% |
 | React/Next.js UI実装 | shadcn | 60% |
+| **AWSドキュメント参照** | **awslabs.aws-documentation** | **60%** |
+| **AWS Terraform実装** | **awslabs.terraform** | **50%** |
 | 問題解決 | sequentialthinking | 40% |
 | Docker環境管理 | docker | 40% |
 | ファイル操作 | filesystem | 35% |
 | Web検索（最新情報） | kagi | 30% |
+| **汎用Terraform（マルチクラウド）** | **terraform** | **30%** |
 | Webクロール・分析 | firecrawl | 25% |
 | ブラウザ自動化 | puppeteer | 25% |
 | 動画分析 | youtube | 20% |

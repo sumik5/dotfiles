@@ -228,6 +228,20 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
 - **deepwiki MCP**（オープンソース調査）
   - `mcp__deepwiki__ask_question`: リポジトリ質問
 
+- **awslabs.aws-documentation MCP**（AWSドキュメント・ベストプラクティス）
+  - AWS公式ドキュメントの検索と参照
+  - AWSアーキテクチャパターンとベストプラクティス
+  - AWS Well-Architected Frameworkの活用
+
+- **awslabs.terraform MCP**（AWS Terraform専門）
+  - AWS特化のTerraformベストプラクティス
+  - セキュアなAWSインフラのコード化
+  - AWSプロバイダー最新ドキュメント
+
+- **terraform MCP**（汎用Terraform）
+  - マルチクラウド環境のIaC実装
+  - Azure、GCP等のインフラ構築
+
 ## 🎯 MCPサーバの戦略的活用
 
 ### 0. 必須: 利用可能なMCPサーバーの確認
@@ -262,7 +276,11 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
 - パフォーマンス分析 → Chrome DevTools MCP活用を指示
 
 **インフラ戦略**:
-- IaC（Infrastructure as Code） → Terraform MCP活用を推奨
+- **AWSインフラ構築**:
+  - AWSドキュメント・ベストプラクティス確認 → awslabs.aws-documentation MCP最優先
+  - AWS特化Terraform実装 → awslabs.terraform MCP活用を推奨（セキュリティ重視）
+  - マルチクラウド/汎用IaC → terraform MCP活用を推奨（Azure、GCP等）
+- **AWS以外のクラウド**: terraform MCP活用を推奨
 
 ### 4. リスク評価時
 - **依存関係分析**: serena MCPで重要コンポーネントの参照を確認
