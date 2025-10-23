@@ -387,6 +387,13 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
   - Azure、GCP等のインフラコード作成
   - マルチクラウド環境の管理
 
+- **next-devtools MCP**（Next.js開発統合ツール）
+  - `mcp__next-devtools__upgrade`: Next.jsアップグレード自動化
+  - `mcp__next-devtools__enable_cache`: Cache Components自動セットアップ
+  - `mcp__next-devtools__diagnose`: 開発サーバー診断とエラー検出
+  - `mcp__next-devtools__get_routes`: ルート構造取得
+  - `mcp__next-devtools__auto_fix`: エラー自動修正機能
+
 ## 🛠️ 開発タスクの実行方法
 ### 重要: serena MCPを活用した効率的実装
 **開発タスクを受け取ったら、serena MCPを最大限活用して効率的に実装します。**
@@ -590,6 +597,82 @@ mcp__pandoc__convert({
 
 **警告**: 古い仕様や非推奨のパターンを使用すると、バグや非互換性の原因になります
 
+##### 3-2. Next.js開発時の必須手順（Next.jsプロジェクト専用）
+
+**⚠️ 最重要: Next.jsプロジェクトでは必ずnext-devtools MCPを最優先で使用**
+
+**A. プロジェクト開始時の診断**
+```typescript
+// 1. 開発サーバーが起動していることを確認
+// Bash: npm run dev または yarn dev
+
+// 2. next-devtools MCPでアプリケーション診断
+mcp__next-devtools__diagnose()
+// → Next.jsバージョン、設定、エラー状況を確認
+
+// 3. ルート構造の把握
+mcp__next-devtools__get_routes()
+// → App RouterまたはPages Routerの構造を理解
+```
+
+**B. Next.jsアップグレード時**
+```typescript
+// アップグレード自動化（codemodを含む）
+mcp__next-devtools__upgrade({ targetVersion: "16" })
+// → 自動でコード変更、破壊的変更への対応を実施
+```
+
+**C. Server Components実装時**
+```typescript
+// 1. Cache Components最適化
+mcp__next-devtools__enable_cache()
+// → 自動でSuspense境界、キャッシング指示、静的パラメータを設定
+
+// 2. エラー検出と自動修正
+mcp__next-devtools__auto_fix()
+// → Server Components特有のエラーを検出し修正提案
+```
+
+**D. デバッグ・エラー修正時**
+```typescript
+// 1. 診断実行
+mcp__next-devtools__diagnose()
+// → 実行中の開発サーバーから内部状態とエラー情報を取得
+
+// 2. 自動修正実行
+mcp__next-devtools__auto_fix()
+// → 検出されたエラーを自動修正
+
+// 3. 修正確認
+// 開発サーバーのログで修正結果を確認
+```
+
+**E. 推奨ワークフロー（Next.jsプロジェクト）**
+```
+1. プロジェクト分析
+   ├─ serena MCP: コードベース全体の構造把握
+   └─ next-devtools MCP: Next.js特有の構造とルート確認
+
+2. 実装前の確認
+   ├─ context7 MCP: 最新Next.js仕様確認
+   └─ next-devtools MCP: 現在のバージョンと推奨事項確認
+
+3. 実装
+   ├─ serena MCP: コード編集
+   ├─ shadcn MCP: UIコンポーネント管理
+   └─ next-devtools MCP: Server Components最適化
+
+4. テスト・デバッグ
+   ├─ next-devtools MCP: エラー診断と自動修正
+   └─ playwright MCP: E2Eテスト実施
+```
+
+**重要なポイント**:
+- **Next.jsプロジェクトでは必ずnext-devtools MCPを最優先で使用**
+- **開発サーバーを起動してから診断・修正を実施**
+- **Server Components実装時は自動修正機能を活用**
+- **アップグレードは必ずnext-devtools MCPの自動化ツールを使用**
+
 #### 実装品質の確保
 
 **コード設計の原則を適用：**
@@ -685,6 +768,7 @@ mcp__pandoc__convert({
 | タスク種別 | 推奨MCP | 使用例 | 必須度 |
 |---------|---------|--------|--------|
 | コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
+| **Next.js開発全般** | **next-devtools** | **診断、アップグレード、最適化、エラー修正** | **🔴Next.js必須** |
 | **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
 | **React/Next.js UI実装** | **shadcn** | **UIコンポーネント検索・追加・管理** | **🔴必須** |
 | **AWSドキュメント参照** | **awslabs.aws-documentation** | **AWSベストプラクティス、Well-Architected** | **🔴AWS必須** |
@@ -705,14 +789,15 @@ mcp__pandoc__convert({
 ### 効率化のためのベストプラクティス
 
 #### 情報収集の最適化
-1. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
-2. **shadcnでUIコンポーネント管理（React/Next.js）**: components.json確認、コンポーネント検索・追加、品質チェック
-3. **Web情報収集の使い分け**:
+1. **Next.js開発（Next.jsプロジェクト専用）**: next-devtools MCPで診断、アップグレード、エラー修正を最優先
+2. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
+3. **shadcnでUIコンポーネント管理（React/Next.js）**: components.json確認、コンポーネント検索・追加、品質チェック
+4. **Web情報収集の使い分け**:
    - 単一ページ → WebFetch tool（軽量・安定）
    - 最新情報・時事問題 → kagi MCP（検索特化）
    - 複数ページ調査 → firecrawl MCP（クロール・分析）
    - ファイル変換保存 → markdownify MCP（多様な形式対応）
-4. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
+5. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
 
 #### コード編集の最適化
 5. **serena優先**: コード編集はserenaのシンボル単位操作

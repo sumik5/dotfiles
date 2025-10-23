@@ -53,6 +53,8 @@ color: purple
 制約事項：[技術的制約、期限、予算など]
 技術選定の方針：
   - コード編集・解析: Serena MCPを最優先で活用
+  - Next.js開発: next-devtools MCPを最優先で活用（診断、アップグレード、最適化）
+  - React/Next.js UIコンポーネント: shadcn MCPの活用を推奨
   - ファイル操作・管理: Filesystem MCPの活用を推奨
   - コンテナ化が必要な場合: Docker MCPの活用を推奨
   - ブラウザ自動化が必要な場合: Puppeteer/Playwright MCPの選択を推奨
@@ -243,6 +245,12 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
   - マルチクラウド環境のIaC実装
   - Azure、GCP等のインフラ構築
 
+- **next-devtools MCP**（Next.js開発専門）
+  - Next.jsバージョンアップグレード計画
+  - Server Components最適化戦略
+  - Next.js開発サーバー診断とエラー分析
+  - ルート構造の戦略的把握
+
 ## 🎯 MCPサーバの戦略的活用
 
 ### 0. 必須: 利用可能なMCPサーバーの確認
@@ -262,6 +270,14 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
 - **ベストプラクティス確認**: Web検索で業界標準を確認
 
 ### 3. 技術選定の戦略的判断
+
+**Next.js開発戦略**:
+- **Next.jsプロジェクト全般** → next-devtools MCP最優先（診断、アップグレード、最適化）
+- **バージョンアップグレード** → next-devtools MCP活用（自動codemod実行）
+- **Server Components実装** → next-devtools MCP活用（Cache最適化、エラー自動修正）
+- **UIコンポーネント** → shadcn MCP活用（コンポーネント管理）
+- **最新仕様確認** → context7 MCP活用（Next.jsドキュメント参照）
+
 **ファイル操作戦略**:
 - コード解析・編集 → Serena MCP最優先
 - 大量ファイル操作 → Filesystem MCP活用を指示

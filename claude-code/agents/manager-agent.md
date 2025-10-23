@@ -78,6 +78,8 @@ color: green
 技術要件：[使用技術・制約事項]
 特別なMCP活用：
   - コード編集・解析: serena MCPを最優先
+  - Next.js開発: next-devtools MCPを最優先（診断、アップグレード、エラー修正）
+  - React/Next.js UIコンポーネント: shadcn MCPを使用
   - 大量ファイル操作: filesystem MCPを使用
   - Docker環境構築が必要な場合: docker MCPを使用
   - ブラウザ自動化が必要な場合: puppeteer/playwright MCPを選択
@@ -240,6 +242,28 @@ color: green
 ※軽量タスクはpuppeteer、複雑なE2Eはplaywright、詳細分析はchrome-devtools
 ```
 
+#### Next.js開発プロジェクトの場合
+```
+【段階的実行】
+第1段階（分析・診断フェーズ - 並列実行）：
+- dev1: next-devtools MCPでNext.jsアプリケーション診断とルート構造確認
+- dev2: serena MCPでコードベース全体の構造分析
+- dev3: context7 MCPで最新Next.js仕様確認
+
+第2段階（dev1,2,3完了後 - 実装フェーズ）：
+- dev1: フロントエンド実装（next-devtools + shadcn MCP活用）
+- dev2: Server Components実装とCache最適化（next-devtools MCP活用）
+- dev3: API Routes / Server Actions実装（next-devtools MCP活用）
+
+第3段階（品質保証フェーズ）：
+- dev4: next-devtools MCPでエラー検出・自動修正
+- dev1: playwright MCPでE2Eテスト実施
+
+※Next.jsプロジェクトは必ずnext-devtoolsを最優先使用
+※UIコンポーネントはshadcn MCPで管理
+※Server Componentsの最適化はnext-devtools MCPの自動修正機能を活用
+```
+
 #### AWSインフラ構築プロジェクトの場合
 ```
 【段階的実行】
@@ -374,6 +398,11 @@ color: green
 - **terraform MCP**（汎用Terraform）
   - マルチクラウド環境のIaC実装
   - Azure、GCP等のインフラ構築
+
+- **next-devtools MCP**（Next.js開発専門）
+  - Next.jsアプリケーション診断と最適化
+  - Server Componentsのエラー検出と修正
+  - ルート構造の分析とパフォーマンス確認
 
 **注意: TaskツールはManagerでは使用しません。タスク配分計画を返し、実際のDeveloper起動はClaude Codeが行います。**
 

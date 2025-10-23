@@ -260,6 +260,24 @@ mcp__serena__get_symbols_overview()
   - アクセシブルで再利用可能なUIコンポーネントの追加
   - 新規コンポーネント追加後の品質確認
 
+#### **next-devtools** - Next.js開発統合ツール【Next.js専用・必須】
+- **用途**:
+  - Next.jsのバージョンアップグレード自動化（codemod実行含む）
+  - Cache Components（React Server Components）のセットアップと最適化
+  - Next.js開発サーバーの内部状態・診断・エラー情報へのアクセス
+  - 実行中のNext.js開発サーバーのルート構造取得
+  - エラー検出と自動修正（Suspense境界、キャッシング指示、静的パラメータ）
+  - Next.js公式ドキュメントとベストプラクティスへの統合アクセス
+  - Playwrightとの統合によるブラウザテストサポート
+- **使用場面**:
+  - **Next.jsプロジェクト開発時（必須）**
+  - **Next.jsバージョンアップグレード時（最優先）**
+  - **Server Components実装とCache最適化時（最優先）**
+  - Next.jsアプリケーションのデバッグと診断
+  - ルート構造の確認と最適化
+  - Next.js特有の問題の自動修正
+  - Next.js 16以降の最新機能活用
+
 ### 🔍 情報検索・調査系
 
 #### **kagi** - Web検索とコンテンツ要約
@@ -502,12 +520,16 @@ mcp__serena__get_symbols_overview()
 
 ### 2. 開発タスクの優先順位
 1. **コード解析・編集**: `serena` を必須使用（正確な変更）
-2. **React/Next.js UI実装**: `shadcn` を使用（コンポーネント管理）
-3. **AWSインフラ設定**:
+2. **Next.js開発（Next.js専用）**:
+   - **Next.js全般**: `next-devtools` を最優先使用（診断、アップグレード、エラー修正）
+   - **UIコンポーネント**: `shadcn` を使用（コンポーネント管理）
+   - **最新仕様確認**: `context7` でNext.jsドキュメント確認
+3. **React/Next.js UI実装**: `shadcn` を使用（コンポーネント管理）
+4. **AWSインフラ設定**:
    - **AWSドキュメント参照**: `awslabs.aws-documentation-mcp-server` を最優先（ベストプラクティス確認）
    - **AWS Terraform実装**: `awslabs.terraform-mcp-server` を使用（セキュアなIaC）
    - **マルチクラウド/汎用Terraform**: `terraform` を使用（Azure、GCP等）
-4. **Web自動化・テスト**: `playwright` を使用（UI操作）
+5. **Web自動化・テスト**: `playwright` を使用（UI操作）
 
 ### 3. 問題解決アプローチ
 - **コードの理解と変更**: `serena` で構造を把握してから作業
@@ -633,6 +655,51 @@ graph TD
   - 詳細なパフォーマンス計測
   - ネットワーク分析
   - Chrome特有の機能利用
+
+### Next.js開発の最適化（重要）
+**Next.jsプロジェクトでは必ずnext-devtoolsを最優先で活用してください**
+
+#### プロジェクト開始時
+- **開発サーバー起動確認**: `npm run dev` または `yarn dev` で開発サーバーを起動
+- **next-devtoolsで診断**: 実行中のNext.js開発サーバーの状態を確認
+- **ルート構造の把握**: next-devtoolsでルート構造を取得し、プロジェクトの全体像を理解
+
+#### Next.jsアップグレード時
+- **next-devtoolsでアップグレード**: 自動アップグレードツールを使用
+  - コマンド例: "Next Devtools, help me upgrade my Next.js app to version 16"
+  - 自動でcodemodが実行され、破壊的変更に対応
+
+#### Server Components実装時
+- **Cache Components最適化**: next-devtoolsでCache Componentsのセットアップ
+  - 自動でSuspense境界を設定
+  - キャッシング指示の自動挿入
+  - 静的パラメータの最適化
+  - エラー検出と自動修正
+
+#### デバッグとエラー修正時
+- **next-devtoolsで診断**: 実行中の開発サーバーから内部状態とエラー情報を取得
+- **自動修正機能**: Next.js特有のエラーを検出し、自動修正を提案
+- **ベストプラクティス確認**: Next.js公式ドキュメントへの統合アクセス
+
+#### 推奨ワークフロー
+```
+1. プロジェクト分析
+   └─ serena MCP: コードベース全体の構造把握
+   └─ next-devtools MCP: Next.js特有の構造とルート確認
+
+2. 実装前の確認
+   └─ context7 MCP: 最新Next.js仕様確認
+   └─ next-devtools MCP: 現在のNext.jsバージョンと推奨事項確認
+
+3. 実装
+   └─ serena MCP: コード編集
+   └─ shadcn MCP: UIコンポーネント管理
+   └─ next-devtools MCP: Server Components最適化
+
+4. テスト・デバッグ
+   └─ next-devtools MCP: エラー診断と自動修正
+   └─ playwright MCP: E2Eテスト
+```
 
 ## 🔒 セキュリティプラグイン（CodeGuard）
 
@@ -869,6 +936,7 @@ Web情報が必要
 | タスク種別 | 推奨MCP | 使用頻度 |
 |---------|--------|---------|
 | コード編集 | serena | 90% |
+| **Next.js開発全般** | **next-devtools** | **80%** |
 | ライブラリ調査 | context7 | 70% |
 | React/Next.js UI実装 | shadcn | 60% |
 | **AWSドキュメント参照** | **awslabs.aws-documentation** | **60%** |
