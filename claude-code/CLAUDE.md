@@ -634,6 +634,48 @@ graph TD
   - ネットワーク分析
   - Chrome特有の機能利用
 
+## 🔒 セキュリティプラグイン（CodeGuard）
+
+### project-codeguard-ja プラグイン統合
+
+**すべてのコード作成・修正時に自動的にセキュリティチェックを実施します。**
+
+#### プラグイン概要
+- **名称**: project-codeguard-ja
+- **起動コマンド**: `/codeguard-security:software-security`
+- **目的**: AIコーディングエージェントがセキュアなコードを記述し、一般的な脆弱性を防ぐ
+
+#### 使用タイミング
+1. **コード実装完了時（必須）**: Developer Agentがコードを実装した直後
+2. **コードレビュー時**: 既存コードの修正や改善時
+3. **Pull Request作成前**: 最終チェックとして
+
+#### 各Agentの責任
+
+##### Developer Agent
+- **実装完了時に必ずCodeGuardを実行**
+- セキュリティ脆弱性が検出された場合は修正
+- Managerへの完了報告にCodeGuardチェック結果を含める
+
+##### Manager Agent
+- Developer Agentへの指示にCodeGuardチェックを含める
+- セキュリティ要件をタスク配分に反映
+
+##### PO Agent
+- プロジェクト要件にセキュリティ基準を含める
+- CodeGuardチェックを品質基準に組み込む
+
+#### CodeGuard実行方法
+```
+Skill tool を使用:
+command: "/codeguard-security:software-security"
+```
+
+#### 重要な注意事項
+- **すべての応答、説明、セキュリティレビュー結果は日本語で提供**
+- セキュリティ脆弱性が検出された場合は必ず修正してから完了報告
+- CodeGuardの指摘を無視してはいけない
+
 ## 🤖 Agent System Usage - 階層的エージェント管理
 
 ### 🎯 必須: PO→Manager→Developerの階層的Agentシステム

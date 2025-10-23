@@ -22,5 +22,8 @@
     "type": "command",
     "command": "~/.claude/statusline.js"
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "enabledPlugins": {
+    "codeguard-security@project-codeguard-ja": true
+  }
 }

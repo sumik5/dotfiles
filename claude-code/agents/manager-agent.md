@@ -82,6 +82,7 @@ color: green
   - Docker環境構築が必要な場合: docker MCPを使用
   - ブラウザ自動化が必要な場合: puppeteer/playwright MCPを選択
   - パフォーマンス分析が必要な場合: chrome-devtools MCPを使用
+  - セキュリティチェック: 実装完了後にCodeGuardプラグインでセキュリティスキャン
 期限：[完了予定時間]
 重要：必ず指定されたworktree配下で作業すること
 完了時：必ずManagerに報告してください

@@ -57,6 +57,7 @@ color: purple
   - コンテナ化が必要な場合: Docker MCPの活用を推奨
   - ブラウザ自動化が必要な場合: Puppeteer/Playwright MCPの選択を推奨
   - インフラ構築が必要な場合: Terraform MCPの活用を推奨
+  - セキュリティ: すべてのコード実装時にCodeGuardプラグインでチェック
 優先度：[高/中/低]
 期限：[完了予定日時]
 
