@@ -116,12 +116,150 @@ Skill tool: /codeguard-security:software-security
 - **接続プールの活用**: DB接続、HTTPクライアントの再利用
 - **非同期処理**: I/O待機時間の最小化
 
+### 型安全性の原則（TypeScript/JavaScript & Python）
+
+#### 🚫 TypeScript/JavaScript: `any`の使用は絶対禁止
+
+**❌ 絶対に使用してはいけない:**
+```typescript
+// ❌ 悪い例: any型の使用
+function processData(data: any) {
+  return data.value; // 型安全性が失われる
+}
+const result: any = fetchData(); // 型チェックが無効化される
+```
+
+**✅ 正しい実装:**
+```typescript
+// ✅ 良い例: 明示的な型定義
+interface DataResponse {
+  value: string;
+  status: number;
+}
+
+function processData(data: DataResponse): string {
+  return data.value;
+}
+
+// ✅ unknown を使用（型ガードで安全に処理）
+function handleUnknownData(data: unknown): string {
+  if (typeof data === 'object' && data !== null && 'value' in data) {
+    return (data as DataResponse).value;
+  }
+  throw new Error('Invalid data structure');
+}
+
+// ✅ ジェネリクスの活用
+function fetchData<T>(url: string): Promise<T> {
+  return fetch(url).then(res => res.json());
+}
+```
+
+**TypeScriptベストプラクティス（必須）:**
+1. **strict mode有効化**: `tsconfig.json`で`"strict": true`を設定
+2. **`any`の代わりに`unknown`**: 不明な型は`unknown`を使用し、型ガードで安全に処理
+3. **`!`（non-null assertion）の濫用禁止**: 型ガードやオプショナルチェイニング`?.`を使用
+4. **型アサーション`as`の慎重な使用**: 必要最小限にとどめ、型ガードを優先
+5. **明示的な型注釈**: 関数の引数と戻り値には必ず型を指定
+6. **プリミティブ型のラッパー禁止**: `String` ではなく `string` を使用
+7. **`const assertion`の活用**: Enumより`as const`を使用（より型安全）
+8. **インターフェースと型エイリアスの使い分け**:
+   - オブジェクト形状の定義: `interface`
+   - ユニオン型、交差型: `type`
+
+#### 🚫 Python: `Any`の使用は絶対禁止
+
+**❌ 絶対に使用してはいけない:**
+```python
+# ❌ 悪い例: Any型の使用
+from typing import Any
+
+def process_data(data: Any) -> Any:
+    return data.get('value')  # 型安全性が失われる
+
+result: Any = fetch_data()  # 型チェックが無効化される
+```
+
+**✅ 正しい実装:**
+```python
+# ✅ 良い例: 明示的な型ヒント
+from typing import Dict, Optional, Union, Protocol, TypeVar, Generic
+
+class DataResponse(Protocol):
+    """構造的部分型による型定義"""
+    value: str
+    status: int
+
+def process_data(data: DataResponse) -> str:
+    return data.value
+
+# ✅ TypedDictの活用
+from typing import TypedDict
+
+class UserDict(TypedDict):
+    name: str
+    age: int
+    email: Optional[str]
+
+def get_user_info(user: UserDict) -> str:
+    return f"{user['name']} ({user['age']})"
+
+# ✅ ジェネリクスの活用
+T = TypeVar('T')
+
+def fetch_data(url: str, response_type: type[T]) -> T:
+    # 実装
+    pass
+
+# ✅ Union型の適切な使用
+def process_value(value: Union[int, str]) -> str:
+    if isinstance(value, int):
+        return str(value)
+    return value
+```
+
+**Pythonベストプラクティス（必須）:**
+1. **型ヒントの徹底**: すべての関数に引数と戻り値の型ヒントを記述
+2. **`Any`の使用禁止**: 具体的な型、`Union`、`Protocol`、ジェネリクスで代替
+3. **`Optional`の明示**: `None`の可能性がある場合は`Optional[T]`を使用
+4. **`Protocol`の活用**: ダックタイピングが必要な場合は構造的部分型を使用
+5. **ジェネリクスの使用**: 汎用的な関数やクラスは`TypeVar`でジェネリック化
+6. **型チェッカーの活用**: mypy、pyright、pyranceで静的型チェック実施
+7. **`cast()`の慎重な使用**: 必要最小限にとどめ、型ガードを優先
+8. **`TypedDict`の活用**: 辞書型のデータ構造には`TypedDict`を使用
+9. **`dataclass`の活用**: データクラスには`@dataclass`デコレータを使用
+
+#### その他の避けるべきコード規則
+
+**共通（TypeScript & Python）:**
+- **マジックナンバー禁止**: 定数化して意図を明確に
+- **グローバル変数の濫用禁止**: スコープを最小限に
+- **過度なネスト禁止**: 早期リターンで可読性向上
+- **巨大な関数禁止**: 1関数1責任、20行以内を目標
+- **コメントアウトされたコード**: 削除（バージョン管理で履歴管理）
+
+**TypeScript固有:**
+- **`==`の使用禁止**: 常に`===`を使用（厳密等価演算子）
+- **暗黙的な型変換に依存禁止**: 明示的な変換を実施
+- **`Function`型の禁止**: 具体的な関数シグネチャを定義
+- **配列操作で`for...in`禁止**: `for...of`またはArray methodsを使用
+
+**Python固有:**
+- **`eval()`の使用禁止**: セキュリティリスクが高い
+- **`exec()`の使用禁止**: セキュリティリスクが高い
+- **bare `except:`禁止**: 具体的な例外クラスを指定
+- **`lambda`の過度な使用禁止**: 複雑な処理は通常の関数で
+- **可変デフォルト引数禁止**: `def func(items=[])`ではなく`def func(items=None)`
+
 ### コード品質の自己チェック（実装完了前に必須）
 
 実装完了前に以下を確認：
 - [ ] 単一責任の原則を守っているか
 - [ ] DRY（Don't Repeat Yourself）原則に従っているか
 - [ ] YAGNI（You Ain't Gonna Need It）- 不要な機能を実装していないか
+- [ ] **型安全性**: `any`（TypeScript）や`Any`（Python）を使用していないか
+- [ ] **型ヒント**: すべての関数に適切な型注釈があるか
+- [ ] **strict mode**: TypeScriptのstrictモードが有効か
 - [ ] エラーハンドリングは適切か
 - [ ] ログ出力は適切なレベルか
 - [ ] ドキュメント/コメントは過不足ないか

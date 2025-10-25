@@ -138,6 +138,82 @@ mcp__serena__get_symbols_overview()
 - **副作用を避ける**: 純粋関数を優先
 - **早期リターン**: ネストを減らし、ガード句を使用
 
+### 型安全性の原則（最重要）
+
+#### 🚫 TypeScript/JavaScript: `any`型の使用は絶対禁止
+
+**基本原則:**
+- **`any`型は絶対に使用しない**: 型安全性を完全に失う
+- **`unknown`を活用**: 不明な型は`unknown`を使用し、型ガードで安全に処理
+- **strict mode必須**: `tsconfig.json`で`"strict": true`を設定
+- **明示的な型注釈**: 関数の引数と戻り値には必ず型を指定
+- **`!`（non-null assertion）の濫用禁止**: 型ガードやオプショナルチェイニング`?.`を使用
+- **型アサーション`as`の慎重な使用**: 必要最小限にとどめ、型ガードを優先
+
+**良い例:**
+```typescript
+// ✅ 明示的な型定義
+interface User {
+  id: string;
+  name: string;
+}
+
+function getUser(id: string): User | null {
+  // 実装
+}
+
+// ✅ unknown と型ガード
+function processUnknown(data: unknown): string {
+  if (typeof data === 'object' && data !== null && 'value' in data) {
+    return String((data as { value: unknown }).value);
+  }
+  throw new Error('Invalid data');
+}
+```
+
+#### 🚫 Python: `Any`型の使用は絶対禁止
+
+**基本原則:**
+- **`Any`型は絶対に使用しない**: 型チェックを無効化する
+- **型ヒントの徹底**: すべての関数に引数と戻り値の型ヒントを記述
+- **`Union`、`Optional`、`Protocol`の活用**: 柔軟性と型安全性の両立
+- **型チェッカーの使用**: mypy、pyright、pyranceで静的型チェック実施
+- **`TypedDict`、`dataclass`の活用**: 構造化データには専用の型を定義
+
+**良い例:**
+```python
+# ✅ 明示的な型ヒント
+from typing import Optional, Protocol
+
+class User(Protocol):
+    id: str
+    name: str
+
+def get_user(user_id: str) -> Optional[User]:
+    # 実装
+    pass
+
+# ✅ TypedDict の活用
+from typing import TypedDict
+
+class UserDict(TypedDict):
+    id: str
+    name: str
+    email: Optional[str]
+```
+
+#### その他の型安全性ベストプラクティス
+
+**TypeScript固有:**
+- プリミティブ型のラッパー禁止: `String` → `string`
+- `const assertion`の活用: Enumより`as const`
+- `==`禁止、`===`使用: 厳密等価演算子の徹底
+
+**Python固有:**
+- `eval()`、`exec()`使用禁止: セキュリティリスク
+- bare `except:`禁止: 具体的な例外クラスを指定
+- 可変デフォルト引数禁止: `def func(items=[])`は`def func(items=None)`に
+
 ### 設計パターンとアーキテクチャ
 
 #### 推奨パターン
