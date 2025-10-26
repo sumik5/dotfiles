@@ -6,7 +6,16 @@
     "allow": [
       "Bash(rg:*)",
       "Read(~/.claude/agents/*)",
-      "Read(~/repo/*)"
+      "Read(~/repo/*)",
+      "Bash(rm -rf .next:*)",
+      "Bash(rm -rf */.next:*)",
+      "Bash(rmdir:*)",
+      "Bash(mkdir:*)",
+      "Bash(find:*)",
+      "Bash(rm:*)",
+      "Bash(npm run build:*)",
+      "Bash(grep:*)",
+      "Bash(tree:*)"
     ],
     "deny": [
       "Bash(sudo:*)",
