@@ -123,6 +123,8 @@ path=(
   $HOME/.local/bin(N-/)
   $HOME/idea/bin(N-/)
   $HOME/.local/share/mise/shims(N-/) # mise
+  $HOME/.lmstudio/bin(N-/)
+  $HOME/Library/pnpm(N-/)
   /opt/homebrew/bin(N-/)
   /opt/homebrew/sbin(N-/)
   /opt/homebrew/share/google-cloud-sdk/path.zsh.inc
@@ -136,7 +138,6 @@ path=(
   /opt/homebrew/opt/trash/bin(N-/)
   /Library/TeX/texbin(N-/)
   /opt/homebrew/opt/postgresql@15/bin(N-/)
-  ~/.lmstudio/bin(N-/)
   $path
 )
 # /Library/TeX/texbin(N-/)
@@ -390,3 +391,6 @@ fi
 if ! command -v direnv &> /dev/null && [ -f "./.envrc" ]; then
   source "./.envrc"
 fi
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
