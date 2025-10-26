@@ -24,7 +24,17 @@
       "Bash(git commit:*)",
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(terraform apply:*)",
+      "Bash(terraform destroy:*)",
+      "Bash(terraform import:*)",
+      "Bash(terraform taint:*)",
+      "Bash(terraform untaint:*)",
+      "Bash(terraform state rm:*)",
+      "Bash(terraform state mv:*)",
+      "Bash(terraform state push:*)",
+      "Bash(terraform state replace-provider:*)",
+      "Bash(terraform refresh:*)"
     ]
   },
   "statusLine": {
