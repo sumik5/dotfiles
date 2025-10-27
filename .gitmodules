@@ -24,6 +24,6 @@
 [submodule "claude-code/plugins/marketplaces/project-codeguard-ja"]
 	path = claude-code/plugins/marketplaces/project-codeguard-ja
 	url = https://github.com/sumik5/project-codeguard-ja.git
-[submodule "claude-code/plugins/marketplaces/thedotmack"]
-	path = claude-code/plugins/marketplaces/thedotmack
+[submodule "claude-code/plugins/marketplaces/claude-mem"]
+	path = claude-code/plugins/marketplaces/claude-mem
 	url = https://github.com/thedotmack/claude-mem.git
