@@ -21,3 +21,9 @@
 	path = .vim/bundle/vimproc
 	url = https://github.com/Shougo/vimproc.vim.git
 	ignore = dirty
+[submodule "claude-code/plugins/marketplaces/project-codeguard-ja"]
+	path = claude-code/plugins/marketplaces/project-codeguard-ja
+	url = https://github.com/sumik5/project-codeguard-ja.git
+[submodule "claude-code/plugins/marketplaces/thedotmack"]
+	path = claude-code/plugins/marketplaces/thedotmack
+	url = https://github.com/thedotmack/claude-mem.git

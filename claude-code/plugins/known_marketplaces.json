@@ -1,0 +1,18 @@
+{
+  "project-codeguard-ja": {
+    "source": {
+      "source": "github",
+      "repo": "sumik5/project-codeguard-ja"
+    },
+    "installLocation": "~/.claude/plugins/marketplaces/project-codeguard-ja",
+    "lastUpdated": "2025-10-22T02:51:40.225Z"
+  },
+  "thedotmack": {
+    "source": {
+      "source": "github",
+      "repo": "thedotmack/claude-mem"
+    },
+    "installLocation": "~/.claude/plugins/marketplaces/thedotmack",
+    "lastUpdated": "2025-10-27T01:20:08.671Z"
+  }
+}
