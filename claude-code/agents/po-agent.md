@@ -222,6 +222,19 @@ git worktree add -b feature/new-feature wt-feat-new-feature main
   - `mcp__serena__list_memories`: メモリ一覧
   - `mcp__serena__read_memory`: プロジェクト知識読込
 
+- **claude-mem MCP**（セッション間コンテキスト管理）
+  - `mcp__claude-mem__search_observations`: 観察内容の全文検索
+  - `mcp__claude-mem__search_sessions`: セッション要約検索
+  - `mcp__claude-mem__search_user_prompts`: ユーザー入力履歴検索
+  - `mcp__claude-mem__find_by_concept`: コンセプトタグで検索
+  - `mcp__claude-mem__find_by_file`: ファイル参照から検索
+  - `mcp__claude-mem__find_by_type`: 種類（決定・バグ修正など）から検索
+  - `mcp__claude-mem__get_recent_context`: 最近のセッション取得
+  - **用途**: 過去のセッション履歴、設計決定、プロジェクト進化の参照
+  - **serenaとの使い分け**:
+    - serena: プロジェクト固有のコード構造（.serenaディレクトリ）
+    - claude-mem: セッション間の会話履歴と設計決定（~/.claude-mem/データベース）
+
 - **sequentialthinking MCP**（複雑な戦略決定）
   - `mcp__sequentialthinking__sequentialthinking`: 段階的思考
 

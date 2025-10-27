@@ -386,6 +386,20 @@ color: green
   - `mcp__serena__read_memory`: プロジェクト知識参照
   - `mcp__serena__write_memory`: タスク計画記録
 
+- **claude-mem MCP**（セッション間コンテキスト管理）
+  - `mcp__claude-mem__search_observations`: 観察内容の全文検索
+  - `mcp__claude-mem__search_sessions`: セッション要約検索
+  - `mcp__claude-mem__search_user_prompts`: ユーザー入力履歴検索
+  - `mcp__claude-mem__find_by_concept`: コンセプトタグで検索
+  - `mcp__claude-mem__find_by_file`: ファイル参照から検索
+  - `mcp__claude-mem__find_by_type`: 種類別検索（決定・バグ修正など）
+  - `mcp__claude-mem__get_recent_context`: 最近のセッション取得
+  - **用途**: 過去のタスク配分決定、実装パターン、プロジェクトの意思決定履歴を参照
+  - **serenaとの使い分け**:
+    - serena: 現在のコード構造とシンボル関係（プロジェクト固有）
+    - claude-mem: 過去の議論と決定の履歴（セッション間永続化）
+    - 併用推奨: serenaで技術的詳細を分析、claude-memで過去の経緯を参照
+
 - **sequentialthinking MCP**（複雑なタスク分割）
   - `mcp__sequentialthinking__sequentialthinking`: 段階的タスク分析
 

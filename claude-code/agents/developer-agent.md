@@ -430,6 +430,21 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
   - `mcp__serena__search_for_pattern`: パターン検索
   - `mcp__serena__write_memory`: 作業メモ保存
 
+- **claude-mem MCP**（セッション間コンテキスト管理）
+  - `mcp__claude-mem__search_observations`: 観察内容の全文検索
+  - `mcp__claude-mem__search_sessions`: セッション要約検索
+  - `mcp__claude-mem__search_user_prompts`: ユーザー入力履歴検索
+  - `mcp__claude-mem__find_by_concept`: コンセプトタグで検索
+  - `mcp__claude-mem__find_by_file`: ファイル参照から検索
+  - `mcp__claude-mem__find_by_type`: 種類別検索（決定・バグ修正など）
+  - `mcp__claude-mem__get_recent_context`: 最近のセッション取得
+  - **用途**: 過去の実装パターン、バグ修正履歴、設計議論の参照
+  - **実装前の活用**: 同様の機能を過去に実装していないか、どう解決したかを検索
+  - **serenaとの使い分け**:
+    - serena: 現在のコード構造とシンボル関係
+    - claude-mem: 過去のセッションでの実装経緯と決定理由
+    - 併用: serenaでコード実装、claude-memで設計思想の理解
+
 - **filesystem MCP**（ファイル操作）
   - `mcp__filesystem__read_file`: ファイル読み込み
   - `mcp__filesystem__write_file`: ファイル書き込み
@@ -908,6 +923,7 @@ mcp__next-devtools__auto_fix()
 | タスク種別 | 推奨MCP | 使用例 | 必須度 |
 |---------|---------|--------|--------|
 | コード編集 | serena | シンボル置換、挿入、検索 | 🔴必須 |
+| **長期プロジェクトコンテキスト** | **claude-mem** | **過去の実装パターン、設計決定、履歴検索** | **🔴推奨** |
 | **Next.js開発全般** | **next-devtools** | **診断、アップグレード、最適化、エラー修正** | **🔴Next.js必須** |
 | **最新仕様確認** | **context7** | **React、Vue、Next.jsドキュメント** | **🔴必須** |
 | **React/Next.js UI実装** | **shadcn** | **UIコンポーネント検索・追加・管理** | **🔴必須** |
@@ -929,30 +945,31 @@ mcp__next-devtools__auto_fix()
 ### 効率化のためのベストプラクティス
 
 #### 情報収集の最適化
-1. **Next.js開発（Next.jsプロジェクト専用）**: next-devtools MCPで診断、アップグレード、エラー修正を最優先
-2. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
-3. **shadcnでUIコンポーネント管理（React/Next.js）**: components.json確認、コンポーネント検索・追加、品質チェック
-4. **Web情報収集の使い分け**:
+1. **過去の実装パターン確認**: claude-mem MCPで類似機能の実装履歴を検索
+2. **Next.js開発（Next.jsプロジェクト専用）**: next-devtools MCPで診断、アップグレード、エラー修正を最優先
+3. **context7で最新仕様確認（最重要）**: 実装前に必ず最新ドキュメントを確認
+4. **shadcnでUIコンポーネント管理（React/Next.js）**: components.json確認、コンポーネント検索・追加、品質チェック
+5. **Web情報収集の使い分け**:
    - 単一ページ → WebFetch tool（軽量・安定）
    - 最新情報・時事問題 → kagi MCP（検索特化）
    - 複数ページ調査 → firecrawl MCP（クロール・分析）
    - ファイル変換保存 → markdownify MCP（多様な形式対応）
-5. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
+6. **動画コンテンツ活用**: youtube MCPで技術解説動画やカンファレンスを分析
 
 #### コード編集の最適化
-5. **serena優先**: コード編集はserenaのシンボル単位操作
-6. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
-7. **並列MCP呼び出し**: 複数のMCPを同時実行
+7. **serena優先**: コード編集はserenaのシンボル単位操作
+8. **filesystem活用**: 非コードファイルや大量処理はfilesystem MCP
+9. **並列MCP呼び出し**: 複数のMCPを同時実行
 
 #### 開発環境の最適化
-8. **メモリ活用**: 作業メモをserenaに保存
-9. **段階的検索**: 概要→詳細の順で情報取得
-10. **ドキュメント変換**: pandoc/markdownify MCPで文書形式を柔軟に変換
-11. **ブラウザ自動化の使い分け**:
+10. **メモリ活用**: serenaに作業メモ、claude-memに設計決定を保存
+11. **段階的検索**: 概要→詳細の順で情報取得
+12. **ドキュメント変換**: pandoc/markdownify MCPで文書形式を柔軟に変換
+13. **ブラウザ自動化の使い分け**:
     - 軽量・高速処理 → puppeteer
     - マルチブラウザ対応 → playwright
     - 詳細分析 → chrome-devtools
-12. **Docker活用**: 開発環境はコンテナ化して管理
+14. **Docker活用**: 開発環境はコンテナ化して管理
 
 ## 重要なポイント
 
