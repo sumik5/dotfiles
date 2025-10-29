@@ -28,3 +28,4 @@ done 2>/dev/null &
 $DOTPATH/init/"$(get_os)"/init.sh
 
 $CURRENT/tmux.sh
+$CURRENT/mise.sh

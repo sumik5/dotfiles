@@ -5,9 +5,10 @@ DOTFILES_DIR      := $(PWD)
 DOTFILES_FILES    := $(filter-out $(DOTFILES_EXCLUDES), $(DOTFILES_TARGET))
 
 .DEFAULT_GOAL := help
-.PHONY: help init symlinks update
+.PHONY: help init symlinks update submodule-update
 
 init:  ## Setup environents
+	git submodule update --init --recursive
 	@DOTPATH=$(PWD) bash $(PWD)/init/init.sh
 
 deploy: ## deploy to the home folder
@@ -17,6 +18,9 @@ deploy: ## deploy to the home folder
 
 update: ## Fetch changes
 	@DOTPATH=$(PWD) bash $(PWD)/bin/dotfiles_update
+
+submodule-update: ## Update submodules to latest remote versions
+	git submodule update --remote --recursive
 
 install: init deploy update ## Runs init, deploy, update
 
