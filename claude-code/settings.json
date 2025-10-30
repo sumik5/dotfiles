@@ -42,7 +42,8 @@
     "command": "~/.claude/statusline.js"
   },
   "enabledPlugins": {
-    "codeguard-security@project-codeguard-ja": true
+    "codeguard-security@project-codeguard-ja": true,
+    "claude-mem@thedotmack": true
   },
   "alwaysThinkingEnabled": true
 }

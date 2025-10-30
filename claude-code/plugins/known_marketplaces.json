@@ -5,14 +5,14 @@
       "path": "/Users/sumik/dotfiles/claude-code/plugins/marketplaces/project-codeguard-ja"
     },
     "installLocation": "/Users/sumik/.claude/plugins/marketplaces/project-codeguard-ja",
-    "lastUpdated": "2025-10-27T01:34:29.682Z"
+    "lastUpdated": "2025-10-29T00:29:05.500Z"
   },
   "thedotmack": {
     "source": {
       "source": "directory",
-      "path": "/Users/sumik/dotfiles/claude-code/plugins/marketplaces/claude-mem"
+      "path": "/Users/sumik/.claude/plugins/marketplaces/claude-mem"
     },
-    "installLocation": "/Users/sumik/dotfiles/claude-code/plugins/marketplaces/claude-mem",
-    "lastUpdated": "2025-10-27T03:08:36.493Z"
+    "installLocation": "/Users/sumik/.claude/plugins/marketplaces/claude-mem",
+    "lastUpdated": "2025-10-30T07:15:21.083Z"
   }
 }
