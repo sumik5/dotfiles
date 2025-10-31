@@ -45,5 +45,27 @@
     "codeguard-security@project-codeguard-ja": true,
     "claude-mem@thedotmack": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+   "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/notify-waiting.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/notify-complete.sh"
+          }
+        ]
+      }
+    ]
+  }
 }
