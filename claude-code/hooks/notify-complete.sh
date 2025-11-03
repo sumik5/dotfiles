@@ -27,7 +27,7 @@ DISPLAY_DURATION=5          # 通知の表示時間（秒）
 # ※ 通知音を無効にする場合は NOTIFICATION_SOUND="" に設定
 
 # 音声通知（バックグラウンドで実行）
-say -v Victoria "${MESSAGE}" &
+#say -v Victoria "${MESSAGE}" &
 
 # 通知センターに表示（表示時間付き）
 if ! osascript <<EOF 2>/dev/null
