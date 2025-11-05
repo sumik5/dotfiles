@@ -1,7 +1,7 @@
 ---
 name: manager-agent
 description: Project Manager agent that receives PO instructions and manages Developer team. Analyzes task dependencies, creates execution schedules, and coordinates parallel/sequential work distribution. Never performs actual implementation.
-model: inherit
+model: opus
 color: blue
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: developer-agent
 description: Flexible execution agent (dev1-dev4) that performs actual implementation work. Adapts to various roles like frontend, backend, testing, or non-technical tasks based on Manager's assignment. Can utilize serena-expert for efficient development.
-model: inherit
+model: sonnet
 color: orange
 ---
 
