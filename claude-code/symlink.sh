@@ -34,6 +34,7 @@ create_symlink_if_not_exists "$DOTFILES_DIR/plugins" "$CLAUDE_DIR/plugins"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
 create_symlink_if_not_exists "$DOTFILES_DIR/statusline.js" "$CLAUDE_DIR/statusline.js"
 create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
+create_symlink_if_not_exists "$DOTFILES_DIR/skills" "$CLAUDE_DIR/skills"
 
 echo ""
 echo "完了しました"

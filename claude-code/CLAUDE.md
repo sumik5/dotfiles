@@ -94,522 +94,163 @@ mcp__serena__onboarding()  # 未実施の場合
 
 # 4. プロジェクト構造を把握
 mcp__serena__get_symbols_overview()
+
+# 5. プロジェクト種別を検出し、言語固有スキルを確認
+# Next.js: package.jsonまたはnext.config.* の確認 → nextjs-web-modern スキル参照
+# Python: pyproject.toml または requirements.txt の確認 → python-modern スキル参照
 ```
 
-## 🎨 コード設計の原則
-
-### SOLID原則の徹底
-すべてのコード実装において、以下のSOLID原則を厳守してください：
-
-1. **Single Responsibility Principle (単一責任の原則)**
-   - 各クラス・関数は単一の責任のみを持つ
-   - 「変更する理由」は1つだけ
-   - 例: UserServiceはユーザー管理のみ、EmailServiceはメール送信のみ
-
-2. **Open/Closed Principle (開放閉鎖の原則)**
-   - 拡張に対して開いており、修正に対して閉じている
-   - 新機能追加時は既存コードを変更せず、拡張で対応
-   - インターフェースや抽象クラスを活用
-
-3. **Liskov Substitution Principle (リスコフの置換原則)**
-   - 派生クラスは基底クラスと置換可能
-   - サブクラスは親クラスの契約を破らない
-
-4. **Interface Segregation Principle (インターフェース分離の原則)**
-   - クライアントが使用しないメソッドへの依存を強制しない
-   - 大きなインターフェースより小さな特化したインターフェース
-
-5. **Dependency Inversion Principle (依存関係逆転の原則)**
-   - 上位モジュールは下位モジュールに依存しない
-   - 両者は抽象に依存する
-   - 依存性注入（DI）を積極的に活用
-
-### クリーンコードの原則
-
-#### 命名規則とコードの可読性
-- **意図を明確にする命名**: `getUserById()` not `getUser()`
-- **検索可能な名前**: マジックナンバーは定数化
-- **発音可能な名前**: `ymdhms` ではなく `timestamp`
-- **メソッド名は動詞、クラス名は名詞**
-
-#### 関数設計の原則
-- **関数は小さく**: 理想は20行以内、最大でも1画面に収まる
-- **引数は最小限**: 理想は0〜2個、3個以上は要リファクタリング
-- **副作用を避ける**: 純粋関数を優先
-- **早期リターン**: ネストを減らし、ガード句を使用
-
-### 型安全性の原則（最重要）
-
-#### 🚫 TypeScript/JavaScript: `any`型の使用は絶対禁止
-
-**基本原則:**
-- **`any`型は絶対に使用しない**: 型安全性を完全に失う
-- **`unknown`を活用**: 不明な型は`unknown`を使用し、型ガードで安全に処理
-- **strict mode必須**: `tsconfig.json`で`"strict": true`を設定
-- **明示的な型注釈**: 関数の引数と戻り値には必ず型を指定
-- **`!`（non-null assertion）の濫用禁止**: 型ガードやオプショナルチェイニング`?.`を使用
-- **型アサーション`as`の慎重な使用**: 必要最小限にとどめ、型ガードを優先
-
-**良い例:**
-```typescript
-// ✅ 明示的な型定義
-interface User {
-  id: string;
-  name: string;
-}
-
-function getUser(id: string): User | null {
-  // 実装
-}
-
-// ✅ unknown と型ガード
-function processUnknown(data: unknown): string {
-  if (typeof data === 'object' && data !== null && 'value' in data) {
-    return String((data as { value: unknown }).value);
-  }
-  throw new Error('Invalid data');
-}
-```
-
-#### 🚫 Python: `Any`型の使用は絶対禁止
-
-**基本原則:**
-- **`Any`型は絶対に使用しない**: 型チェックを無効化する
-- **型ヒントの徹底**: すべての関数に引数と戻り値の型ヒントを記述
-- **`Union`、`Optional`、`Protocol`の活用**: 柔軟性と型安全性の両立
-- **型チェッカーの使用**: mypy、pyright、pyranceで静的型チェック実施
-- **`TypedDict`、`dataclass`の活用**: 構造化データには専用の型を定義
-
-**良い例:**
-```python
-# ✅ 明示的な型ヒント
-from typing import Optional, Protocol
-
-class User(Protocol):
-    id: str
-    name: str
-
-def get_user(user_id: str) -> Optional[User]:
-    # 実装
-    pass
-
-# ✅ TypedDict の活用
-from typing import TypedDict
-
-class UserDict(TypedDict):
-    id: str
-    name: str
-    email: Optional[str]
-```
-
-#### その他の型安全性ベストプラクティス
-
-**TypeScript固有:**
-- プリミティブ型のラッパー禁止: `String` → `string`
-- `const assertion`の活用: Enumより`as const`
-- `==`禁止、`===`使用: 厳密等価演算子の徹底
-
-**Python固有:**
-- `eval()`、`exec()`使用禁止: セキュリティリスク
-- bare `except:`禁止: 具体的な例外クラスを指定
-- 可変デフォルト引数禁止: `def func(items=[])`は`def func(items=None)`に
-
-### 設計パターンとアーキテクチャ
-
-#### 推奨パターン
-1. **Composition over Inheritance（継承より合成）**
-   - 継承階層を深くせず、コンポジションで柔軟性を確保
-
-2. **Immutability First（不変性優先）**
-   - 可能な限りimmutableなデータ構造を使用
-   - 状態変更は新しいオブジェクトを返す
-
-3. **Fail Fast（早期失敗）**
-   - エラーは早期に検出し、明確なメッセージで失敗
-   - 防御的プログラミングより契約による設計
-
-4. **Separation of Concerns（関心の分離）**
-   - ビジネスロジック、データアクセス、プレゼンテーションを分離
-   - レイヤードアーキテクチャまたはヘキサゴナルアーキテクチャ
-
-### テストファーストアプローチ
-
-#### テスタブルなコード設計
-- **依存性の注入**: テストしやすいよう外部依存を注入可能に
-- **モック可能な設計**: インターフェースを通じた疎結合
-- **単体テストのカバレッジ**: ビジネスロジックは100%を目指す
-- **テストピラミッド**: 単体テスト > 統合テスト > E2Eテスト
-
-#### テストの品質
-- **AAA（Arrange-Act-Assert）パターン**を徹底
-- **1テスト1アサーション**の原則
-- **テストケース名は仕様を説明**: `should_return_error_when_user_not_found()`
-
-### パフォーマンス意識
-
-#### 最適化の原則
-- **測定してから最適化**: 推測ではなくプロファイリング結果に基づく
-- **Big O記法を意識**: アルゴリズムの計算量を考慮
-- **遅延評価**: 必要になるまで計算を遅らせる
-- **キャッシング戦略**: 適切なキャッシュレイヤーの実装
-
-#### リソース管理
-- **メモリリークの防止**: 適切なリソースの解放
-- **接続プールの活用**: DB接続、HTTPクライアントの再利用
-- **非同期処理**: I/O待機時間の最小化
-
-### セキュリティの組み込み
-
-#### セキュアコーディング
-- **入力検証**: すべての外部入力を検証・サニタイズ
-- **最小権限の原則**: 必要最小限の権限で動作
-- **セキュアなデフォルト**: デフォルト設定を安全側に
-- **防御的プログラミング**: 想定外の入力に対する耐性
-
-#### 機密情報の管理
-- **環境変数の活用**: ハードコーディングを避ける
-- **シークレット管理**: 専用ツールの使用（Vault、KMS等）
-- **暗号化**: 保存時・転送時の暗号化
-
-### コード品質の自己チェック
-
-実装完了時に以下を確認：
-- [ ] 単一責任の原則を守っているか
-- [ ] DRY（Don't Repeat Yourself）原則に従っているか
-- [ ] YAGNI（You Ain't Gonna Need It）- 不要な機能を実装していないか
-- [ ] エラーハンドリングは適切か
-- [ ] ログ出力は適切なレベルか
-- [ ] ドキュメント/コメントは過不足ないか
-- [ ] 命名は一貫性があり意図が明確か
-- [ ] テストは書かれており、意味のあるテストか
-
-## 📚 利用可能なMCPサーバー一覧
-
-
-以下のMCPサーバーが利用可能です。各サーバーは特定の機能に特化しているため、タスクに応じて適切に使い分けてください。
-
-### 🔥 最重要：開発支援系
-
-#### **serena** - エリートアプリ開発エージェント【必須利用】
-- **用途**:
-  - **プロジェクトの初期分析とオンボーディング（最初に必ず実施）**
-  - コードベース全体の構造把握と依存関係の理解
-  - シンボル（クラス、関数、変数）の正確な検索と位置特定
-  - コードパターンの検出と影響範囲の分析
-  - リファクタリング計画の立案と安全な実行
-  - プロジェクト固有の知識とコンテキストの永続化
-  - 効率的なコード変更と一括修正
-  - テストコードの構造理解と改善提案
-- **使用場面**:
-  - **新規プロジェクトの作業開始時（必須）**
-  - **`.serena`ディレクトリが存在しない場合（必須）**
-  - 大規模なコード変更やリファクタリング
-  - バグの原因調査と修正
-  - 新機能の実装位置の決定
-  - コードレビューと品質改善
-
-#### **codex** - AIペアプログラミング
-- **用途**:
-  - 対話的なコード生成とリファクタリング
-  - 複雑な実装タスクのサポート
-  - コードレビューと改善提案
-  - シェルコマンドの生成と実行支援
-- **使用場面**:
-  - 複雑な実装タスク
-  - インタラクティブな開発セッション
-  - コードの説明と理解
-
-### 🎨 UI・コンポーネント系
-
-#### **shadcn** - React/Next.js UIコンポーネント管理
-- **用途**:
-  - shadcn/uiコンポーネントライブラリの管理
-  - プロジェクトレジストリの設定と確認（components.json）
-  - UIコンポーネントの検索、表示、追加
-  - コンポーネントの使用例とデモコードの取得
-  - コンポーネント追加後の品質チェックリスト
-  - 複数コンポーネントの一括追加
-- **使用場面**:
-  - **React/Next.jsプロジェクトでのUI実装時（必須）**
-  - shadcn/uiベースのコンポーネントシステム構築
-  - デザインシステムの統一とメンテナンス
-  - アクセシブルで再利用可能なUIコンポーネントの追加
-  - 新規コンポーネント追加後の品質確認
-
-#### **next-devtools** - Next.js開発統合ツール【Next.js専用・必須】
-- **用途**:
-  - Next.jsのバージョンアップグレード自動化（codemod実行含む）
-  - Cache Components（React Server Components）のセットアップと最適化
-  - Next.js開発サーバーの内部状態・診断・エラー情報へのアクセス
-  - 実行中のNext.js開発サーバーのルート構造取得
-  - エラー検出と自動修正（Suspense境界、キャッシング指示、静的パラメータ）
-  - Next.js公式ドキュメントとベストプラクティスへの統合アクセス
-  - Playwrightとの統合によるブラウザテストサポート
-- **使用場面**:
-  - **Next.jsプロジェクト開発時（必須）**
-  - **Next.jsバージョンアップグレード時（最優先）**
-  - **Server Components実装とCache最適化時（最優先）**
-  - Next.jsアプリケーションのデバッグと診断
-  - ルート構造の確認と最適化
-  - Next.js特有の問題の自動修正
-  - Next.js 16以降の最新機能活用
-
-### 🔍 情報検索・調査系
-
-#### **kagi** - Web検索とコンテンツ要約
-- **用途**: 
-  - インターネット上の最新情報、ニュース、技術動向の検索
-  - Webページ、動画（YouTube等）、音声コンテンツの内容を素早く把握
-  - 長文記事やドキュメントの要点抽出
-  - 複数の情報源から包括的な情報収集
-- **使用場面**: 最新の技術トレンド、ニュース、一般的な情報検索、リサーチが必要な場合
-
-#### **context7** - ライブラリドキュメント検索  
-- **用途**: 
-  - プログラミングライブラリ、フレームワーク、SDKの最新仕様確認
-  - APIリファレンス、使用例、ベストプラクティスの取得
-  - バージョン固有のドキュメント参照
-  - 非推奨メソッドや破壊的変更の確認
-- **使用場面**: **ライブラリやフレームワークを使用する際は必ず利用**。React、Vue、Next.js、Express、Django等の実装時
-
-#### **deepwiki** - GitHubリポジトリ解析
-- **用途**: 
-  - オープンソースプロジェクトの構造理解と技術詳細の把握
-  - README、Wiki、ドキュメントの統合的な理解
-  - プロジェクトの設計思想、アーキテクチャの把握
-  - コントリビューション方法、開発ガイドラインの確認
-  - イシューやPRの傾向分析
-- **使用場面**: **GitHubのパブリックリポジトリ情報が必要な場合は最優先で使用**
-
-#### **docset** - Dashドキュメント検索
-- **用途**:
-  - プログラミング言語（Python、JavaScript、Go等）の言語仕様確認
-  - 標準ライブラリのリファレンス検索
-  - コマンドラインツール（Git、Docker、kubectl等）のチートシート参照
-  - フレームワーク固有のAPI仕様確認
-  - オフラインでも参照可能なローカルドキュメント活用
-- **使用場面**: 言語仕様の確認、標準ライブラリの使い方、クイックリファレンスが必要な場合
-
-#### **firecrawl** - 高度なWebクロール・分析
-- **用途**:
-  - Webスクレイピング（JavaScript対応）
-  - 複数ページクロール
-  - キーワード検索と情報抽出
-  - 複数URLのバッチ処理
-  - ディープリサーチ
-- **使用場面**:
-  - 複数ページの包括的な調査
-  - 競合サイト分析
-  - ウェブサイト全体のLLM用変換
-  - 高度な分析とトレンドリサーチ
-
-#### **markdownify** - 多様なファイル形式変換
-- **用途**:
-  - WebページをMarkdownに変換
-  - PDF、画像、音声ファイルの変換
-  - Office文書（docx, xlsx, pptx）変換
-  - YouTube字幕取得
-  - 一括変換処理
-- **使用場面**:
-  - ドキュメントの構造化保存
-  - 多様なファイル形式の統一管理
-  - コンテンツアーカイブ作成
-
-#### **pandoc** - ドキュメント形式変換
-- **用途**:
-  - Markdown ↔ Word (docx)
-  - Markdown → ePub
-  - Markdown → PDF
-  - Word → Markdown
-  - テキスト → HTML
-- **使用場面**:
-  - AI生成コンテンツの文書化
-  - ビジネス文書作成
-  - eBook生成
-
-#### **youtube** - YouTube動画分析
-- **用途**:
-  - 字幕取得と分析
-  - 動画要約
-  - 翻訳
-  - キーポイント抽出
-  - 複数動画の比較分析
-- **使用場面**:
-  - 動画コンテンツの要約
-  - 学習ノート作成
-  - プレゼンテーション分析
-
-### 🛠️ インフラ・DevOps系
-
-#### **terraform** - Infrastructure as Code（汎用）
-- **用途**:
-  - クラウドインフラ（AWS、Azure、GCP）の設計と構築
-  - インフラストラクチャのバージョン管理と変更追跡
-  - 環境間（開発、ステージング、本番）の構成管理
-  - モジュールを使用した再利用可能なインフラコンポーネント作成
-  - プロバイダーの最新機能と非推奨機能の確認
-  - セキュリティとコンプライアンスのポリシー実装
-- **使用場面**: マルチクラウド環境、AWS以外のクラウドプロバイダー（Azure、GCP等）
-
-#### **awslabs.aws-documentation-mcp-server** - AWSドキュメント専門
-- **用途**:
-  - AWSサービスの公式ドキュメントへの直接アクセス
-  - AWSベストプラクティスとアーキテクチャパターンの取得
-  - AWS Well-Architected Frameworkの参照
-  - AWSサービス固有の設定ガイドと推奨事項
-  - セキュリティ、コンプライアンス、コスト最適化のガイドライン
-- **使用場面**:
-  - **AWS特化の開発・構築時（最優先）**
-  - AWSサービスの正確な仕様確認
-  - AWSアーキテクチャ設計の意思決定
-  - AWS Well-Architected Reviewの実施
-
-#### **awslabs.terraform-mcp-server** - AWS Terraform専門
-- **用途**:
-  - AWS特化のTerraformベストプラクティス提供
-  - AWSプロバイダー（aws、awscc）の最新ドキュメント
-  - セキュリティ重視のTerraformワークフロー
-  - AWSリソースのIaC実装パターン
-  - Terraform State管理のAWSベストプラクティス
-  - AWS固有のモジュール設計とリソース最適化
-- **使用場面**:
-  - **AWS環境のTerraform実装時（AWS特化、最優先）**
-  - セキュアなAWSインフラのコード化
-  - AWSマネージドサービスのTerraform化
-  - AWS Control TowerやOrganizationsとの統合
-
-#### **docker** - コンテナ管理
-- **用途**:
-  - コンテナ操作（起動、停止、管理）
-  - イメージ管理（ビルド、プル、プッシュ）
-  - ボリューム管理
-  - ネットワーク管理
-  - ログ取得とデバッグ
-  - Docker Composeプロジェクトの管理
-- **使用場面**:
-  - Dockerコンテナの起動・停止・管理
-  - Docker Composeプロジェクトの管理
-  - コンテナログの確認とデバッグ
-  - 開発環境の構築と管理
-  - Dockerfileの作成・編集時
-  - コンテナベースの開発環境構築
-
-### 📂 ファイル・システム操作系
-
-#### **filesystem** - ファイルシステム操作
-- **用途**:
-  - ファイル読み込み、書き込み、編集
-  - ディレクトリ操作（作成、一覧表示）
-  - ファイル移動・コピー
-  - ファイル検索
-  - ファイル情報取得
-- **使用場面**:
-  - 大量のファイル操作が必要な場合
-  - ディレクトリ構造の管理
-  - ファイルの一括処理
-  - バックアップやコピー作業
-- **serenaとの使い分け**:
-  - **serena優先**: コード解析・編集の場合
-  - **filesystem優先**: 非コードファイル操作、大量ファイル処理の場合
-
-### 🤖 ブラウザ自動化系
-
-#### **playwright** - フルブラウザ自動化
-- **用途**:
-  - Webアプリケーションの自動テスト（E2E、統合テスト）
-  - 動的Webサイトのスクレイピングとデータ収集
-  - フォームの自動入力と業務プロセスの自動化
-  - Webアプリケーションのパフォーマンス測定と監視
-  - クロスブラウザ互換性のテスト
-  - ビジュアルリグレッションテスト（スクリーンショット比較）
-  - ユーザー操作のシミュレーションとワークフロー自動化
-  - マルチブラウザ対応（Chrome, Firefox, Safari）
-- **使用場面**:
-  - E2Eテスト実装
-  - クロスブラウザテスト
-  - 複雑なWebアプリケーションの自動化
-  - QA自動化、データ収集、RPA
-
-#### **puppeteer** - ヘッドレスブラウザ制御
-- **用途**:
-  - ページナビゲーション
-  - スクリーンショット取得
-  - PDF生成
-  - 要素操作（クリック、入力、選択）
-  - JavaScript実行
-  - ページ情報取得
-- **使用場面**:
-  - Webページの自動スクリーンショット取得
-  - PDFレポート生成
-  - Webサイトのクローリング・スクレイピング
-  - フォーム自動入力とテスト
-  - SPAアプリケーションのE2Eテスト
-  - 軽量なブラウザ自動化が必要な場合
-  - Node.js環境でのブラウザ制御
-  - パフォーマンス重視のスクレイピング
-
-#### **chrome-devtools** - Chrome DevTools制御
-- **用途**:
-  - ページ分析（スナップショット取得）
-  - パフォーマンス計測
-  - ネットワーク監視
-  - リアルタイムデバッグ
-- **使用場面**:
-  - Webアプリデバッグ
-  - パフォーマンス分析
-  - ネットワーク問題の診断
-  - Chrome特有の機能が必要な場合
-  - 詳細なパフォーマンス分析
-  - DevToolsプロトコルの直接利用
-
-### 🧠 思考支援系
-
-#### **sequentialthinking** - 段階的思考プロセス
-- **用途**:
-  - 複雑な問題の段階的な分解と解決策の探索
-  - 仮説の生成、検証、修正のイテレーション
-  - 不確実性が高い問題への適応的アプローチ
-  - マルチステップの計画立案と実行戦略
-  - 思考の分岐と代替案の探索
-  - 問題の本質的な理解と洞察の獲得
-  - 論理的推論と創造的思考の組み合わせ
-- **使用場面**:
-  - アーキテクチャ設計の検討
-  - 複雑なバグの原因調査
-  - ビジネスロジックの設計
-  - 技術選定の意思決定
-  - パフォーマンス問題の根本原因分析
-
-### 🧩 記憶・コンテキスト管理系
-
-#### **claude-mem** - セッション間コンテキスト永続化【推奨】
-- **用途**:
-  - セッション終了後も前回のコンテキストを自動注入
-  - プロジェクト固有の知識と決定事項の長期保存
-  - 観察内容、ユーザー入力、設計決定の履歴管理
-  - コンセプト、ファイル、種類別の高度な検索
-  - 最大10セッション分の履歴保持と段階的情報開示
-  - SQLiteベースの永続化ストレージ
-  - 7つの専門検索ツールによる効率的な情報取得
-- **使用場面**:
-  - **長期プロジェクトのコンテキスト管理（推奨）**
-  - セッションをまたいだ作業の継続
-  - プロジェクトの設計決定と議論の記録
-  - 過去のバグ修正や実装パターンの参照
-  - チーム知識の蓄積と共有
-  - 複雑なプロジェクトの段階的な理解構築
-- **7つのMCP検索ツール**:
-  - `search_observations`: 観察内容の全文検索
-  - `search_sessions`: セッション要約検索
-  - `search_user_prompts`: ユーザー入力履歴検索
-  - `find_by_concept`: コンセプトタグで検索
-  - `find_by_file`: ファイル参照から検索
-  - `find_by_type`: 種類（決定・バグ修正など）から検索
-  - `get_recent_context`: 最近のセッション取得
-- **serenaとの使い分け**:
-  - **serena**: プロジェクト固有のコード構造と実装詳細（`.serena`ディレクトリ）
-  - **claude-mem**: セッション間の会話履歴と設計決定（`~/.claude-mem/`データベース）
-  - **併用推奨**: serenaでコード分析、claude-memで長期的なコンテキスト管理
+## 🎨 コード品質基準
+
+**詳細な原則は以下のClaude Code Skillsを参照してください：**
+
+### 普遍的な品質基準（すべてのプロジェクト）
+- **SOLID原則・クリーンコード**: `solid-clean-code` スキル参照
+- **型安全性（TypeScript/Python）**: `type-safety` スキル参照
+- **テストファースト・TDD**: `testing` スキル参照
+- **セキュアコーディング**: `security-codeguard` スキル参照
+- **テクニカルライティング**: `technical-writing` スキル参照
+
+### 言語・フレームワーク固有の品質基準
+- **Next.js/Reactプロジェクト**: `nextjs-web-modern` スキル参照（最新機能とベストプラクティス）
+- **Pythonプロジェクト**: `python-modern` スキル参照（最新機能とPEP規約）
+
+**重要**: 実装時は必ず上記のスキルを参照し、品質基準を遵守してください。プロジェクト種別に応じて言語固有スキルも併せて確認してください。
+
+## 🎯 言語・フレームワーク固有のベストプラクティス
+
+**プロジェクト種別に応じた自動適用ルールと最新のベストプラクティスを参照してください。**
+
+### プロジェクト検出と自動適用
+
+#### Next.js/React プロジェクト
+**検出条件**: `package.json`に`"next"`が含まれる、または`next.config.js`/`next.config.mjs`が存在
+
+**適用スキル**: `nextjs-web-modern` スキル参照
+
+**使用タイミング**:
+- Next.jsプロジェクトのセットアップ開始時
+- Server Components/Client Components実装時
+- App Router設計時
+- Cache Components設定時
+- パフォーマンス最適化実施時
+
+**カバー範囲**:
+- Next.js 15/16の最新機能（App Router、Server Components、Cache Components）
+- React 19の新機能（useActionState、useFormStatus等）
+- TypeScript厳格型チェック設定
+- Biome最新設定（lintとフォーマット統合）
+- Vitestテスト環境構築
+
+#### Python プロジェクト
+**検出条件**: `pyproject.toml`が存在、または`requirements.txt`と`.py`ファイルが存在
+
+**適用スキル**: `python-modern` スキル参照
+
+**使用タイミング**:
+- Pythonプロジェクトのセットアップ開始時
+- 新規モジュール・クラス実装時
+- 型アノテーション追加時
+- テストコード作成時
+- 依存関係管理とパッケージ公開準備時
+
+**カバー範囲**:
+- Python 3.12+の最新機能（型システム、PEP規約）
+- Ruff最新設定（lintとフォーマット統合）
+- Mypy厳格型チェック設定
+- pytestテスト環境構築
+- uv/Poetry等の依存関係管理ツール
+
+### 既存スキルとの連携
+
+**型安全性スキルとの連携**:
+- `type-safety` スキル: 基本的な型安全原則（any/Any型禁止）
+- `nextjs-web-modern` スキル: Next.js/React固有の型パターン（ComponentProps、Server Component型定義）
+- `python-modern` スキル: Python固有の型パターン（Protocol、TypedDict、Generics）
+
+**SOLID・クリーンコードスキルとの連携**:
+- `solid-clean-code` スキル: 言語非依存の設計原則
+- `nextjs-web-modern` スキル: React Hooksでの適用方法、コンポーネント設計パターン
+- `python-modern` スキル: Pythonでの適用方法、クラス設計パターン
+
+**テストスキルとの連携**:
+- `testing` スキル: 一般的なTDD原則とテスト戦略
+- `nextjs-web-modern` スキル: Vitest設定、React Testing Library、MSW
+- `python-modern` スキル: pytest設定、モック戦略、カバレッジ計測
+
+**MCP開発ツールとの連携**:
+- `mcp-next-devtools` スキル: Next.js開発時の最優先ツール（診断、アップグレード、エラー修正）
+- `nextjs-web-modern` スキル: Next.js実装のベストプラクティス適用
+- `mcp-serena` スキル: コード分析・編集の基盤ツール
+- 言語固有スキル: serenaで分析したコードに対するベストプラクティス適用
+
+### 適用優先順位
+
+**Next.jsプロジェクトでの優先順位**:
+1. `mcp-next-devtools` で診断・エラー検出
+2. `nextjs-web-modern` でベストプラクティス確認
+3. `mcp-serena` でコード分析・編集
+4. `type-safety` で型安全性チェック
+5. `testing` でテスト実装
+
+**Pythonプロジェクトでの優先順位**:
+1. `python-modern` でベストプラクティス確認
+2. `mcp-serena` でコード分析・編集
+3. `type-safety` で型安全性チェック
+4. `testing` でテスト実装
+
+## 📚 利用可能なMCPサーバー
+
+**詳細な使用方法は各Claude Code Skillsを参照してください。**
+
+### カテゴリ別MCPサーバー
+
+#### 🔥 開発支援系（最優先）
+- **serena MCP**: コードベース分析・編集（最優先） → `mcp-serena` スキル参照
+- **next-devtools MCP**: Next.js開発専用（Next.js必須） → `mcp-next-devtools` スキル参照
+- **codex MCP**: AIペアプログラミング
+
+#### 🎨 UI・コンポーネント系
+- **shadcn MCP**: React/Next.js UIコンポーネント管理 → `mcp-shadcn` スキル参照
+
+#### 🔍 情報検索・調査系
+- **情報検索全般** → `mcp-search` スキル参照
+  - kagi MCP: Web検索とコンテンツ要約
+  - context7 MCP: ライブラリドキュメント検索
+  - deepwiki MCP: GitHubリポジトリ解析
+  - docset MCP: Dashドキュメント検索
+  - firecrawl MCP: 高度なWebクロール
+  - markdownify MCP: ファイル形式変換
+  - pandoc MCP: ドキュメント形式変換
+  - youtube MCP: YouTube動画分析
+
+#### 🛠️ インフラ・DevOps系
+- **AWS開発** → `mcp-aws` スキル参照
+  - awslabs.aws-documentation MCP: AWSドキュメント専門
+  - awslabs.terraform MCP: AWS Terraform専門
+  - terraform MCP: 汎用Infrastructure as Code
+- **Docker環境** → `mcp-docker` スキル参照
+  - docker MCP: コンテナ管理
+
+#### 📂 ファイル・システム操作系
+- **filesystem MCP**: ファイルシステム操作 → `mcp-filesystem` スキル参照
+
+#### 🤖 ブラウザ自動化系
+- **ブラウザ自動化全般** → `mcp-browser-auto` スキル参照
+  - playwright MCP: フルブラウザ自動化（推奨）
+  - puppeteer MCP: ヘッドレスブラウザ制御
+  - chrome-devtools MCP: Chrome DevTools制御
+
+#### 🧠 思考支援系
+- **sequentialthinking MCP**: 段階的思考プロセス
+  - 複雑な問題の分解と解決策探索
+  - アーキテクチャ設計、バグ調査、技術選定
+
+#### 🧩 記憶・コンテキスト管理系
+- **claude-mem MCP**: セッション間コンテキスト永続化【推奨】
+  - 設計決定と議論の履歴管理
+  - 7つの専門検索ツール（search_observations等）
+  - serenaとの併用推奨（serena=コード構造、claude-mem=設計履歴）
 
 ## 使用優先順位ガイドライン
 
@@ -626,17 +267,21 @@ class UserDict(TypedDict):
 5. **言語仕様・標準API**: `docset` を使用（リファレンス参照）
 
 ### 2. 開発タスクの優先順位
-1. **コード解析・編集**: `serena` を必須使用（正確な変更）
-2. **Next.js開発（Next.js専用）**:
+1. **プロジェクト種別の確認と言語固有スキル適用**:
+   - **Next.js/Reactプロジェクト**: `nextjs-web-modern` スキル参照（最新機能、型定義、テスト）
+   - **Pythonプロジェクト**: `python-modern` スキル参照（型システム、PEP規約、テスト）
+2. **コード解析・編集**: `serena` を必須使用（正確な変更）
+3. **Next.js開発（Next.js専用）**:
    - **Next.js全般**: `next-devtools` を最優先使用（診断、アップグレード、エラー修正）
+   - **Next.jsベストプラクティス**: `nextjs-web-modern` スキル参照（実装パターン）
    - **UIコンポーネント**: `shadcn` を使用（コンポーネント管理）
    - **最新仕様確認**: `context7` でNext.jsドキュメント確認
-3. **React/Next.js UI実装**: `shadcn` を使用（コンポーネント管理）
-4. **AWSインフラ設定**:
+4. **React/Next.js UI実装**: `shadcn` を使用（コンポーネント管理）
+5. **AWSインフラ設定**:
    - **AWSドキュメント参照**: `awslabs.aws-documentation-mcp-server` を最優先（ベストプラクティス確認）
    - **AWS Terraform実装**: `awslabs.terraform-mcp-server` を使用（セキュアなIaC）
    - **マルチクラウド/汎用Terraform**: `terraform` を使用（Azure、GCP等）
-5. **Web自動化・テスト**: `playwright` を使用（UI操作）
+6. **Web自動化・テスト**: `playwright` を使用（UI操作）
 
 ### 3. 問題解決アプローチ
 - **コードの理解と変更**: `serena` で構造を把握してから作業
@@ -650,191 +295,40 @@ class UserDict(TypedDict):
 
 ## serena利用のベストプラクティス
 
-### 初回セットアップ（必須）
-1. `activate_project`でプロジェクトをアクティブ化
-2. `check_onboarding_performed`でオンボーディング状態を確認
-3. 未実施の場合は`onboarding`を実行
-4. `get_symbols_overview`で主要ファイルの構造を把握
-5. `write_memory`でプロジェクト固有の情報を記録
+**詳細な使用方法は `mcp-serena` スキルを参照してください。**
 
-### 日常的な利用
-- **コード検索**: `find_symbol`で正確な位置を特定してから編集
-- **パターン検索**: `search_for_pattern`で影響範囲を確認
-- **変更作業**: `replace_symbol_body`や`insert_*_symbol`で安全に変更
-- **知識管理**: `read_memory`/`write_memory`でコンテキストを維持
+### 必須手順
+1. **初回セットアップ**: プロジェクトのアクティブ化とオンボーディング実施
+2. **日常的な利用**: シンボル検索、パターン検索、安全な変更作業
 
 ## 🚀 タスク別MCP利用ガイド
 
-### コード作業フロー
-```mermaid
-graph TD
-    A[プロジェクト開始] --> B{.serenaあり?}
-    B -->|No| C[serena初期化]
-    B -->|Yes| D[serena活用]
-    C --> D
-    D --> E[コード分析・編集]
-    E --> F{複雑な問題?}
-    F -->|Yes| G[sequentialthinking]
-    F -->|No| H[直接実装]
-```
+**詳細な使用方法は各Claude Code Skillsを参照してください。**
 
-### 情報検索の優先順位
-1. **コード内**: `serena` → シンボル検索
-2. **ライブラリ**: `context7` → 公式ドキュメント
-3. **GitHub**: `deepwiki` → リポジトリ解析
-4. **言語仕様**: `docset` → ローカルリファレンス
-5. **一般情報・最新情報**: `kagi` → Web検索
-6. **複数ページ調査**: `firecrawl` → 高度なクロール・分析
-7. **動画コンテンツ**: `youtube` → 字幕取得・分析
-8. **ファイル変換**: `markdownify` / `pandoc` → 形式変換
-
-### ブラウザ自動化の選択基準
-```mermaid
-graph TD
-    A[ブラウザ自動化タスク] --> B{要件分析}
-    B --> C{軽量・高速?}
-    C -->|Yes| D[Puppeteer]
-    C -->|No| E{マルチブラウザ?}
-    E -->|Yes| F[Playwright]
-    E -->|No| G{詳細分析?}
-    G -->|Yes| H[Chrome DevTools]
-    G -->|No| I[Puppeteer/Playwright]
-```
-
-### コンテナ操作フロー
-```mermaid
-graph TD
-    A[Docker作業] --> B{作業内容}
-    B -->|開発環境構築| C[docker MCP]
-    B -->|Dockerfile作成| D[serena + docker MCP]
-    B -->|コンテナ管理| E[docker MCP]
-    B -->|ログ分析| F[docker MCP → get_container_logs]
-```
-
-### 複雑なタスクの分解
-1. **問題分析**: sequentialthinking MCPで段階的に問題を分解
-2. **コード調査**: serena MCPでシンボル検索と依存関係を分析
-3. **実装**: serena MCPでシンボル単位の編集を実施
+### 基本的な優先順位
+1. **プロジェクト種別確認**:
+   - **Next.js/React**: `nextjs-web-modern` スキル参照
+   - **Python**: `python-modern` スキル参照
+2. **コード作業**: `mcp-serena` スキル参照 → serena MCPを最優先使用
+3. **情報検索**: `mcp-search` スキル参照 → context7, kagi, deepwiki等を適切に使い分け
+4. **Next.js開発**: `mcp-next-devtools` スキル参照 → Next.js専用MCPを最優先使用
+5. **UI実装**: `mcp-shadcn` スキル参照 → shadcn MCPでコンポーネント管理
+6. **ブラウザ自動化**: `mcp-browser-auto` スキル参照 → playwright/puppeteer/chrome-devtoolsを選択
+7. **インフラ構築**: `mcp-aws`, `mcp-docker` スキル参照
 
 ## 💡 ベストプラクティス
 
-### serenaの効果的な活用
-- **❌ 悪い例**: ファイル全体を読み込む（Readツール使用）
-- **✅ 良い例**: serena MCPで必要なシンボルだけを検索・読込
-
-### 並列処理の活用
-- 複数のMCP操作を同時実行して効率化
-- context7でライブラリドキュメント取得
-- kagiでWeb検索
-- firecrawlで複数ページクロール
-- serenaでシンボル検索
-- これらを並列実行可能
-
-### メモリ管理
-
-#### serena MCP（プロジェクト固有）
-- **永続化**: serena MCPのwrite_memoryでプロジェクト知識を保存
-- **参照**: serena MCPのread_memoryで後から情報を取得
-- **用途**: コード構造、シンボル関係、技術的詳細
-
-#### claude-mem MCP（セッション間）
-- **自動永続化**: セッション終了時に自動的にコンテキストを保存
-- **自動注入**: 次回セッション開始時に前回のコンテキストを自動復元
-- **検索ツール活用**: 7つの検索ツールで過去の情報を効率的に取得
-  - `search_observations`: 観察内容の全文検索
-  - `search_sessions`: セッション要約検索
-  - `search_user_prompts`: ユーザー入力履歴検索
-  - `find_by_concept`: コンセプトタグで検索
-  - `find_by_file`: ファイル参照から検索
-  - `find_by_type`: 種類別検索
-  - `get_recent_context`: 最近のセッション取得
-- **用途**: 設計決定、議論の履歴、プロジェクトの進化過程
-
-#### 使い分けの原則
-- **serena**: 「今」のコード構造（現在のスナップショット）
-- **claude-mem**: 「過去から今まで」の意思決定と議論（履歴と進化）
-- **併用**: serenaで技術実装を管理、claude-memで設計思想を記録
+### MCP使用の基本原則
+- **コード編集**: serena MCP最優先 → `mcp-serena` スキル参照
+- **ファイル操作**: filesystem MCP活用 → `mcp-filesystem` スキル参照
+- **並列処理**: 複数のMCP操作を同時実行して効率化
+- **コンテキスト管理**: serenaとclaude-memを併用
 
 ### コマンド実行の原則
-- **❌ 悪い例**: Bashツールで`grep`、`find`、`cat`などのコマンドを使用
-- **✅ 良い例**: 専用ツール（Grep、Glob、Read）を使用
-- **検索**:
-  - **最優先**: Grepツール（ripgrep）を使用 - Claude Code用に最適化済み
-  - **Bashで検索する場合**: `grep`ではなく`rg`コマンドを使用 - より高速
-- **ファイル検索**: Globツールを使用 - `find`コマンドより効率的
-- **ファイル読込**: Readツールを使用 - `cat`コマンドより最適化
-- **理由**: 専用ツールはClaude Code用に最適化され、より高速で効率的
-
-### ファイル操作の効率化
-- **コード編集**: serena MCPのシンボル単位編集
-- **一括処理**: filesystem MCPで複数ファイル操作
-- **バックアップ**: filesystem MCPでディレクトリ単位のコピー
-- **検索**: filesystem MCPのsearch_filesで高速検索
-
-### Docker環境の効率的な管理
-- **状態確認**: docker MCPでコンテナ一覧を確認してから操作
-- **環境構築**: Docker Composeで開発環境を一括起動
-- **ログ監視**: コンテナログを継続的に監視してデバッグ
-- **イメージ管理**: 必要に応じてイメージをビルド・管理
-
-### ブラウザ自動化の使い分け
-- **軽量タスク**: Puppeteer MCPを使用
-  - スクリーンショット取得
-  - PDF生成
-  - 簡単なWebスクレイピング
-- **複雑なE2Eテスト**: Playwright MCPを使用
-  - マルチブラウザテスト
-  - 複雑なフォーム操作
-  - 高度なE2Eテストシナリオ
-- **パフォーマンス分析**: Chrome DevTools MCPを使用
-  - 詳細なパフォーマンス計測
-  - ネットワーク分析
-  - Chrome特有の機能利用
-
-### Next.js開発の最適化（重要）
-**Next.jsプロジェクトでは必ずnext-devtoolsを最優先で活用してください**
-
-#### プロジェクト開始時
-- **開発サーバー起動確認**: `npm run dev` または `yarn dev` で開発サーバーを起動
-- **next-devtoolsで診断**: 実行中のNext.js開発サーバーの状態を確認
-- **ルート構造の把握**: next-devtoolsでルート構造を取得し、プロジェクトの全体像を理解
-
-#### Next.jsアップグレード時
-- **next-devtoolsでアップグレード**: 自動アップグレードツールを使用
-  - コマンド例: "Next Devtools, help me upgrade my Next.js app to version 16"
-  - 自動でcodemodが実行され、破壊的変更に対応
-
-#### Server Components実装時
-- **Cache Components最適化**: next-devtoolsでCache Componentsのセットアップ
-  - 自動でSuspense境界を設定
-  - キャッシング指示の自動挿入
-  - 静的パラメータの最適化
-  - エラー検出と自動修正
-
-#### デバッグとエラー修正時
-- **next-devtoolsで診断**: 実行中の開発サーバーから内部状態とエラー情報を取得
-- **自動修正機能**: Next.js特有のエラーを検出し、自動修正を提案
-- **ベストプラクティス確認**: Next.js公式ドキュメントへの統合アクセス
-
-#### 推奨ワークフロー
-```
-1. プロジェクト分析
-   └─ serena MCP: コードベース全体の構造把握
-   └─ next-devtools MCP: Next.js特有の構造とルート確認
-
-2. 実装前の確認
-   └─ context7 MCP: 最新Next.js仕様確認
-   └─ next-devtools MCP: 現在のNext.jsバージョンと推奨事項確認
-
-3. 実装
-   └─ serena MCP: コード編集
-   └─ shadcn MCP: UIコンポーネント管理
-   └─ next-devtools MCP: Server Components最適化
-
-4. テスト・デバッグ
-   └─ next-devtools MCP: エラー診断と自動修正
-   └─ playwright MCP: E2Eテスト
-```
+- **検索**: Grepツール（ripgrep）を最優先使用
+- **ファイル検索**: Globツールを使用
+- **ファイル読込**: Readツールを使用
+- **❌ 避ける**: Bashツールで`grep`、`find`、`cat`などを使用
 
 ## 🔒 セキュリティプラグイン（CodeGuard）
 
@@ -1011,410 +505,61 @@ command: "/codeguard-security:software-security"
 - 環境変数は.envファイルで管理
 - APIキーは暗号化して保存
 
-## 🔍 Web情報取得MCPの使い分け（重要）
+## 🔍 Web情報取得MCPの使い分け
 
-### 状況に応じた最適なMCP選択
+**詳細な選択基準は `mcp-search` スキルを参照してください。**
 
-#### 🌐 Fetch MCP（WebFetch tool）
-**使用場面**:
-- 単一ページの情報取得
-- 軽量な環境での使用
-- シンプルな使い方を好む場合
-- 公式リファレンス実装なので安定性が高い
-
-**特徴**: 軽量、安定、単一URL向け
-
-#### 🕷️ Firecrawl MCP
-**使用場面**:
-- 複数ページのクロール
-- 検索機能が必要
-- 高度な分析
-- ディープリサーチが必要な場合
-- ウェブサイト全体をLLM用に変換
-
-**特徴**: 高機能、複数ページ対応、JavaScript対応
-
-#### 🌐 Markdownify MCP
-**使用場面**:
-- ウェブページをMarkdownに変換して保存
-- PDF、Officeファイル、画像、オーディオを変換
-- 構造化されたMarkdownとして保存したい場合
-- 多様なファイル形式の変換に特化
-
-**特徴**: 多様なファイル形式対応、保存・アーカイブ向け
-
-#### 🔍 Kagi MCP
-**使用場面**:
-- 最新のウェブ情報への素早いアクセス
-- 高度な検索機能
-- 複雑なリサーチクエリが必要な場合
-- 最新情報や時事問題の調査
-
-**特徴**: 最新情報、検索特化、高速
-
-### 選択フローチャート
-```
-Web情報が必要
-    ↓
-単一ページ？
-├─ Yes → Fetch MCP（軽量・安定）
-└─ No → 複数ページ/高度な分析？
-        ├─ Yes → Firecrawl MCP（クロール・分析）
-        └─ No → 最新情報検索？
-                ├─ Yes → Kagi MCP（検索特化）
-                └─ No → ファイル変換保存？
-                        └─ Yes → Markdownify MCP（変換・保存）
-```
-
-## 📊 MCP利用統計の目安
-
-| タスク種別 | 推奨MCP | 使用頻度 |
-|---------|--------|---------|
-| コード編集 | serena | 90% |
-| **長期プロジェクトコンテキスト管理** | **claude-mem** | **85%** |
-| **Next.js開発全般** | **next-devtools** | **80%** |
-| ライブラリ調査 | context7 | 70% |
-| React/Next.js UI実装 | shadcn | 60% |
-| **AWSドキュメント参照** | **awslabs.aws-documentation** | **60%** |
-| **AWS Terraform実装** | **awslabs.terraform** | **50%** |
-| 問題解決 | sequentialthinking | 40% |
-| Docker環境管理 | docker | 40% |
-| ファイル操作 | filesystem | 35% |
-| Web検索（最新情報） | kagi | 30% |
-| **汎用Terraform（マルチクラウド）** | **terraform** | **30%** |
-| Webクロール・分析 | firecrawl | 25% |
-| ブラウザ自動化 | puppeteer | 25% |
-| 動画分析 | youtube | 20% |
-| テスト自動化 | playwright | 20% |
-| ドキュメント変換 | pandoc/markdownify | 15% |
-| パフォーマンス分析 | chrome-devtools | 15% |
+### 基本的な選択
+- **単一ページ**: Fetch MCP（軽量・安定）
+- **複数ページ/高度な分析**: Firecrawl MCP
+- **最新情報検索**: Kagi MCP
+- **ファイル変換**: Markdownify / Pandoc MCP
 
 ## 🌳 Git Worktree を使用した並行開発
 
-### 🎯 基本原則：新規作業時のWorktree使用（最重要）
+**詳細な手順は `git-worktree` スキルを参照してください。**
 
-#### ⚠️ 必須ルール
+### ⚠️ 絶対遵守ルール
+
+#### 新規作業時の必須確認
 **新しい、今までの作業と関係ない作業だと判断した場合：**
 
-1. **Worktreeを作成して作業を開始すること**
-2. **ただし、必ずユーザーに確認を取ってから実行すること**
-   - どういう名前のworktreeで作業するか提案
-   - ユーザーの承認を得てから作成
-   - 勝手にworktreeを作成して作業開始してはいけない
-3. **現在作業しているworktreeでの作業であれば確認不要**
-4. **このworktreeを使った作業フローは絶対に遵守すること**
+1. **必ずユーザーに確認を取る**
+   - worktree名を提案（例: `wt-feat-機能名`）
+   - ユーザー承認後に作成
+   - 勝手に作成して作業開始してはいけない
 
-#### 判断基準
-```
-新しいタスク受信
-    ↓
-現在の作業と関連？
-    ├─ Yes → 現在のworktreeで作業継続（確認不要）
-    └─ No → 新規worktree必要
-        ↓
-        ユーザーに確認
-        「新しい作業のため、worktree `wt-feat/機能名` を作成しますか？」
-        ↓
-        承認後に作成・作業開始
-```
+2. **判断基準**
+   - 現在の作業と関連 → 現在のworktreeで継続（確認不要）
+   - 新規作業 → ユーザー確認してworktree作成
 
-### 基本概念と制約
-Git Worktreeは複数のブランチを同時に作業できる仕組みです。ただし、**Claude Codeは親ディレクトリ（`..`）にアクセスできない**ため、通常とは異なる方法で運用します。
+#### 基本制約
+- **作成場所**: プロジェクトフォルダ直下（`..`にアクセス不可）
+- **命名規則**: 必ず`wt-`プレフィックス使用
+- **環境設定**: `.env`と`.serena`を親からコピー
 
-### ⚠️ 重要な制約
-- **親ディレクトリへのアクセス不可**: Claude Codeは`../`にアクセスできません
-- **解決策**: メインリポジトリ内のサブディレクトリとしてworktreeを作成
-- **作成場所**: 必ずプロジェクトフォルダ直下
-- **命名規則**: 必ず`wt-`プレフィックスを使用
-
-### 📁 推奨ディレクトリ構造
-```
-your-project/              # メインリポジトリ（main/masterブランチ）
-├── src/                   # ソースコード
-├── tests/                 # テスト
-├── .env                   # 環境変数（必要に応じてworktreeにコピー）
-├── wt-feat-auth/         # 認証機能開発用worktree
-├── wt-feat-payment/      # 決済機能開発用worktree
-├── wt-fix-bug-123/       # バグ修正用worktree
-└── wt-hotfix-security/   # 緊急セキュリティ修正用worktree
-```
-
-### 🎯 Worktree作成の命名規則
-
-#### 基本フォーマット
+#### 基本コマンド
 ```bash
-# プロジェクトフォルダ直下にwt-プレフィックスで作成
+# 新規worktree作成
 git worktree add -b feature/ブランチ名 wt-ワークツリー名 main
-```
 
-**パラメータ説明：**
-- `feature/ブランチ名`: 作業内容に合わせた新しいブランチ名（バグ修正の場合は`hotfix/ブランチ名`）
-- `wt-ワークツリー名`: 作業内容に合わせたworktree名（必ず`wt-`プレフィックス）
-- `main`: 元となるブランチ名（指示がなければmainをデフォルト）
-
-#### カテゴリ別の命名例
-```bash
-# 機能開発
-git worktree add -b feature/user-auth wt-feat-user-auth main
-git worktree add -b feature/payment-integration wt-feat-payment main
-
-# バグ修正
-git worktree add -b hotfix/memory-leak wt-fix-memory-leak main
-git worktree add -b hotfix/issue-456 wt-fix-issue-456 main
-
-# 緊急修正
-git worktree add -b hotfix/critical-security wt-hotfix-security main
-
-# 実験的開発
-git worktree add -b experimental/new-arch wt-exp-new-arch main
-
-# リリース準備
-git worktree add -b release/v2.0.0 wt-release-v2.0.0 main
-```
-
-### 📋 Worktree操作ガイド
-
-#### 1. 新規Worktree作成
-```bash
-# まず作業ディレクトリを確認
-pwd  # メインリポジトリのルートであることを確認
-
-# 既存のworktreeを確認
+# 確認・管理
 git worktree list
-
-# 新しいworktreeを作成（新規ブランチ作成と同時に）
-git worktree add -b feature/payment-integration wt-feat-payment main
-
-# 既存ブランチからworktreeを作成
-git worktree add wt-feat-existing feature/existing-branch
-
-# リモートブランチから作成
-git worktree add wt-feat-remote origin/feature/remote-branch
+git worktree remove wt-名前
 ```
-
-#### 2. Worktreeでの作業
-```bash
-# worktreeに移動
-cd wt-feat-payment
-
-# 必要に応じて環境変数ファイルをコピー
-cp ../.env .env
-
-# 親フォルダの.serenaをコピー（初期化より高速）
-cp -r ../.serena .serena
-
-# 通常通り開発作業を実施
-git status
-git add .
-git commit -m "feat: implement payment gateway"
-git push origin feature/payment-integration
-
-# メインリポジトリに戻る
-cd ..
-```
-
-#### 3. Worktreeの管理
-```bash
-# 全worktreeの一覧表示
-git worktree list
-
-# 不要なworktreeの削除（作業完了後）
-git worktree remove wt-feat/payment
-
-# 強制削除（未コミットの変更がある場合）
-git worktree remove --force wt-feat/payment
-
-# 削除済みworktreeのクリーンアップ
-git worktree prune
-```
-
-### ⚡ ベストプラクティス
-
-#### DO（推奨事項）
-- ✅ **ユーザー確認を取る**: 新規worktree作成時は必ずユーザーに確認
-- ✅ **プレフィックス使用**: 必ず`wt-`プレフィックスを使用
-- ✅ **プロジェクト直下に作成**: 親ディレクトリではなくプロジェクトフォルダ直下
-- ✅ **環境変数のコピー**: 必要に応じて`.env`ファイルをworktreeにコピー
-- ✅ **.serenaのコピー**: `cp -r ../.serena .serena`で親の.serenaをコピー（初期化不要）
-- ✅ **作業前の確認**: `git worktree list`で既存worktreeを確認
-- ✅ **定期的なクリーンアップ**: 使用済みworktreeは削除（ただしAgentは自動削除しない）
-
-#### DON'T（避けるべき事項）
-- ❌ **勝手にworktreeを作成**: 必ずユーザー確認を取る
-- ❌ **勝手にworktreeを削除**: Agentはworktreeを自動削除しない
-- ❌ **親ディレクトリへの作成**: `../`にworktreeを作成しない
-- ❌ **ネストしたworktree**: worktree内にworktreeを作成しない
-- ❌ **同じブランチの複数worktree**: 1つのブランチに複数のworktreeを作成しない
-- ❌ **worktree外での作業**: 必ずworktree内部で作業する
-- ❌ **serenaの再初期化**: worktreeごとに初期化せず、.serenaをコピーする
-
-### 🔍 トラブルシューティング
-
-#### worktreeが作成できない場合
-```bash
-# エラー: ブランチが既に別のworktreeで使用中
-git worktree list  # 既存のworktreeを確認
-git worktree remove {既存のworktree}  # 不要なworktreeを削除
-
-# エラー: ディレクトリが既に存在
-rm -rf wt-feat/existing-dir  # 既存ディレクトリを削除
-git worktree add wt-feat/existing-dir feature/branch
-```
-
-#### worktreeが削除できない場合
-```bash
-# 未コミットの変更を確認
-cd wt-feat/branch
-git status
-git stash  # 変更を一時保存
-
-# メインディレクトリに戻って削除
-cd ../..
-git worktree remove wt-feat/branch
-```
-
-#### worktreeの状態がおかしくなった場合
-```bash
-# worktreeの修復
-git worktree repair
-
-# 全worktreeの検証と修復
-git worktree repair --all
-
-# 無効なworktreeの削除
-git worktree prune
-```
-
-### 📊 Worktree使用時のserena連携
-
-Worktreeで作業する場合、親フォルダの.serenaをコピーして使用します：
-
-```bash
-# worktreeに移動
-cd wt-feat-new-feature
-
-# 必要に応じて環境変数をコピー
-cp ../.env .env
-
-# 親フォルダの.serenaをコピー（初期化より高速）
-cp -r ../.serena .serena
-
-# 開発作業を実施
-# ...
-
-# メインリポジトリに戻る
-cd ..
-```
-
-**重要**:
-- `.serena`をコピーすることで、毎回の初期化が不要になり時間を節約
-- 親プロジェクトで既にserenaが初期化されている必要があります
-- worktree内で`.serena`を変更しても親には影響しません
-
-### 🛠️ gwq（Git Worktree Quick）ツールの活用
-
-gwqは、git worktreeをより効率的に管理するためのツールです。利用可能な場合は積極的に使用してください。
-
-#### 基本的な使い方
-```bash
-# 一貫した命名規則で自動作成
-gwq add -b feature/auth-refactor
-
-# Fuzzy Finderでworktreeを選択してアクセス
-cd $(gwq get)  # 全worktreeから選択
-
-# 部分マッチで素早くアクセス
-cd $(gwq get auth)  # 'auth'を含むworktreeを検索
-```
-
-**注意**: gwqが利用できない環境では通常の`git worktree`コマンドを使用してください。
 
 ## 📝 テクニカルライティングガイドライン
 
-効果的なテクニカルライティングの原則に基づいた、自然で読みやすい技術文書作成のためのガイドラインです。
+**詳細な原則は `technical-writing` スキルを参照してください。**
 
-### 基本原則：効果的なテクニカルライティングの「7つのC」
-
-優れたテクニカルドキュメントは以下の品質を持ちます：
-
-- **Clear（明確）**: 曖昧さがなく、容易に理解できる
-- **Concise（簡潔）**: 必要な情報を最小限の言葉で表現
-- **Correct（正確）**: 文法、事実、技術的内容に誤りがない
-- **Coherent（一貫）**: 論理的に結びつき、スムーズに流れる
-- **Concrete（具体的）**: 抽象的でなく、測定可能で明確
-- **Complete（完全）**: 必要な情報がすべて含まれている
-- **Courteous（丁寧）**: 読者を意識した適切なトーンと構成
-
-### 1. 簡潔性の原則（Conciseness）
-
-#### 冗長表現の排除
-
-| 検出される表現 | 推奨される表現 | 理由 |
-|---------------|---------------|------|
-| まず最初に | まず / 最初に | 意味の重複 |
-| あらかじめ予測 | 予測 | 「予測」自体が事前の概念を含む |
-| することができます | できます / します | 不必要な助動詞の重複 |
-| する必要があります | してください / します | より直接的な表現 |
-| 言うまでもなく | （削除） | 不要な前置き |
-
-### 2. 明確性の原則（Clarity）
-
-#### 受動態から能動態への変更
-
-| 受動的表現 | 能動的表現 | 改善効果 |
-|-----------|-----------|---------|
-| 処理が行われます | システムが処理します | 主語が明確 |
-| データの変更を行う | データを変更する | 直接的な動作 |
-| によって実行される | ○○が実行する | 行為者が明確 |
-
-### 3. 具体性の原則（Concreteness）
-
-#### 曖昧な表現と具体的な代替案
-
-| 抽象的表現 | 具体的表現の例 | 改善効果 |
-|-----------|---------------|---------|
-| 高速なパフォーマンス | 50ms未満の応答時間 | 測定可能な基準 |
-| 大幅に向上 | 従来比200%向上 | 定量的な情報 |
-| 効率的な | メモリ使用量を30%削減 | 具体的な効果 |
-| 適切な | セキュリティ基準に準拠した | 明確な判断基準 |
-
-### 4. 一貫性の原則（Consistency）
-
-#### よくある不一致パターン
-
-| 不一致の例 | 統一すべき表現 | 注意点 |
-|-----------|---------------|--------|
-| ユーザー/クライアント/顧客 | プロジェクトで統一 | 同一対象は同一用語 |
-| 設定画面/設定ページ/環境設定 | UI名称で統一 | 機能名は正確に |
-| です・ます調/だ・である調 | 文書全体で統一 | 文体の混在を避ける |
-
-### 5. 構造化の原則（Structure）
-
-#### 文の長さと構造
-- **一文一義**: 一つの文には一つの主要なアイデアのみ
-- **適切な長さ**: 50文字を超える文は分割を検討
-- **論理的順序**: 時系列や重要度に基づいた情報配置
-
-#### リストと見出しの活用
-- 連続する手順は番号付きリスト
-- 関連項目は箇条書き
-- 階層構造は見出しレベルで表現
-
-### 実装での考慮事項
-
-#### ルールの適用レベル
-このガイドラインは以下の優先順位で適用されます：
-
-1. **正確性**: 技術的事実の正確性が最優先
-2. **明確性**: 読者の理解を妨げない表現
-3. **簡潔性**: 文書の目的に応じて調整
-4. **丁寧さ**: 読者層に適したトーン
-
-#### カスタマイズ
-プロジェクトの特性に応じて：
-- 専門用語の定義と統一
-- 読者層に応じた説明レベル
-- 組織固有のスタイルガイド
+### 基本原則：7つのC
+- **Clear（明確）**: 曖昧さがなく理解しやすい
+- **Concise（簡潔）**: 最小限の言葉で表現
+- **Correct（正確）**: 文法・事実・技術内容に誤りがない
+- **Coherent（一貫）**: 論理的に結びつく
+- **Concrete（具体的）**: 測定可能で明確
+- **Complete（完全）**: 必要な情報がすべて含まれる
+- **Courteous（丁寧）**: 読者を意識した適切なトーン
 
 ## 🔄 定期メンテナンス
 
