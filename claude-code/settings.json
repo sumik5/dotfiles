@@ -37,10 +37,6 @@
       "Bash(terraform refresh:*)"
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.js"
-  },
   "enabledPlugins": {
     "codeguard-security@project-codeguard-ja": true,
     "claude-mem@thedotmack": true
@@ -67,5 +63,10 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bun x ccusage statusline",
+    "padding": 0
   }
 }
