@@ -35,7 +35,7 @@
 3. プロジェクト構造把握
 4. プロジェクト種別検出（Next.js/Python）→ 言語固有スキル適用
 
-詳細: `mcp-serena` スキル参照
+**注**: serena MCPは自動的にオンデマンドで起動されます
 
 ---
 
@@ -56,29 +56,48 @@
 
 ## 📚 MCP使用ガイド
 
+### modular-mcp の仕組み
+**すべてのMCPはmodular-mcpによってオンデマンドで起動されます**
+- コンテキスト量を大幅削減（常時起動なし）
+- 必要な時に自動的に適切なMCPを選択・起動
+- 設定: `~/.config/claude-code/modular-mcp.json`
+
 ### 最優先MCP（必須）
 - **serena**: コード分析・編集（プロジェクト作業前に必ず初期化）
+  - プロジェクト初期化、シンボル検索、効率的なコード変更
+  - トリガー: 'edit code', 'refactor', 'find class/function', 'code analysis'
 - **next-devtools**: Next.js専用（診断・アップグレード）
-- **claude-mem**: セッション間永続化
+  - Next.js 16+のruntime診断、自動アップグレード、Cache Components最適化
+  - トリガー: 'Next.js', 'upgrade Next.js', 'Cache Components', 'Server Components'
 
 ### カテゴリ別MCP
-- 🔥 **開発**: serena, next-devtools, shadcn
-- 🔍 **検索**: kagi, context7, deepwiki, docset
-- 🛠️ **インフラ**: awslabs.aws-documentation, terraform, docker
-- 🤖 **ブラウザ**: playwright, puppeteer, chrome-devtools
-- 📂 **ファイル**: filesystem
-- 🧠 **思考**: sequentialthinking
-
-詳細: 各`mcp-*` スキル参照
+- 🔥 **開発**:
+  - **serena**: コード分析・編集（シンボル検索、効率的なコード変更、プロジェクト構造分析）
+  - **next-devtools**: Next.js専用開発ツール（診断、アップグレード、Cache Components最適化）
+  - **shadcn**: shadcn/ui UIコンポーネント管理（検索、追加、使用例）
+- 🔍 **検索**:
+  - **context7**: ライブラリドキュメント取得（最新公式ドキュメント、API参照）
+  - **deepwiki**: GitHubリポジトリ分析（オープンソースプロジェクト理解）
+- 🛠️ **インフラ**:
+  - **terraform**: Terraform IaCドキュメント（モジュール、プロバイダー、ポリシー）
+  - **docker**: Docker/Composeコンテナ管理（作成、デプロイ、ログ取得）
+- 🤖 **ブラウザ**:
+  - **playwright**: 高度なE2Eテスト（クロスブラウザ、フォーム自動化）
+  - **puppeteer**: 軽量ブラウザ自動化（スクリーンショット、PDF生成）
+  - **chrome-devtools**: パフォーマンス分析（Core Web Vitals、ネットワーク分析）
+- 📂 **変換**:
+  - **mcp-pandoc**: ドキュメント形式変換（Markdown ↔ Word/PDF/LaTeX）
+- 🧠 **思考**:
+  - **sequentialthinking**: 複雑な問題解決（段階的思考、仮説検証）
 
 ### 優先順位
 1. **プロジェクト作業開始**: `.serena`確認 → serena初期化・オンボーディング
-2. **情報検索**: serena > context7 > deepwiki > kagi > docset
+2. **情報検索**: serena (コード) > context7 (ライブラリ) > deepwiki (GitHub)
 3. **開発タスク**:
    - プロジェクト種別確認（Next.js/Python）→ 言語固有スキル適用
    - コード作業: serena必須
    - Next.js: next-devtools最優先
-4. **コンテキスト管理**: claude-mem（長期知識）+ serena（コード構造）
+4. **ブラウザ自動化**: playwright (複雑) > puppeteer (軽量) > chrome-devtools (分析)
 
 ---
 

@@ -1,69 +1,14 @@
 {
   "mcpServers": {
-    "context7": {
-      "type": "stdio",
-      "command": "npx",
+    "mcp-router": {
+      "command": "/Users/sumik/.local/share/mise/shims/npx",
       "args": [
         "-y",
-        "@upstash/context7-mcp"
-      ],
-      "env": {}
-    },
-    "serena": {
-      "type": "stdio",
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/oraios/serena",
-        "serena",
-        "start-mcp-server",
-        "--context ide-assistant"
-      ],
-      "env": {}
-    },
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@playwright/mcp@latest"
-      ],
-      "env": {}
-    },
-    "kagi": {
-      "command": "uvx",
-      "args": [
-        "kagimcp"
+        "modular-mcp"
       ],
       "env": {
-        "KAGI_API_KEY": "INPUT ME",
-        "KAGI_SUMMARIZER_ENGINE": "cecil"
+        "MODULAR_MCP_CONFIG": "/Users/sumik/.config/claude-code/modular-mcp.json"
       }
-    },
-    "deepwiki": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "https://mcp.deepwiki.com/sse"
-      ]
-    },
-    "sequentialthinking": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
-      ]
-    },
-    "translate-srt": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/sumik5/translate-srt-mcp",
-        "translate-srt-mcp"
-      ],
-      "env": {
-        "LM_STUDIO_URL": "http://localhost:1234",
-        "LM_MODEL_NAME": "grapevine-AI/plamo-2-translate@q4_k_m"
-      }
+    }
   }
 }

@@ -1,0 +1,2 @@
+claude mcp add --transport stdio modular-mcp -- npx -y @kimuson/modular-mcp@latest $HOME/.claude/modular-mcp.json
+

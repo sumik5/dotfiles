@@ -53,11 +53,7 @@ color: orange
 - **mcp-serena** - コード編集の最優先ツール（詳細）
 - **mcp-next-devtools** - Next.js開発の必須ツール
 - **mcp-shadcn** - UIコンポーネント管理
-- **mcp-aws** - AWSインフラ構築
 - **mcp-docker** - Docker環境管理
-- **mcp-browser-auto** - ブラウザ自動化
-- **mcp-search** - 情報検索戦略
-- **mcp-filesystem** - ファイル操作と変換
 
 ## 🎨 コード設計の原則（必須遵守）
 
@@ -224,10 +220,13 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
 - **next-devtools MCP**（Next.js専用） - `mcp-next-devtools` スキル参照
 - **shadcn MCP**（UIコンポーネント） - `mcp-shadcn` スキル参照
 - **docker MCP**（コンテナ管理） - `mcp-docker` スキル参照
-- **playwright/puppeteer/chrome-devtools MCP**（ブラウザ自動化） - `mcp-browser-auto` スキル参照
-- **kagi/firecrawl/deepwiki/docset MCP**（情報検索） - `mcp-search` スキル参照
-- **filesystem/markdownify/pandoc MCP**（ファイル操作） - `mcp-filesystem` スキル参照
-- **awslabs.aws-documentation/terraform MCP**（AWSインフラ） - `mcp-aws` スキル参照
+- **playwright MCP**（E2Eテスト・クロスブラウザ） - modular-mcp自動起動
+- **puppeteer MCP**（軽量ブラウザ自動化） - modular-mcp自動起動
+- **chrome-devtools MCP**（パフォーマンス分析） - modular-mcp自動起動
+- **context7 MCP**（ライブラリドキュメント） - modular-mcp自動起動
+- **deepwiki MCP**（GitHubリポジトリ分析） - modular-mcp自動起動
+- **mcp-pandoc**（ドキュメント変換） - modular-mcp自動起動
+- **terraform MCP**（Terraform IaC） - modular-mcp自動起動
 - **claude-mem MCP**（セッション間コンテキスト管理）
 - **sequentialthinking MCP**（複雑な問題解決）
 
@@ -259,14 +258,10 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
 
 **⚠️ 重要: 実装前に必ず最新仕様を確認してください**
 
-**詳細な手順は以下のスキルを参照してください：**
+**利用可能なMCPツール（modular-mcp自動起動）：**
 
-- **情報検索全般**: `mcp-search` スキル参照
-  - context7 MCPでのライブラリドキュメント取得
-  - kagi MCPでの最新情報検索
-  - firecrawl MCPでの包括的調査
-  - docset MCPでの言語仕様確認
-  - youtube MCPでの動画コンテンツ分析
+- **context7 MCP**: ライブラリドキュメント取得（最新公式ドキュメント）
+- **deepwiki MCP**: GitHubリポジトリ分析（オープンソースプロジェクト理解）
 
 - **React/Next.js UI実装**: `mcp-shadcn` スキル参照
   - shadcn/uiコンポーネントの検索・追加・管理
@@ -290,10 +285,10 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
 
 #### インフラ・環境構築
 
-**詳細な手順は以下のスキルを参照してください：**
-- **AWSインフラ構築**: `mcp-aws` スキル参照
+**利用可能なMCPツール：**
 - **Docker環境構築**: `mcp-docker` スキル参照
-- **ブラウザ自動化**: `mcp-browser-auto` スキル参照
+- **Terraform IaC**: terraform MCP（modular-mcp自動起動）
+- **ブラウザ自動化**: playwright/puppeteer/chrome-devtools MCP（modular-mcp自動起動）
 
 #### MCP活用の基本原則
 

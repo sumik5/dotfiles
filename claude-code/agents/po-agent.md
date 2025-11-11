@@ -39,7 +39,6 @@ color: purple
 
 #### コード分析・調査時
 - **mcp-serena** - プロジェクト分析の詳細（最優先）
-- **mcp-search** - 情報検索戦略
 
 #### 技術選定時
 
@@ -50,10 +49,7 @@ color: purple
 ##### MCP開発ツール
 - **mcp-next-devtools** - Next.js開発戦略
 - **mcp-shadcn** - UIコンポーネント戦略
-- **mcp-aws** - AWSインフラ戦略
 - **mcp-docker** - コンテナ化戦略
-- **mcp-browser-auto** - ブラウザ自動化戦略
-- **mcp-filesystem** - ファイル操作戦略
 
 #### 品質基準策定時
 - **solid-clean-code** - SOLID原則とクリーンコード
@@ -153,8 +149,7 @@ color: purple
 - **serena MCP** (mcp-serena スキル)
 - **claude-mem MCP** (セッション履歴管理)
 - **sequentialthinking MCP** (複雑な戦略決定)
-- **kagi MCP** (mcp-search スキル)
-- **その他のMCP** (各種MCPスキル参照)
+- **その他のMCP** (modular-mcp.jsonに定義されたMCPを適宜使用)
 
 ## 重要なポイント
 - 絶対に一人で作業せず、必ずManagerに委任する
@@ -177,11 +172,7 @@ color: purple
 - `mcp-serena` - プロジェクト分析
 - `mcp-next-devtools` - Next.js開発
 - `mcp-shadcn` - UIコンポーネント
-- `mcp-aws` - AWSインフラ
 - `mcp-docker` - コンテナ化
-- `mcp-browser-auto` - ブラウザ自動化
-- `mcp-search` - 情報検索
-- `mcp-filesystem` - ファイル操作
 
 ### 開発原則
 - `solid-clean-code` - SOLID原則

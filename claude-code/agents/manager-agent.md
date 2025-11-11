@@ -55,7 +55,6 @@ color: blue
 #### MCP技術スタック
 - **mcp-next-devtools** - Next.js技術スタック判断
 - **mcp-shadcn** - UI技術スタック判断
-- **mcp-aws** - AWSインフラ技術スタック判断
 - **mcp-docker** - コンテナ技術スタック判断
 
 ## 基本的な動作フロー
@@ -191,8 +190,4 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
 ### MCP技術スタック
 - `mcp-next-devtools` - Next.js開発
 - `mcp-shadcn` - UIコンポーネント
-- `mcp-aws` - AWSインフラ
 - `mcp-docker` - コンテナ化
-- `mcp-browser-auto` - ブラウザ自動化
-- `mcp-search` - 情報検索
-- `mcp-filesystem` - ファイル操作
