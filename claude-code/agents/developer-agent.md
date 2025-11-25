@@ -67,11 +67,11 @@ color: orange
 1. ManagerまたはClaude Codeからタスクと役割の指示を待つ
 2. タスクと役割を受信
 3. **Worktree情報の確認と移動（最重要）**
-   - **Submoduleの有無を確認**
-   - Submoduleがある場合：対象submodule名とworktreeパスを確認
+   - **変更対象を確認**（親git側 vs submodule内）
+   - 指示されたworktreeパスを確認
    - 指示されたworktree配下に移動
-     - Submoduleなし：`cd wt-feat-xxx`
-     - Submoduleあり：`cd submodule1/wt-feat-xxx`
+     - 親git側変更：`cd wt-feat-xxx`（親gitルート直下）
+     - Submodule内変更のみ：`cd submodule1/wt-feat-xxx`（submodule内のみ）
    - 必要に応じて環境変数ファイルをコピー
 4. **利用可能なMCPサーバーを確認**
    - ListMcpResourcesToolで全MCPサーバーの一覧を取得
@@ -215,9 +215,9 @@ Managerから指定された役割を柔軟に担当：
 #### 実装の進め方
 1. **タスク受信**: ManagerまたはClaude Codeからタスクと要件を受信
 2. **Worktree配下への移動**: 指定されたworktreeに移動（詳細は `git-worktree` スキル参照）
-   - **Submoduleの有無を確認**
-   - Submoduleなし：`cd wt-feat-xxx`
-   - Submoduleあり：`cd submodule1/wt-feat-xxx`（指定されたsubmoduleとworktreeパス）
+   - **変更対象を確認**（親git側 vs submodule内）
+   - 親git側変更：`cd wt-feat-xxx`（親gitルート直下）
+   - Submodule内変更のみ：`cd submodule1/wt-feat-xxx`（指定されたsubmodule内）
 3. **serena MCPでコード分析**: シンボル検索、依存関係分析（詳細は `mcp-serena` スキル参照）
 4. **serena MCPで編集**: シンボル単位の置換、挿入（詳細は `mcp-serena` スキル参照）
 5. **品質確認**: テスト、lint、型チェック実施（詳細は `testing` スキル参照）
@@ -228,16 +228,16 @@ Managerから指定された役割を柔軟に担当：
 **詳細は `git-worktree` スキルを参照してください。**
 
 **最重要:**
-- ✅ **Submoduleの有無を必ず確認**
+- ✅ **変更対象を必ず確認**（親git側 vs submodule内）
 - ✅ 必ず指定されたworktree配下で作業
-  - Submoduleなし：プロジェクトルート直下のworktree
-  - Submoduleあり：指定されたsubmodule内のworktree
+  - 親git側変更：親gitルート直下のworktree（`wt-feat-xxx`）
+  - Submodule内変更のみ：指定されたsubmodule内のworktree（`submodule1/wt-feat-xxx`）
 - ✅ 環境変数(.env)と.serenaは親からコピー
-  - Submoduleなし：`cp ../.env .env`
-  - Submoduleあり：`cp ../../.env .env`または`cp ../.env .env`
+  - 親git側変更：`cp ../.env .env`
+  - Submodule内変更：`cp ../.env .env`（submodule内から）
 - ❌ Worktreeを勝手に作成・削除しない
-- ❌ メインリポジトリで作業しない（worktree指定時）
-- ❌ Submoduleがあるのにプロジェクトルートで作業しない
+- ❌ 間違った場所で作業しない（worktree指定時）
+- ❌ **Submodule内変更のみなのに親gitで作業しない**（最重要）
 
 #### 📚 ライブラリ・ドキュメント参照
 

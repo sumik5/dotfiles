@@ -16,27 +16,32 @@ Worktreeの操作は大きく3つのフェーズに分かれます：
 # 現在のディレクトリを確認（メインリポジトリのルートであること）
 pwd
 
-# Submoduleの有無を確認（最重要）
+# 変更対象を明確化（最重要）
+# - 親git側のコード変更？
+# - Submodule内のコード変更のみ？
+
+# Submoduleの有無を確認
 ls -la .gitmodules
 git submodule status
 
 # 既存のworktreeを確認
 git worktree list
 
-# 出力例（submoduleなし）:
+# 出力例（親gitのworktree）:
 # /Users/user/project              abc1234 [main]
 # /Users/user/project/wt-feat-auth def5678 [feature/auth]
 
-# 出力例（submoduleあり）:
+# Submodule一覧の出力例:
 # +abc1234567890abcdef1234567890abcdef12345678 submodule1 (heads/main)
 # +def4567890abcdef1234567890abcdef123456789 submodule2 (heads/main)
 ```
 
 ### 基本的な作成方法
 
-#### Submoduleがない場合：新規ブランチとともに作成（最も一般的）
+#### ケース1: 親git側のコード変更
 
 ```bash
+# 親gitルートで実行
 # 基本フォーマット
 git worktree add -b <新規ブランチ名> <worktreeディレクトリ名> <元ブランチ>
 
@@ -48,10 +53,12 @@ git worktree add -b feature/payment-integration wt-feat-payment main
 # HEAD is now at abc1234 Latest commit message
 ```
 
-#### Submoduleがある場合：各submodule内でworktree作成
+#### ケース2: Submodule内のコード変更のみ
 
 ```bash
-# 各submodule内でworktreeを作成
+# ⚠️ 重要: 親gitにはworktreeを作らない
+
+# 対象submodule内でのみworktreeを作成
 cd submodule1
 git worktree add -b feature/payment-integration wt-feat-payment main
 
@@ -59,16 +66,14 @@ git worktree add -b feature/payment-integration wt-feat-payment main
 # Preparing worktree (new branch 'feature/payment-integration')
 # HEAD is now at abc1234 Latest commit message
 
-# 次のsubmoduleに移動して同様に作成
-cd ../submodule2
-git worktree add -b feature/payment-integration wt-feat-payment main
+# worktreeに移動
+cd wt-feat-payment
 
-# プロジェクトルートに戻る
-cd ..
-
-# worktree一覧確認（各submodule内で実行）
-cd submodule1 && git worktree list && cd ..
-cd submodule2 && git worktree list && cd ..
+# worktree一覧確認（submodule内で実行）
+git worktree list
+# 出力例:
+# /path/to/project/submodule1              abc1234 [main]
+# /path/to/project/submodule1/wt-feat-payment def5678 [feature/payment-integration]
 ```
 
 #### 既存ブランチからworktreeを作成
@@ -113,10 +118,10 @@ git branch
 
 ### 環境設定のセットアップ
 
-#### Submoduleがない場合
+#### ケース1: 親git側のコード変更
 
 ```bash
-# worktreeに移動
+# 親gitのworktreeに移動
 cd wt-feat-payment
 
 # 環境変数ファイルをコピー
@@ -134,19 +139,16 @@ npm install
 ls -la .env .serena
 ```
 
-#### Submoduleがある場合
+#### ケース2: Submodule内のコード変更のみ
 
 ```bash
-# 対象submoduleのworktreeに移動
+# 対象submoduleのworktreeに移動（既に移動済みの場合はスキップ）
 cd submodule1/wt-feat-payment
 
-# 環境変数ファイルをコピー（プロジェクトルートから）
-cp ../../.env .env 2>/dev/null || echo "No .env in project root"
-
-# または、submodule自体の.envをコピー
+# 環境変数ファイルをコピー（submodule自体の.env、必要に応じて）
 cp ../.env .env 2>/dev/null || echo "No .env in submodule"
 
-# Serena MCP設定をコピー（submoduleの親ディレクトリから）
+# Serena MCP設定をコピー（submodule自体の.serena、必要に応じて）
 cp -r ../.serena .serena 2>/dev/null || echo "No .serena in submodule"
 
 # 依存パッケージのインストール（必要に応じて）
@@ -240,30 +242,26 @@ git worktree list --porcelain
 
 #### 通常の削除（安全）
 
-##### Submoduleがない場合
+##### ケース1: 親git側のコード変更
 
 ```bash
-# メインリポジトリに戻る
+# 親gitルートに戻る
 cd /path/to/main/project
 
-# worktreeを削除
+# 親gitのworktreeを削除
 git worktree remove wt-feat-payment
 
 # 未コミットの変更がある場合はエラーが表示される
 # error: 'wt-feat-payment' contains modified or untracked files, use --force to delete it
 ```
 
-##### Submoduleがある場合
+##### ケース2: Submodule内のコード変更のみ
 
 ```bash
-# プロジェクトルートに移動
-cd /path/to/main/project
+# 対象submoduleのルートに移動
+cd /path/to/main/project/submodule1
 
-# 各submodule内のworktreeを削除
-cd submodule1
-git worktree remove wt-feat-payment
-
-cd ../submodule2
+# submodule内のworktreeを削除
 git worktree remove wt-feat-payment
 
 # プロジェクトルートに戻る

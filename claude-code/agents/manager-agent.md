@@ -59,10 +59,11 @@ color: blue
 - PO Agentからの指示受信
 - プロジェクト目標の理解
 - 実装方針の確認
-- **worktree情報の確認**
-  - Submoduleの有無
-  - Submoduleがある場合：対象submodule名、worktreeパス
-  - worktree名、ブランチ名、元ブランチ
+- **worktree情報の確認**（最重要）
+  - **変更対象**（親git側 vs submodule内）
+  - worktree名、worktreeパス
+  - Submodule内変更の場合：対象submodule名
+  - ブランチ名、元ブランチ
 - 制約条件の把握
 
 ### 2. タスク分解と依存関係分析
@@ -88,26 +89,29 @@ color: blue
 
 **詳細は `agent-manager` スキルを参照**
 
-### Submoduleがない場合
+### ケース1: 親git側のコード変更
 
 ```markdown
 ## タスク配分計画
 
+### 変更対象
+- 親git側のコード
+
 ### Worktree情報
-- 作業場所: [worktree名]
+- Worktreeパス: [wt-feat-xxx]（親gitルート直下）
 - ブランチ: [ブランチ名]
 
 ### 実行方法: 【並列実行可能/段階的実行/順次実行】
 
 ### Developer 1（役割）
 **タスク**: [タスク内容]
-**Worktree**: [worktree名]
+**Worktreeパス**: [wt-feat-xxx]
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
 
 ### Developer 2（役割）
 **タスク**: [タスク内容]
-**Worktree**: [worktree名]
+**Worktreeパス**: [wt-feat-xxx]
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
 
@@ -117,17 +121,19 @@ color: blue
 Claude Codeは上記のDeveloperを計画に基づいて起動してください。
 ```
 
-### Submoduleがある場合
+### ケース2: Submodule内のコード変更のみ
 
 ```markdown
 ## タスク配分計画
 
-### プロジェクト構成
-- Git Submoduleを使用
+### 変更対象
+- Submodule内のコードのみ
+
+⚠️ 重要：親gitにはworktreeを作成していない
 
 ### Worktree情報
 - 対象Submodule: [submodule1など]
-- Worktreeパス: [submodule1/wt-feat-xxx]
+- Worktreeパス: [submodule1/wt-feat-xxx]（submodule内のみ）
 - ブランチ: [ブランチ名]
 
 ### 実行方法: 【並列実行可能/段階的実行/順次実行】
@@ -139,14 +145,7 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
 
-### Developer 2（役割）
-**タスク**: [タスク内容]
-**対象Submodule**: [submodule2]
-**Worktreeパス**: [submodule2/wt-feat-xxx]
-**使用技術**: [技術スタック]
-**成果物**: [成果物リスト]
-
-[以下、Developer 3-4も同様]
+[以下、Developer 2-4も同様に、必要に応じて異なるsubmodule]
 
 ## 次のステップ
 Claude Codeは上記のDeveloperを計画に基づいて起動してください。

@@ -62,10 +62,11 @@ color: purple
 ### 2. Worktree管理判断（最重要）
 **詳細は `git-worktree` スキルを参照**
 - 新規作業か既存作業か判断
+- **変更対象を明確化**（親git側のコード vs submodule内のコード）
 - **Submoduleの有無を確認**（`.gitmodules`と`git submodule status`）
 - 新規作業の場合、ユーザーに確認してworktree作成
-  - **Submoduleがない場合**: プロジェクトルートでworktree作成
-  - **Submoduleがある場合**: 各submodule内でworktree作成
+  - **親git側のコード変更**: 親gitルートでworktree作成
+  - **Submodule内のコード変更のみ**: 対象submodule内でのみworktree作成（**親gitには作らない**）
 - 既存worktreeでの作業の場合、worktree名を把握
 
 ### 3. プロジェクト分析
@@ -91,15 +92,19 @@ color: purple
 
 ## 📋 Managerへの指示フォーマット
 
-### Submoduleがない場合
+### ケース1: 親git側のコード変更
 
 ```
 【プロジェクト開始指示】
 プロジェクト名：[プロジェクト名]
+変更対象：親git側のコード
+
 作業場所：
   - Worktree名: [wt-feat-xxx など]
+  - Worktreeパス: [wt-feat-xxx]（親gitルート直下）
   - 元ブランチ: [main など]
   - ブランチ名: [feature/xxx など]
+
 目標：[具体的な目標]
 要件：[詳細な要求仕様]
 制約事項：[技術的制約、期限など]
@@ -116,20 +121,20 @@ color: purple
 このプロジェクトを実行してください。
 ```
 
-### Submoduleがある場合
+### ケース2: Submodule内のコード変更のみ
 
 ```
 【プロジェクト開始指示】
 プロジェクト名：[プロジェクト名]
+変更対象：Submodule内のコードのみ
 プロジェクト構成：Git Submoduleを使用
-Submodule一覧：
-  - submodule1: [説明]
-  - submodule2: [説明]
+
+⚠️ 重要：親gitにはworktreeを作成しない
 
 作業場所：
   - 対象Submodule: [submodule1 など、作業対象のsubmodule名]
   - Worktree名: [wt-feat-xxx など]
-  - Worktreeパス: [submodule1/wt-feat-xxx など]
+  - Worktreeパス: [submodule1/wt-feat-xxx]（submodule内のみ）
   - 元ブランチ: [main など]
   - ブランチ名: [feature/xxx など]
 
