@@ -16,17 +16,25 @@ Worktreeの操作は大きく3つのフェーズに分かれます：
 # 現在のディレクトリを確認（メインリポジトリのルートであること）
 pwd
 
+# Submoduleの有無を確認（最重要）
+ls -la .gitmodules
+git submodule status
+
 # 既存のworktreeを確認
 git worktree list
 
-# 出力例:
+# 出力例（submoduleなし）:
 # /Users/user/project              abc1234 [main]
 # /Users/user/project/wt-feat-auth def5678 [feature/auth]
+
+# 出力例（submoduleあり）:
+# +abc1234567890abcdef1234567890abcdef12345678 submodule1 (heads/main)
+# +def4567890abcdef1234567890abcdef123456789 submodule2 (heads/main)
 ```
 
 ### 基本的な作成方法
 
-#### 新規ブランチとともに作成（最も一般的）
+#### Submoduleがない場合：新規ブランチとともに作成（最も一般的）
 
 ```bash
 # 基本フォーマット
@@ -38,6 +46,29 @@ git worktree add -b feature/payment-integration wt-feat-payment main
 # 出力例:
 # Preparing worktree (new branch 'feature/payment-integration')
 # HEAD is now at abc1234 Latest commit message
+```
+
+#### Submoduleがある場合：各submodule内でworktree作成
+
+```bash
+# 各submodule内でworktreeを作成
+cd submodule1
+git worktree add -b feature/payment-integration wt-feat-payment main
+
+# 出力例:
+# Preparing worktree (new branch 'feature/payment-integration')
+# HEAD is now at abc1234 Latest commit message
+
+# 次のsubmoduleに移動して同様に作成
+cd ../submodule2
+git worktree add -b feature/payment-integration wt-feat-payment main
+
+# プロジェクトルートに戻る
+cd ..
+
+# worktree一覧確認（各submodule内で実行）
+cd submodule1 && git worktree list && cd ..
+cd submodule2 && git worktree list && cd ..
 ```
 
 #### 既存ブランチからworktreeを作成
@@ -82,6 +113,8 @@ git branch
 
 ### 環境設定のセットアップ
 
+#### Submoduleがない場合
+
 ```bash
 # worktreeに移動
 cd wt-feat-payment
@@ -99,6 +132,30 @@ npm install
 
 # 設定が正しくコピーされたか確認
 ls -la .env .serena
+```
+
+#### Submoduleがある場合
+
+```bash
+# 対象submoduleのworktreeに移動
+cd submodule1/wt-feat-payment
+
+# 環境変数ファイルをコピー（プロジェクトルートから）
+cp ../../.env .env 2>/dev/null || echo "No .env in project root"
+
+# または、submodule自体の.envをコピー
+cp ../.env .env 2>/dev/null || echo "No .env in submodule"
+
+# Serena MCP設定をコピー（submoduleの親ディレクトリから）
+cp -r ../.serena .serena 2>/dev/null || echo "No .serena in submodule"
+
+# 依存パッケージのインストール（必要に応じて）
+npm install
+# または既存のnode_modulesへのシンボリックリンク
+# ln -s ../node_modules node_modules
+
+# 設定が正しくコピーされたか確認
+ls -la .env .serena 2>/dev/null || echo "Config files status checked"
 ```
 
 ### 開発作業の実施
@@ -183,12 +240,34 @@ git worktree list --porcelain
 
 #### 通常の削除（安全）
 
+##### Submoduleがない場合
+
 ```bash
 # メインリポジトリに戻る
 cd /path/to/main/project
 
 # worktreeを削除
 git worktree remove wt-feat-payment
+
+# 未コミットの変更がある場合はエラーが表示される
+# error: 'wt-feat-payment' contains modified or untracked files, use --force to delete it
+```
+
+##### Submoduleがある場合
+
+```bash
+# プロジェクトルートに移動
+cd /path/to/main/project
+
+# 各submodule内のworktreeを削除
+cd submodule1
+git worktree remove wt-feat-payment
+
+cd ../submodule2
+git worktree remove wt-feat-payment
+
+# プロジェクトルートに戻る
+cd ..
 
 # 未コミットの変更がある場合はエラーが表示される
 # error: 'wt-feat-payment' contains modified or untracked files, use --force to delete it

@@ -52,10 +52,6 @@ color: blue
 - **type-safety** - 型安全性要件の明確化
 - **testing** - テスト戦略の策定
 
-#### MCP技術スタック
-- **mcp-next-devtools** - Next.js技術スタック判断
-- **mcp-shadcn** - UI技術スタック判断
-- **mcp-docker** - コンテナ技術スタック判断
 
 ## 基本的な動作フロー
 
@@ -63,7 +59,10 @@ color: blue
 - PO Agentからの指示受信
 - プロジェクト目標の理解
 - 実装方針の確認
-- **worktree情報の確認**（worktree名、ブランチ名、元ブランチ）
+- **worktree情報の確認**
+  - Submoduleの有無
+  - Submoduleがある場合：対象submodule名、worktreeパス
+  - worktree名、ブランチ名、元ブランチ
 - 制約条件の把握
 
 ### 2. タスク分解と依存関係分析
@@ -88,6 +87,8 @@ color: blue
 ## 📋 Claude Codeへの配分計画フォーマット
 
 **詳細は `agent-manager` スキルを参照**
+
+### Submoduleがない場合
 
 ```markdown
 ## タスク配分計画
@@ -116,6 +117,42 @@ color: blue
 Claude Codeは上記のDeveloperを計画に基づいて起動してください。
 ```
 
+### Submoduleがある場合
+
+```markdown
+## タスク配分計画
+
+### プロジェクト構成
+- Git Submoduleを使用
+
+### Worktree情報
+- 対象Submodule: [submodule1など]
+- Worktreeパス: [submodule1/wt-feat-xxx]
+- ブランチ: [ブランチ名]
+
+### 実行方法: 【並列実行可能/段階的実行/順次実行】
+
+### Developer 1（役割）
+**タスク**: [タスク内容]
+**対象Submodule**: [submodule1]
+**Worktreeパス**: [submodule1/wt-feat-xxx]
+**使用技術**: [技術スタック]
+**成果物**: [成果物リスト]
+
+### Developer 2（役割）
+**タスク**: [タスク内容]
+**対象Submodule**: [submodule2]
+**Worktreeパス**: [submodule2/wt-feat-xxx]
+**使用技術**: [技術スタック]
+**成果物**: [成果物リスト]
+
+[以下、Developer 3-4も同様]
+
+## 次のステップ
+Claude Codeは上記のDeveloperを計画に基づいて起動してください。
+各Developerは指定されたsubmodule内のworktreeで作業を行います。
+```
+
 
 ## 🚫 絶対禁止事項
 
@@ -142,7 +179,7 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
 
 ## ✅ 使用許可ツール
 
-### 分析ツール
+### MCPツール（.mcp.jsonに定義済み）
 - **serena MCP**（詳細は `mcp-serena` スキル参照）
   - コードベースの詳細分析
   - シンボル間の依存関係調査
@@ -151,6 +188,8 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
   - タスク分解の段階的思考
   - 依存関係の論理的分析
   - 並列実行可能性の検討
+
+### 基本ツール
 - Read、Glob、Grep（情報収集）
 
 ### 禁止ツール
@@ -185,9 +224,4 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
 - `type-safety` - 型安全性要件の明確化
 - `testing` - テスト戦略の策定
 - `solid-clean-code` - SOLID原則の適用判断
-- `security-codeguard` - セキュリティ基準の設定
 
-### MCP技術スタック
-- `mcp-next-devtools` - Next.js開発
-- `mcp-shadcn` - UIコンポーネント
-- `mcp-docker` - コンテナ化

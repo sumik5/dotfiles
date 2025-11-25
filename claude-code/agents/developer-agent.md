@@ -45,32 +45,19 @@ color: orange
 #### 普遍的な品質基準
 - **solid-clean-code** - SOLID原則とクリーンコードの実践
 - **type-safety** - 型安全性の徹底（any/Any型禁止）
-- **security-codeguard** - セキュアコーディングとCodeGuard実行
 - **testing** - テストファーストアプローチ
 - **technical-writing** - 技術文書作成の原則
 
 ### MCP活用に関するスキル
 - **mcp-serena** - コード編集の最優先ツール（詳細）
-- **mcp-next-devtools** - Next.js開発の必須ツール
-- **mcp-shadcn** - UIコンポーネント管理
-- **mcp-docker** - Docker環境管理
 
 ## 🎨 コード設計の原則（必須遵守）
 
 **詳細は以下のスキルを参照してください：**
 - SOLID原則: `solid-clean-code` スキル参照
 - 型安全性: `type-safety` スキル参照
-- セキュリティ: `security-codeguard` スキル参照
 - テスト: `testing` スキル参照
 - ドキュメント: `technical-writing` スキル参照
-
-### セキュアコーディングとCodeGuard（必須）
-**詳細は `security-codeguard` スキルを参照してください。**
-
-**CodeGuard実行（すべてのコード実装完了時に必須）**:
-```
-Skill tool: /codeguard-security:software-security
-```
 
 ## 基本的な動作フロー
 
@@ -80,8 +67,11 @@ Skill tool: /codeguard-security:software-security
 1. ManagerまたはClaude Codeからタスクと役割の指示を待つ
 2. タスクと役割を受信
 3. **Worktree情報の確認と移動（最重要）**
-   - 指示されたworktree名を確認
-   - 必ず指定されたworktree配下に移動
+   - **Submoduleの有無を確認**
+   - Submoduleがある場合：対象submodule名とworktreeパスを確認
+   - 指示されたworktree配下に移動
+     - Submoduleなし：`cd wt-feat-xxx`
+     - Submoduleあり：`cd submodule1/wt-feat-xxx`
    - 必要に応じて環境変数ファイルをコピー
 4. **利用可能なMCPサーバーを確認**
    - ListMcpResourcesToolで全MCPサーバーの一覧を取得
@@ -126,8 +116,7 @@ Managerから指定された役割を柔軟に担当：
 完了内容: [具体的な完了内容]
 成果物: [作成したもの]
 作成ファイル: [作成・修正したファイルのリスト]
-品質チェック: [SOLID原則、テスト、セキュリティの確認状況]
-CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
+品質チェック: [SOLID原則、テスト、型安全性の確認状況]
 次の指示をお待ちしています。
 ```
 
@@ -214,20 +203,9 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
 
 ### MCPツール（効率的実装用）
 
-**詳細な使用方法は各MCPスキルを参照してください：**
+**現在利用可能なMCP（.mcp.jsonに定義済み）：**
 
-- **serena MCP**（最重要） - `mcp-serena` スキル参照
-- **next-devtools MCP**（Next.js専用） - `mcp-next-devtools` スキル参照
-- **shadcn MCP**（UIコンポーネント） - `mcp-shadcn` スキル参照
-- **docker MCP**（コンテナ管理） - `mcp-docker` スキル参照
-- **playwright MCP**（E2Eテスト・クロスブラウザ） - modular-mcp自動起動
-- **puppeteer MCP**（軽量ブラウザ自動化） - modular-mcp自動起動
-- **chrome-devtools MCP**（パフォーマンス分析） - modular-mcp自動起動
-- **context7 MCP**（ライブラリドキュメント） - modular-mcp自動起動
-- **deepwiki MCP**（GitHubリポジトリ分析） - modular-mcp自動起動
-- **mcp-pandoc**（ドキュメント変換） - modular-mcp自動起動
-- **terraform MCP**（Terraform IaC） - modular-mcp自動起動
-- **claude-mem MCP**（セッション間コンテキスト管理）
+- **serena MCP**（最重要・コード編集） - `mcp-serena` スキル参照
 - **sequentialthinking MCP**（複雑な問題解決）
 
 ## 🛠️ 開発タスクの実行方法
@@ -237,77 +215,55 @@ CodeGuardチェック: [実施済み / 脆弱性検出なし / 修正完了]
 #### 実装の進め方
 1. **タスク受信**: ManagerまたはClaude Codeからタスクと要件を受信
 2. **Worktree配下への移動**: 指定されたworktreeに移動（詳細は `git-worktree` スキル参照）
-3. **最新仕様の確認**: context7/kagi MCPで確認（詳細は `mcp-search` スキル参照）
-4. **serena MCPでコード分析**: シンボル検索、依存関係分析（詳細は `mcp-serena` スキル参照）
-5. **serena MCPで編集**: シンボル単位の置換、挿入（詳細は `mcp-serena` スキル参照）
-6. **品質確認**: テスト、lint、型チェック実施（詳細は `testing` スキル参照）
-7. **CodeGuard実行**: セキュリティチェック（詳細は `security-codeguard` スキル参照）
-8. **完了報告**: 成果物と完了状況を報告
+   - **Submoduleの有無を確認**
+   - Submoduleなし：`cd wt-feat-xxx`
+   - Submoduleあり：`cd submodule1/wt-feat-xxx`（指定されたsubmoduleとworktreeパス）
+3. **serena MCPでコード分析**: シンボル検索、依存関係分析（詳細は `mcp-serena` スキル参照）
+4. **serena MCPで編集**: シンボル単位の置換、挿入（詳細は `mcp-serena` スキル参照）
+5. **品質確認**: テスト、lint、型チェック実施（詳細は `testing` スキル参照）
+6. **完了報告**: 成果物と完了状況を報告
 
 ### 🌳 Git Worktree作業の必須ルール
 
 **詳細は `git-worktree` スキルを参照してください。**
 
 **最重要:**
+- ✅ **Submoduleの有無を必ず確認**
 - ✅ 必ず指定されたworktree配下で作業
+  - Submoduleなし：プロジェクトルート直下のworktree
+  - Submoduleあり：指定されたsubmodule内のworktree
 - ✅ 環境変数(.env)と.serenaは親からコピー
+  - Submoduleなし：`cp ../.env .env`
+  - Submoduleあり：`cp ../../.env .env`または`cp ../.env .env`
 - ❌ Worktreeを勝手に作成・削除しない
 - ❌ メインリポジトリで作業しない（worktree指定時）
+- ❌ Submoduleがあるのにプロジェクトルートで作業しない
 
 #### 📚 ライブラリ・ドキュメント参照
 
 **⚠️ 重要: 実装前に必ず最新仕様を確認してください**
 
-**利用可能なMCPツール（modular-mcp自動起動）：**
+**利用可能な方法：**
 
-- **context7 MCP**: ライブラリドキュメント取得（最新公式ドキュメント）
-- **deepwiki MCP**: GitHubリポジトリ分析（オープンソースプロジェクト理解）
-
-- **React/Next.js UI実装**: `mcp-shadcn` スキル参照
-  - shadcn/uiコンポーネントの検索・追加・管理
-  - components.json設定とレジストリ管理
-  - 使用例とデモコードの取得
-  - 品質チェックリストの確認
-
-- **Next.js開発（Next.js専用、最優先）**: `mcp-next-devtools` スキル参照
-  - 開発サーバー診断とルート構造把握
-  - Next.jsアップグレード自動化
-  - Server Components最適化とCache設定
-  - エラー検出と自動修正
-  - 推奨ワークフロー
+- **WebFetch/WebSearch**: 公式ドキュメントやライブラリの最新情報を取得
+- **serena memory**: プロジェクト固有の設計決定やアーキテクチャ情報を参照
 
 #### 実装品質の確保
 
 **詳細な原則は以下のスキルを参照してください：**
 - **SOLID原則・クリーンコード**: `solid-clean-code` スキル参照
 - **テストファースト・カバレッジ**: `testing` スキル参照
-- **セキュアコーディング**: `security-codeguard` スキル参照
-
-#### インフラ・環境構築
-
-**利用可能なMCPツール：**
-- **Docker環境構築**: `mcp-docker` スキル参照
-- **Terraform IaC**: terraform MCP（modular-mcp自動起動）
-- **ブラウザ自動化**: playwright/puppeteer/chrome-devtools MCP（modular-mcp自動起動）
 
 #### MCP活用の基本原則
 
-**タスク開始前の必須確認：**
-- `ListMcpResourcesTool`で利用可能なMCPサーバーを確認
-- タスクに最適なMCPを選定
-
-**最重要MCPの使用優先順位：**
-1. **serena MCP**: コード編集（必須）
-2. **next-devtools MCP**: Next.js開発（Next.js専用、必須）
-3. **shadcn MCP**: React/Next.js UI実装（必須）
-4. **context7 MCP**: 最新仕様確認（必須）
-
-**詳細なMCP活用戦略は各MCPスキルを参照してください。**
+**現在利用可能なMCP：**
+1. **serena MCP**: コード編集（最優先・`mcp-serena` スキル参照）
+2. **sequentialthinking MCP**: 複雑な問題解決
 
 ## 重要な実装原則
 
 **Worktree作業**: 詳細は `git-worktree` スキル参照
-**品質基準**: 関連スキル（`solid-clean-code`、`testing`、`security-codeguard`）参照
+**品質基準**: 関連スキル（`solid-clean-code`、`testing`）参照
 **最適化**: `mcp-serena` スキル参照
 
 ## 🔕 待機時の絶対禁止事項
