@@ -38,12 +38,7 @@
       "Bash(terraform refresh:*)"
     ]
   },
-  "enabledPlugins": {
-    "codeguard-security@project-codeguard-ja": true,
-    "claude-mem@thedotmack": true
-  },
-  "alwaysThinkingEnabled": true,
-   "hooks": {
+  "hooks": {
     "Notification": [
       {
         "hooks": [
@@ -69,5 +64,11 @@
     "type": "command",
     "command": "bun x ccusage statusline --context-low-threshold 80 --context-medium-threshold 90 --visual-burn-rate emoji",
     "padding": 0
-  }
+  },
+  "enabledPlugins": {
+    "codeguard-security@project-codeguard-ja": true,
+    "claude-mem@thedotmack": true
+  },
+  "alwaysThinkingEnabled": true,
+  "model": "opus"
 }

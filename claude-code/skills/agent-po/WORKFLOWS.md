@@ -82,30 +82,69 @@ mcp__sequentialthinking__sequentialthinking({
     ├─ 関連あり → 既存worktree名を把握
     └─ 関連なし → 新規worktree必要
         ↓
-        ユーザーに確認
-        「新しい作業のため、worktree `wt-feat-機能名` を作成しますか？」
-        ↓
-        承認取得
-        ↓
-        worktree作成（Bash使用）
+        Step 1: Submoduleの有無を確認
+        ├─ Submoduleなし → 通常フロー
+        │   ↓
+        │   ユーザーに確認
+        │   「新しい作業のため、worktree `wt-feat-xxx` を作成しますか？」
+        │   ↓
+        │   プロジェクトルートにworktree作成
+        │
+        └─ Submoduleあり → 🚨変更対象を厳密に判断
+            ↓
+            「何を変更するか？」を明確化
+            ├─ 親git自体のコード変更
+            │   ↓
+            │   ユーザーに確認
+            │   「親git自体のコードを変更するため、worktree `wt-feat-xxx` を作成しますか？」
+            │   ↓
+            │   親gitルートにworktree作成
+            │
+            └─ Submodule内のコード変更
+                🚫 親gitにworktreeを作成してはいけない
+                ↓
+                ユーザーに確認
+                「submodule1内のコードを変更するため、
+                 submodule1に worktree `wt-feat-xxx` を作成しますか？
+                 ※親gitにはworktreeを作成しません」
+                ↓
+                対象submodule内にのみworktree作成
+```
+
+### 🚨 Step 1: Submoduleの有無を確認（必須）
+
+```bash
+ls -la .gitmodules
+git submodule status
 ```
 
 ### 新規worktree作成の判断基準
 
-#### ✅ 新規worktree作成が必要なケース
+#### 【Submoduleがない場合】通常フロー
+
+##### ✅ 新規worktree作成が必要なケース
 - 既存の作業と**独立した**新機能
 - 異なる実装方針の**プロトタイプ**
 - 緊急のバグ修正（**hotfix**）
 - リリース準備作業
 
-#### ❌ 既存worktree継続が適切なケース
+##### ❌ 既存worktree継続が適切なケース
 - 既存機能の**拡張**
 - 現在作業中の機能の**改善**
 - 関連するバグ修正
 
+#### 【Submoduleがある場合】🚨変更対象を厳密に判断
+
+**⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
+
+| 変更対象 | worktree作成場所 | worktreeパス |
+|---------|-----------------|-------------|
+| 親git自体のコード | 親gitルート | `wt-feat-xxx` |
+| Submodule内のコード | 対象submodule内のみ | `submodule名/wt-feat-xxx`（🚫親gitには作らない） |
+
 ### ユーザー確認プロセス
 
-#### 確認メッセージ例
+#### 確認メッセージ例（Submoduleなしまたは親git自体の変更）
 ```
 【Worktree作成の確認】
 
@@ -120,14 +159,48 @@ mcp__sequentialthinking__sequentialthinking({
 （承認後に作成を実施します）
 ```
 
+#### 確認メッセージ例（Submodule内の変更）
+```
+【Worktree作成の確認】
+
+新しい作業と判断しました。
+変更対象: submodule1内のコード
+
+🚫 親gitにはworktreeを作成しません
+
+提案するworktree名: `wt-feat-xxx`
+作成場所: submodule1/wt-feat-xxx（submodule内のみ）
+ブランチ名: `feature/xxx`
+元ブランチ: `main`
+
+このworktreeをsubmodule1内に作成してよろしいですか？
+
+（承認後に作成を実施します）
+```
+
 #### 承認取得後の作業
-ユーザーの承認を得た後、Bashでworktreeを作成：
+
+##### Submoduleなしまたは親git自体の変更
 ```bash
 # worktree一覧確認（既存との重複チェック）
 git worktree list
 
 # 新規worktree作成
 git worktree add -b feature/user-authentication wt-feat-user-authentication main
+```
+
+##### Submodule内の変更
+```bash
+# 🚫 親gitにはworktreeを作成しない
+
+# 対象submoduleに移動
+cd submodule1
+
+# submodule内でworktree作成
+git worktree add -b feature/xxx wt-feat-xxx main
+
+# worktreeに移動
+cd wt-feat-xxx
 ```
 
 ### 既存worktree使用の場合

@@ -59,10 +59,14 @@ color: blue
 - PO Agentからの指示受信
 - プロジェクト目標の理解
 - 実装方針の確認
-- **worktree情報の確認**（最重要）
-  - **変更対象**（親git側 vs submodule内）
+- **worktree情報の確認**（🚨最重要）
+  - **Submoduleの有無**（POからの指示に明記されているはず）
+  - **変更対象**（親git自体のコード vs submodule内のコード）
   - worktree名、worktreeパス
-  - Submodule内変更の場合：対象submodule名
+  - **Submodule内変更の場合**:
+    - 対象submodule名
+    - ⚠️ worktreeパスがsubmodule内であることを確認（親gitルート直下ではない）
+    - 🚫 **親gitにworktreeが作られていないことを確認**
   - ブランチ名、元ブランチ
 - 制約条件の把握
 
@@ -129,11 +133,13 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
 ### 変更対象
 - Submodule内のコードのみ
 
-⚠️ 重要：親gitにはworktreeを作成していない
+🚨 **絶対ルール：親gitにworktreeを作成していないこと**
+- ❌ 親gitルート直下にwt-*ディレクトリがあってはならない
+- ✅ worktreeは対象submodule内にのみ存在する
 
 ### Worktree情報
 - 対象Submodule: [submodule1など]
-- Worktreeパス: [submodule1/wt-feat-xxx]（submodule内のみ）
+- Worktreeパス: [submodule1/wt-feat-xxx]（⚠️ submodule内のみ、親gitルート直下ではない）
 - ブランチ: [ブランチ名]
 
 ### 実行方法: 【並列実行可能/段階的実行/順次実行】
@@ -172,6 +178,8 @@ Claude Codeは上記のDeveloperを計画に基づいて起動してください
   - worktree作成はPO Agentの責任
 - ❌ **worktreeの削除**
   - worktree削除はユーザーの判断
+- ❌ **🚨 Submodule内変更なのにDeveloperに親gitルートのworktreeパスを指示**
+  - Submodule内変更の場合、worktreeパスは必ず`submodule名/wt-xxx`形式
 
 ### Git操作
 - ❌ **git add, commit, push等の書き込み操作**

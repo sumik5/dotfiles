@@ -14,9 +14,20 @@ PO Agentは以下の3つの視点で戦略を決定します：
 
 ## 1️⃣ Worktree管理判断
 
-### 判断基準マトリクス
+### 🚨 Step 1: Submoduleの有無を最初に確認（必須）
 
-#### ✅ 新規worktree作成が必要なケース
+```bash
+ls -la .gitmodules
+git submodule status
+```
+
+### Step 2: Submoduleの有無に応じた判断
+
+#### 【Submoduleがない場合】
+
+通常のworktree作成フローに従います。
+
+##### ✅ 新規worktree作成が必要なケース
 
 | 状況 | 理由 | worktree名の例 |
 |------|------|----------------|
@@ -25,13 +36,24 @@ PO Agentは以下の3つの視点で戦略を決定します：
 | **緊急のバグ修正（hotfix）** | メイン開発を妨げない | `wt-hotfix-security` |
 | **リリース準備作業** | 安定版の準備と本番環境調整 | `wt-release-v2.0.0` |
 
-#### ❌ 既存worktree継続が適切なケース
+##### ❌ 既存worktree継続が適切なケース
 
 | 状況 | 理由 | 対応 |
 |------|------|------|
 | **既存機能の拡張** | 同じコンテキストで作業 | 既存worktreeで継続 |
 | **現在作業中の機能の改善** | 既存ブランチでのイテレーション | 既存worktreeで継続 |
 | **関連するバグ修正** | 同じ機能領域の修正 | 既存worktreeで継続 |
+
+#### 【Submoduleがある場合】→ 🚨変更対象を厳密に判断
+
+**⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
+
+##### 変更対象の判断
+
+| 変更対象 | worktree作成場所 | worktreeパスの例 |
+|---------|-----------------|-----------------|
+| **親git自体のコード** | 親gitルート | `wt-feat-xxx`（親gitルート直下） |
+| **Submodule内のコード** | 対象submodule内のみ | `submodule1/wt-feat-xxx`（🚫親gitには作らない） |
 
 ### 判断フローチャート
 
@@ -44,11 +66,21 @@ PO Agentは以下の3つの視点で戦略を決定します：
     │
     └─ No → 新規worktree必要
          ↓
-         独立性を確認
-         ├─ 完全に独立 → 新規worktree作成
-         ├─ 実験的 → 新規worktree作成（exp-プレフィックス）
-         ├─ 緊急修正 → 新規worktree作成（hotfix-プレフィックス）
-         └─ リリース準備 → 新規worktree作成（release-プレフィックス）
+         Step 1: Submoduleの有無を確認
+         ├─ Submoduleなし → 通常フロー
+         │   ↓
+         │   プロジェクトルートにworktree作成
+         │
+         └─ Submoduleあり → 🚨変更対象を厳密に判断
+             ↓
+             「何を変更するか？」を明確化
+             ├─ 親git自体のコード変更 → 親gitルートに作成
+             │
+             └─ Submodule内のコード変更
+                 🚫 親gitにworktreeを作成してはいけない
+                 ↓
+                 対象submodule内にのみworktree作成
+                 worktreeパス: submodule名/wt-xxx
          ↓
          ユーザーに確認
          ↓
@@ -343,8 +375,12 @@ kagi MCPで以下を検索:
 ## 📝 戦略決定チェックリスト
 
 ### Worktree判断
+- [ ] **Step 1: Submoduleの有無を確認した**
 - [ ] 新規作業か既存作業かを判断した
-- [ ] 新規の場合、適切なworktree名を決定した
+- [ ] **【Submoduleがある場合】変更対象を厳密に判断した**
+  - 親git自体のコード変更？ → 親gitルートに作成
+  - Submodule内のコード変更？ → 対象submodule内にのみ作成（🚫親gitには作らない）
+- [ ] 新規の場合、適切なworktree名とworktreeパスを決定した
 - [ ] ユーザーに確認を取った（新規の場合）
 
 ### 技術選定

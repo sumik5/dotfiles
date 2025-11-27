@@ -23,18 +23,42 @@ Git Worktreeを使用した並行開発の完全ガイドです。複数のブ�
 
 **新しい、今までの作業と関係ない作業だと判断した場合：**
 
-1. **変更対象を明確化すること（最重要）**
-   - 何を変更するのか分析（親git側のコード vs submodule内のコード）
-   - Submoduleの有無を確認（`.gitmodules`と`git submodule status`）
-2. **変更対象に基づいてworktree作成場所を判断**
-   - **親git側のコード変更**: 親gitのルートでworktree作成
-   - **Submodule内のコード変更のみ**: そのsubmodule内でのみworktree作成（**親gitには作らない**）
-3. **ただし、必ずユーザーに確認を取ってから実行すること**
+#### Step 1: Submoduleの有無を最初に確認（必須）
+```bash
+ls -la .gitmodules
+git submodule status
+```
+
+#### Step 2: Submoduleの有無に応じた分岐
+
+##### 【Submoduleがない場合】
+通常のworktree作成フローに従う：
+1. ユーザーに確認してworktree作成
+2. プロジェクトルート直下に`wt-xxx`を作成
+
+##### 【Submoduleがある場合】→ 🚨最重要判断
+
+**⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
+
+1. **変更対象を厳密に明確化すること**
+   - 何を変更するのか具体的に特定
+   - **親git自体のコード**（プロジェクトルートの設定ファイル、親gitのsrc/など）？
+   - **submodule内のコード**？
+
+2. **変更対象に基づいてworktree作成場所を決定**
+   - **親git自体のコード変更**: 親gitルートでworktree作成
+   - **Submodule内のコード変更**:
+     - 🚫 **親gitにはworktreeを絶対に作らない**
+     - ✅ 対象submoduleディレクトリに移動してからworktree作成
+     - worktreeパスは`submodule名/wt-xxx`形式
+
+3. **必ずユーザーに確認を取ってから実行すること**
    - どういう名前のworktreeで作業するか提案
    - Submodule内変更の場合は、どのsubmoduleにworktreeを作成するか明記
-   - **重要**: Submodule内変更の場合、親gitにはworktreeを作らないことを明示
+   - **🚫 Submodule内変更の場合、親gitにはworktreeを作らないことを明示**
    - ユーザーの承認を得てから作成
    - **勝手にworktreeを作成して作業開始してはいけない**
+
 4. **現在作業しているworktreeでの作業であれば確認不要**
 5. **このworktreeを使った作業フローは絶対に遵守すること**
 
@@ -47,20 +71,33 @@ Git Worktreeを使用した並行開発の完全ガイドです。複数のブ�
     ├─ Yes → 現在のworktreeで作業継続（確認不要）
     └─ No → 新規worktree必要
         ↓
-        変更対象を分析（最重要）
-        「何を変更するか？」を明確化
-        ↓
-        ├─ 親git側のコード変更 → ユーザーに確認
-        │   「新しい作業のため、親gitに worktree `wt-feat/機能名` を作成しますか？」
+        Step 1: Submoduleの有無を確認
+        ├─ Submoduleなし → 通常フロー
         │   ↓
-        │   親gitルートでworktree作成・作業開始
+        │   ユーザーに確認
+        │   「新しい作業のため、worktree `wt-feat-xxx` を作成しますか？」
+        │   ↓
+        │   プロジェクトルートでworktree作成・作業開始
         │
-        └─ Submodule内のコード変更のみ → ユーザーに確認
-            「新しい作業のため、submodule1に worktree `wt-feat/機能名` を作成しますか？
-             ※親gitにはworktreeを作成しません」
+        └─ Submoduleあり → 🚨変更対象を厳密に判断
             ↓
-            対象submodule内でのみworktree作成・作業開始
-            ⚠️ 親gitにはworktreeを作らない
+            「何を変更するか？」を明確化
+            ├─ 親git自体のコード変更 → ユーザーに確認
+            │   「親git自体のコードを変更するため、
+            │    親gitに worktree `wt-feat-xxx` を作成しますか？」
+            │   ↓
+            │   親gitルートでworktree作成・作業開始
+            │
+            └─ Submodule内のコード変更 → ユーザーに確認
+                🚫 親gitにworktreeを作成してはいけない
+                ↓
+                「submodule1内のコードを変更するため、
+                 submodule1に worktree `wt-feat-xxx` を作成しますか？
+                 ※親gitにはworktreeを作成しません」
+                ↓
+                対象submodule内でのみworktree作成
+                worktreeパス: submodule1/wt-feat-xxx
+                ⚠️ 親gitルート直下ではない
 ```
 
 ## 📚 詳細ドキュメント
@@ -184,18 +221,25 @@ cd ..
 ## ⚠️ 重要な注意事項
 
 ### DO（必須事項）
+- ✅ **Step 1: Submoduleの有無を最初に確認**
 - ✅ 新規worktree作成時は**必ずユーザー確認**
-- ✅ **変更対象を明確化**（親git側 vs submodule内）
+- ✅ **変更対象を明確化**（親git自体のコード vs submodule内のコード）
 - ✅ `wt-`プレフィックスを使用
-- ✅ 親git側のコード変更：親gitルートに作成
-- ✅ Submodule内のコード変更のみ：対象submodule内にのみ作成
+- ✅ Submoduleなし：プロジェクトルートに作成
+- ✅ 親git自体のコード変更：親gitルートに作成
+- ✅ Submodule内のコード変更：対象submodule内にのみ作成（`submodule名/wt-xxx`）
 - ✅ `.env`と`.serena`をコピー
 
 ### DON'T（禁止事項）
 - ❌ 勝手にworktreeを作成
 - ❌ 勝手にworktreeを削除
+- ❌ Submoduleの有無確認をスキップ
 - ❌ 変更対象の確認をスキップ
-- ❌ **Submodule内のコード変更のみなのに親gitにworktree作成**（最重要）
+
+### 🚫 絶対禁止（Submodule関連）
+- ❌ **Submodule内のコード変更なのに親gitにworktree作成**（🚨最重要禁止事項）
+- ❌ **Submodule内変更でworktreeパスが`wt-xxx`（親gitルート直下）**
+  - ✅ 正しいパス: `submodule名/wt-xxx`
 - ❌ 親ディレクトリ（`../`）への作成
 - ❌ serenaの再初期化
 
@@ -207,13 +251,19 @@ cd ..
 ## 📋 チェックリスト
 
 新規worktree作成時：
-- [ ] **変更対象を明確化**（親git側 vs submodule内）
-- [ ] Submoduleの有無を確認（`.gitmodules`と`git submodule status`）
+- [ ] **Step 1: Submoduleの有無を確認**（`.gitmodules`と`git submodule status`）
+- [ ] **Step 2: Submoduleの有無に応じた分岐**
+  - **Submoduleなし**: プロジェクトルートにworktree作成
+  - **Submoduleあり**: 変更対象を厳密に判断
+- [ ] **変更対象を明確化**（親git自体のコード vs submodule内のコード）
 - [ ] ユーザーに確認を取得（作成場所を明記）
 - [ ] `wt-`プレフィックスで命名
 - [ ] `git worktree add`で作成
-  - 親git側変更：親gitルートで実行
-  - Submodule内変更のみ：対象submodule内でのみ実行（**親gitには作らない**）
+  - Submoduleなし：プロジェクトルートで実行
+  - 親git自体の変更：親gitルートで実行
+  - Submodule内変更：対象submodule内でのみ実行
+    - 🚫 **親gitには絶対に作らない**
+    - ✅ worktreeパス: `submodule名/wt-xxx`
 - [ ] worktreeに移動
 - [ ] `.env`をコピー（必要に応じて）
 - [ ] `.serena`をコピー

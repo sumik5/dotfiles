@@ -12,33 +12,65 @@ Worktreeの操作は大きく3つのフェーズに分かれます：
 
 ### 事前確認
 
+#### 🚨 Step 1: Submoduleの有無を最初に確認（必須）
+
 ```bash
 # 現在のディレクトリを確認（メインリポジトリのルートであること）
 pwd
 
-# 変更対象を明確化（最重要）
-# - 親git側のコード変更？
-# - Submodule内のコード変更のみ？
-
-# Submoduleの有無を確認
+# Submoduleの有無を確認（最初に必ず実行）
 ls -la .gitmodules
 git submodule status
-
-# 既存のworktreeを確認
-git worktree list
-
-# 出力例（親gitのworktree）:
-# /Users/user/project              abc1234 [main]
-# /Users/user/project/wt-feat-auth def5678 [feature/auth]
 
 # Submodule一覧の出力例:
 # +abc1234567890abcdef1234567890abcdef12345678 submodule1 (heads/main)
 # +def4567890abcdef1234567890abcdef123456789 submodule2 (heads/main)
 ```
 
+#### Step 2: Submoduleの有無に応じた分岐
+
+##### 【Submoduleがない場合】
+通常のworktree作成フローに従う（プロジェクトルートに作成）
+
+##### 【Submoduleがある場合】→ 🚨変更対象を厳密に判断
+
+**⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
+
+```bash
+# 変更対象を明確化（最重要）
+# - 親git自体のコード変更？ → 親gitルートにworktree作成
+# - Submodule内のコード変更？ → 対象submodule内にのみworktree作成（🚫親gitには作らない）
+```
+
+#### 既存のworktreeを確認
+
+```bash
+# 既存のworktreeを確認
+git worktree list
+
+# 出力例（親gitのworktree）:
+# /Users/user/project              abc1234 [main]
+# /Users/user/project/wt-feat-auth def5678 [feature/auth]
+```
+
 ### 基本的な作成方法
 
-#### ケース1: 親git側のコード変更
+#### ケース0: Submoduleがないプロジェクト（通常フロー）
+
+```bash
+# プロジェクトルートで実行
+# 基本フォーマット
+git worktree add -b <新規ブランチ名> <worktreeディレクトリ名> <元ブランチ>
+
+# 実例: mainブランチから新機能ブランチを作成
+git worktree add -b feature/payment-integration wt-feat-payment main
+
+# 出力例:
+# Preparing worktree (new branch 'feature/payment-integration')
+# HEAD is now at abc1234 Latest commit message
+```
+
+#### ケース1: Submoduleあり・親git自体のコード変更
 
 ```bash
 # 親gitルートで実行
@@ -53,10 +85,10 @@ git worktree add -b feature/payment-integration wt-feat-payment main
 # HEAD is now at abc1234 Latest commit message
 ```
 
-#### ケース2: Submodule内のコード変更のみ
+#### ケース2: Submoduleあり・Submodule内のコード変更
 
 ```bash
-# ⚠️ 重要: 親gitにはworktreeを作らない
+# 🚫 親gitにはworktreeを絶対に作らない
 
 # 対象submodule内でのみworktreeを作成
 cd submodule1
@@ -74,6 +106,10 @@ git worktree list
 # 出力例:
 # /path/to/project/submodule1              abc1234 [main]
 # /path/to/project/submodule1/wt-feat-payment def5678 [feature/payment-integration]
+
+# ⚠️ 重要: worktreeパスは submodule1/wt-feat-payment
+# ❌ 間違い: wt-feat-payment（親gitルート直下）
+# ✅ 正しい: submodule1/wt-feat-payment（submodule内）
 ```
 
 #### 既存ブランチからworktreeを作成

@@ -61,12 +61,33 @@ color: purple
 
 ### 2. Worktree管理判断（最重要）
 **詳細は `git-worktree` スキルを参照**
-- 新規作業か既存作業か判断
-- **変更対象を明確化**（親git側のコード vs submodule内のコード）
-- **Submoduleの有無を確認**（`.gitmodules`と`git submodule status`）
-- 新規作業の場合、ユーザーに確認してworktree作成
-  - **親git側のコード変更**: 親gitルートでworktree作成
-  - **Submodule内のコード変更のみ**: 対象submodule内でのみworktree作成（**親gitには作らない**）
+
+#### Step 1: Submoduleの有無を最初に確認（必須）
+```bash
+ls -la .gitmodules
+git submodule status
+```
+
+#### Step 2: Submoduleの有無に応じた判断
+
+##### 【Submoduleがない場合】→ 通常のworktree作成フロー
+- 新規作業の場合、ユーザーに確認してプロジェクトルートにworktree作成
+- 既存worktreeでの作業の場合、worktree名を把握
+
+##### 【Submoduleがある場合】→ 変更対象を厳密に判断（🚨最重要）
+
+**⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
+
+1. **変更対象を明確化**: 何を変更するか具体的に特定
+   - 親git自体のコード（例: プロジェクトルートの設定ファイル、親gitのsrc/）？
+   - submodule内のコード？
+
+2. **変更対象に応じてworktree作成場所を決定**:
+   - **親git自体のコード変更**: 親gitルートでworktree作成
+   - **Submodule内のコード変更**: 対象submodule内でのみworktree作成
+     - 🚫 **親gitにはworktreeを絶対に作らない**
+     - ✅ 対象submoduleディレクトリに移動してからworktree作成
+
 - 既存worktreeでの作業の場合、worktree名を把握
 
 ### 3. プロジェクト分析
@@ -165,6 +186,7 @@ color: purple
 ### Worktree管理
 - ❌ **勝手にworktreeを作成**（必ずユーザー確認）
 - ❌ **勝手にworktreeを削除**
+- ❌ **🚨 Submodule内のコード変更なのに親gitにworktree作成**（最重要禁止事項）
 
 ### Git操作
 - ❌ **git add、commit、push等の書き込み操作**
