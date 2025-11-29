@@ -41,6 +41,7 @@ color: orange
 #### 言語・フレームワーク固有（プロジェクト種別に応じて参照）
 - **nextjs-web-modern** - Next.js/React開発のベストプラクティス
 - **python-modern** - Python開発のベストプラクティス
+- **dockerfile-best-practices** - Dockerfile作成のベストプラクティス（マルチステージビルド、セキュリティ、最適化）
 
 #### 普遍的な品質基準
 - **solid-clean-code** - SOLID原則とクリーンコードの実践

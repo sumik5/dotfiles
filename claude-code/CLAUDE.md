@@ -47,10 +47,12 @@
 ### 言語固有基準
 - **Next.js/React**: `nextjs-web-modern` スキル参照
 - **Python**: `python-modern` スキル参照
+- **Docker**: `dockerfile-best-practices` スキル参照
 
 **検出条件**:
 - Next.js: `package.json`に`"next"`または`next.config.*`存在
 - Python: `pyproject.toml`または`requirements.txt`存在
+- Docker: `Dockerfile`または`docker-compose.yml`存在
 
 ---
 
