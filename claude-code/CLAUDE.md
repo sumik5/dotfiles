@@ -49,10 +49,17 @@
 - **Python**: `python-modern` スキル参照
 - **Docker**: `dockerfile-best-practices` スキル参照
 
+### フロントエンドUI基準
+- **UI構築時**: `frontend-design` スキル参照
+  - Webコンポーネント、ページ、アプリケーション構築時
+  - Figmaデザインからの実装時
+  - 汎用AI美学（AIスロップ）を避け、独創的なデザインを実現
+
 **検出条件**:
 - Next.js: `package.json`に`"next"`または`next.config.*`存在
 - Python: `pyproject.toml`または`requirements.txt`存在
 - Docker: `Dockerfile`または`docker-compose.yml`存在
+- Frontend UI: Figma URL提供時、UI/コンポーネント構築指示時
 
 ---
 
