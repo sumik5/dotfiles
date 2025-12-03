@@ -72,33 +72,130 @@ git submodule status
     └─ No → 新規worktree必要
         ↓
         Step 1: Submoduleの有無を確認
-        ├─ Submoduleなし → 通常フロー
-        │   ↓
-        │   ユーザーに確認
-        │   「新しい作業のため、worktree `wt-feat-xxx` を作成しますか？」
-        │   ↓
-        │   プロジェクトルートでworktree作成・作業開始
-        │
-        └─ Submoduleあり → 🚨変更対象を厳密に判断
-            ↓
-            「何を変更するか？」を明確化
-            ├─ 親git自体のコード変更 → ユーザーに確認
-            │   「親git自体のコードを変更するため、
-            │    親gitに worktree `wt-feat-xxx` を作成しますか？」
-            │   ↓
-            │   親gitルートでworktree作成・作業開始
-            │
-            └─ Submodule内のコード変更 → ユーザーに確認
-                🚫 親gitにworktreeを作成してはいけない
-                ↓
-                「submodule1内のコードを変更するため、
-                 submodule1に worktree `wt-feat-xxx` を作成しますか？
-                 ※親gitにはworktreeを作成しません」
-                ↓
-                対象submodule内でのみworktree作成
-                worktreeパス: submodule1/wt-feat-xxx
-                ⚠️ 親gitルート直下ではない
+        ├─ Submoduleなし → AskUserQuestionで作業場所を確認
+        └─ Submoduleあり → AskUserQuestionで変更対象と作業場所を確認
 ```
+
+## 🎯 AskUserQuestion形式の選択肢（必須）
+
+**すべてのworktree確認はAskUserQuestion形式の選択肢で行う**
+
+### Step 0: 作業場所の選択（最初に必ず確認）
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "新しい作業を開始します。作業場所を選択してください",
+        "header": "作業場所",
+        "options": [
+            {
+                "label": "現在のブランチで作業",
+                "description": f"現在のブランチ `{current_branch}` で直接作業を開始"
+            },
+            {
+                "label": "新規worktreeを作成",
+                "description": "独立したworktreeで作業（並行開発向け）"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+### Step 1: Submoduleがない場合のworktree作成確認
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": f"worktree `wt-{feature_name}` を作成しますか？",
+        "header": "Worktree作成",
+        "options": [
+            {
+                "label": "作成する",
+                "description": f"ブランチ `feature/{feature_name}` を作成して作業開始"
+            },
+            {
+                "label": "作成しない",
+                "description": "現在のブランチで作業を継続"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+### Step 2: Submoduleがある場合の変更対象選択
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "変更対象を選択してください",
+        "header": "変更対象",
+        "options": [
+            {
+                "label": "親git側のコード",
+                "description": "プロジェクトルートの設定ファイルや親gitのソースコード"
+            },
+            {
+                "label": f"Submodule: {submodule_name}",
+                "description": f"{submodule_name}内のコードを変更"
+            }
+            # 複数submoduleがある場合は各submoduleを選択肢として追加
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+### Step 3: Submodule内変更時のworktree作成確認
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": f"{submodule_name}内にworktreeを作成しますか？",
+        "header": "Submodule Worktree",
+        "options": [
+            {
+                "label": "作成する",
+                "description": f"{submodule_name}/wt-{feature_name} を作成（親gitには作成しません）"
+            },
+            {
+                "label": "作成しない",
+                "description": f"{submodule_name}の現在のブランチで作業"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+### 複合選択肢の例（効率化）
+
+複数の確認を1回で行う場合：
+
+```python
+AskUserQuestion(
+    questions=[
+        {
+            "question": "作業場所を選択してください",
+            "header": "作業場所",
+            "options": [
+                {"label": "現在のブランチ", "description": f"`{current_branch}` で作業"},
+                {"label": "新規worktree", "description": "独立した作業環境を作成"}
+            ],
+            "multiSelect": False
+        },
+        {
+            "question": "変更対象を選択してください（worktree作成時のみ）",
+            "header": "変更対象",
+            "options": [
+                {"label": "親git", "description": "親リポジトリのコード"},
+                {"label": f"{submodule_name}", "description": "Submodule内のコード"}
+            ],
+            "multiSelect": False
+        }
+    ]
+)
 
 ## 📚 詳細ドキュメント
 

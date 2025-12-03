@@ -142,40 +142,96 @@ git submodule status
 | 親git自体のコード | 親gitルート | `wt-feat-xxx` |
 | Submodule内のコード | 対象submodule内のみ | `submodule名/wt-feat-xxx`（🚫親gitには作らない） |
 
-### ユーザー確認プロセス
+### ユーザー確認プロセス（AskUserQuestion形式必須）
 
-#### 確認メッセージ例（Submoduleなしまたは親git自体の変更）
+**すべてのworktree確認はAskUserQuestion形式で行う**
+
+#### Step 0: 作業場所の選択（最初に必ず確認）
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "新しい作業を開始します。作業場所を選択してください",
+        "header": "作業場所",
+        "options": [
+            {
+                "label": "現在のブランチで作業",
+                "description": f"現在のブランチ `{current_branch}` で直接作業"
+            },
+            {
+                "label": "新規worktreeを作成",
+                "description": "独立したworktreeで並行開発"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
 ```
-【Worktree作成の確認】
 
-新しい作業と判断しました。
+#### Step 1: Submoduleがある場合の変更対象選択
 
-提案するworktree名: `wt-feat-user-authentication`
-ブランチ名: `feature/user-authentication`
-元ブランチ: `main`
-
-このworktreeを作成してよろしいですか？
-
-（承認後に作成を実施します）
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "変更対象を選択してください",
+        "header": "変更対象",
+        "options": [
+            {
+                "label": "親git側のコード",
+                "description": "プロジェクトルートの設定ファイルや親gitのソースコード"
+            },
+            {
+                "label": f"Submodule: {submodule_name}",
+                "description": f"{submodule_name}内のコードを変更（親gitにはworktree作成しない）"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
 ```
 
-#### 確認メッセージ例（Submodule内の変更）
+#### Step 2: Worktree作成確認（Submoduleなしまたは親git変更）
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": f"worktree `wt-feat-{feature_name}` を作成しますか？",
+        "header": "Worktree作成",
+        "options": [
+            {
+                "label": "作成する",
+                "description": f"ブランチ `feature/{feature_name}` を作成（元: main）"
+            },
+            {
+                "label": "作成しない",
+                "description": "現在のブランチで作業を継続"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
 ```
-【Worktree作成の確認】
 
-新しい作業と判断しました。
-変更対象: submodule1内のコード
+#### Step 3: Worktree作成確認（Submodule内変更）
 
-🚫 親gitにはworktreeを作成しません
-
-提案するworktree名: `wt-feat-xxx`
-作成場所: submodule1/wt-feat-xxx（submodule内のみ）
-ブランチ名: `feature/xxx`
-元ブランチ: `main`
-
-このworktreeをsubmodule1内に作成してよろしいですか？
-
-（承認後に作成を実施します）
+```python
+AskUserQuestion(
+    questions=[{
+        "question": f"{submodule_name}内にworktreeを作成しますか？",
+        "header": "Submodule Worktree",
+        "options": [
+            {
+                "label": "作成する",
+                "description": f"{submodule_name}/wt-feat-{feature_name} を作成（親gitには作成しない）"
+            },
+            {
+                "label": "作成しない",
+                "description": f"{submodule_name}の現在のブランチで作業"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
 ```
 
 #### 承認取得後の作業

@@ -62,31 +62,67 @@ color: purple
 ### 2. Worktree管理判断（最重要）
 **詳細は `git-worktree` スキルを参照**
 
-#### Step 1: Submoduleの有無を最初に確認（必須）
+#### 🎯 AskUserQuestion形式で確認（必須）
+**すべてのworktree確認はAskUserQuestion形式の選択肢で行う**
+
+#### Step 0: 作業場所の選択（最初に必ず確認）
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "新しい作業を開始します。作業場所を選択してください",
+        "header": "作業場所",
+        "options": [
+            {"label": "現在のブランチで作業", "description": f"現在のブランチ `{current_branch}` で直接作業"},
+            {"label": "新規worktreeを作成", "description": "独立したworktreeで並行開発"}
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+#### Step 1: Submoduleの有無を確認（必須）
 ```bash
 ls -la .gitmodules
 git submodule status
 ```
 
-#### Step 2: Submoduleの有無に応じた判断
+#### Step 2: Submoduleがある場合の変更対象選択
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "変更対象を選択してください",
+        "header": "変更対象",
+        "options": [
+            {"label": "親git側のコード", "description": "プロジェクトルートの設定や親gitソース"},
+            {"label": f"Submodule: {submodule_name}", "description": f"{submodule_name}内のコード（親gitにはworktree作成しない）"}
+        ],
+        "multiSelect": False
+    }]
+)
+```
 
-##### 【Submoduleがない場合】→ 通常のworktree作成フロー
-- 新規作業の場合、ユーザーに確認してプロジェクトルートにworktree作成
-- 既存worktreeでの作業の場合、worktree名を把握
+#### Step 3: Worktree作成確認
+```python
+AskUserQuestion(
+    questions=[{
+        "question": f"worktree `wt-feat-{feature_name}` を作成しますか？",
+        "header": "Worktree作成",
+        "options": [
+            {"label": "作成する", "description": f"ブランチ `feature/{feature_name}` を作成"},
+            {"label": "作成しない", "description": "現在のブランチで作業を継続"}
+        ],
+        "multiSelect": False
+    }]
+)
+```
 
-##### 【Submoduleがある場合】→ 変更対象を厳密に判断（🚨最重要）
-
+#### Submodule選択時の注意
 **⚠️ 絶対ルール: submodule内のコードを変更する場合、親gitにworktreeを作成してはいけない**
 
-1. **変更対象を明確化**: 何を変更するか具体的に特定
-   - 親git自体のコード（例: プロジェクトルートの設定ファイル、親gitのsrc/）？
-   - submodule内のコード？
-
-2. **変更対象に応じてworktree作成場所を決定**:
-   - **親git自体のコード変更**: 親gitルートでworktree作成
-   - **Submodule内のコード変更**: 対象submodule内でのみworktree作成
-     - 🚫 **親gitにはworktreeを絶対に作らない**
-     - ✅ 対象submoduleディレクトリに移動してからworktree作成
+- **親git自体のコード変更**: 親gitルートでworktree作成
+- **Submodule内のコード変更**: 対象submodule内でのみworktree作成
+  - 🚫 **親gitにはworktreeを絶対に作らない**
+  - ✅ 対象submoduleディレクトリに移動してからworktree作成
 
 - 既存worktreeでの作業の場合、worktree名を把握
 
