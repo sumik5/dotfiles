@@ -267,7 +267,25 @@ VERSION_NUMBER（vプレフィックスを除いた番号）を使用して、�
    - package.json: `"version": "VERSION_NUMBER"`
    - pyproject.toml: `version = "VERSION_NUMBER"`
 
-問題なければ、すべてのファイルを更新する
+AskUserQuestionで確認を求める：
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "上記の変更内容でファイルを更新してよろしいですか？",
+        "header": "CHANGELOG更新",
+        "options": [
+            {"label": "更新する", "description": "CHANGELOG.mdとバージョンファイルを更新"},
+            {"label": "キャンセル", "description": "更新せず終了（内容を再確認）"}
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+**処理**:
+- 「更新する」が選択された場合: すべてのファイルを更新する
+- 「キャンセル」が選択された場合: 処理を中止
 
 ## Keep a Changelog形式の詳細
 

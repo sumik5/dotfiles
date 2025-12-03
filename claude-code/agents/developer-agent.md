@@ -177,7 +177,34 @@ Managerから指定された役割を柔軟に担当：
 - 適切な成果物を作成
 
 ### 不明な役割への対応
-- 不明・曖昧な役割を受信した場合、Managerに詳細確認を求める
+
+不明・曖昧な役割を受信した場合、AskUserQuestionを使用して確認してください：
+
+```python
+AskUserQuestion(
+    questions=[{
+        "question": "タスクの詳細を確認させてください。どのアプローチを希望しますか？",
+        "header": "アプローチ",
+        "options": [
+            {
+                "label": "アプローチA",
+                "description": "（具体的なアプローチの説明）"
+            },
+            {
+                "label": "アプローチB",
+                "description": "（代替アプローチの説明）"
+            },
+            {
+                "label": "Managerに確認",
+                "description": "詳細をManagerに確認してから作業開始"
+            }
+        ],
+        "multiSelect": False
+    }]
+)
+```
+
+- 選択結果に基づいて作業を進める
 - 類似経験から最適なアプローチを提案
 - 学習・調査を行いながら実行
 
