@@ -1,5 +1,5 @@
 ---
-name: agent-manager
+name: agent-kusanagi
 description: Manager Agent運用 - タスク分割と依存関係管理を担当。POの戦略をDeveloper実行計画に変換。並列実行計画を策定。
 ---
 
@@ -26,7 +26,7 @@ description: Manager Agent運用 - タスク分割と依存関係管理を担当
 
 ### 定義ファイル
 
-**場所**: `~/.claude/agents/manager-agent.md`
+**場所**: `~/.claude/agents/kusanagi-agent.md`
 
 ### 基本的な役割
 
@@ -191,7 +191,7 @@ worktree名、ブランチ名を確認
 ## 🔗 関連スキル
 
 - **agent-hierarchy** - Agent階層全体の理解
-- **agent-po** - POからの指示の理解
-- **agent-developer** - Developerへの適切な指示
+- **agent-aramaki** - POからの指示の理解
+- **agent-tachikoma** - Developerへの適切な指示
 - **mcp-serena** - 詳細なコード分析
 - **mcp-sequentialthinking** - 論理的思考支援

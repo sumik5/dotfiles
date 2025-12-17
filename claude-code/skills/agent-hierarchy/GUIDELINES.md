@@ -67,7 +67,7 @@
 #### ✅ OK - 直接実装可能
 ```
 例1: ファイル読み込み
-- Read ~/.claude/agents/po-agent.md
+- Read ~/.claude/agents/aramaki-agent.md
 - Read package.json
 
 例2: 単純な質問への回答
@@ -115,9 +115,9 @@
 **最初のセッション開始時のみ**:
 ```bash
 # 3つのAgent定義を一度に読み込む（並列実行）
-Read ~/.claude/agents/po-agent.md
-Read ~/.claude/agents/manager-agent.md
-Read ~/.claude/agents/developer-agent.md
+Read ~/.claude/agents/aramaki-agent.md
+Read ~/.claude/agents/kusanagi-agent.md
+Read ~/.claude/agents/tachikoma-agent.md
 ```
 
 **以降のAgent起動時**:

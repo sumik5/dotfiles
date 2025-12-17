@@ -486,7 +486,7 @@ POST /api/auth/login
 詳細については、以下のスキルを参照してください：
 
 - **agent-hierarchy** - Agent階層全体の理解
-- **agent-manager** - Managerからの指示の理解
+- **agent-kusanagi** - Managerからの指示の理解
 - **mcp-serena** - コード編集の詳細
 - **mcp-next-devtools** - Next.js開発の詳細
 - **mcp-shadcn** - UIコンポーネント管理

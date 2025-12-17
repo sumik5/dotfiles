@@ -3,7 +3,7 @@
 ## 🌐 言語設定（絶対遵守）
 
 **CRITICAL: すべての応答は必ず日本語で行う**
-- Claude Code本体、全Agent（PO/Manager/Developer）の応答
+- Claude Code本体、全Agent（Aramaki/Kusanagi/Tachikoma）の応答
 - タスク報告、エラーメッセージ、コード内コメント
 - 例外: 技術用語、ライブラリ名、プログラミングキーワード
 
@@ -13,7 +13,7 @@
 
 ### コード修正
 - **Claude Code本体は絶対にコードを直接修正しない**
-- コード修正は必ずAgent使用（PO→Manager→Developer）
+- コード修正は必ずAgent使用（Aramaki→Kusanagi→Tachikoma）
 - 例外: ファイル読み込み、質問回答のみ
 
 ### Git操作禁止
@@ -114,34 +114,34 @@
 
 ### モデル選択（必須）
 - **Claude Code本体**: Opus（デフォルト）
-- **PO Agent**: Opus（戦略決定に高性能モデル）
-- **Manager Agent**: Opus（タスク分析に高性能モデル）
-- **Developer Agent**: Sonnet（実装に効率的モデル）
+- **Aramaki Agent**: Opus（戦略決定に高性能モデル）
+- **Kusanagi Agent**: Opus（タスク分析に高性能モデル）
+- **Tachikoma Agent**: Sonnet（実装に効率的モデル）
 
 Task tool起動時に必ず`model`パラメータを指定：
 ```
-Task(subagent_type="po-agent", model="opus", ...)
-Task(subagent_type="manager-agent", model="opus", ...)
-Task(subagent_type="developer-agent", model="sonnet", ...)
+Task(subagent_type="aramaki-agent", model="opus", ...)
+Task(subagent_type="kusanagi-agent", model="opus", ...)
+Task(subagent_type="tachikoma-agent", model="sonnet", ...)
 ```
 
 ### 必須使用ケース
 コード修正は必ずAgent使用:
-- 複雑なタスク: PO → Manager → Developer（並列）
-- 軽微な修正: Developer直接起動（worktree情報渡す）
+- 複雑なタスク: Aramaki → Kusanagi → Tachikoma（並列）
+- 軽微な修正: Tachikoma直接起動（worktree情報渡す）
 
 ### 例外（自分で実行可能）
 ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示
 
 ### Agent階層
-- **PO** (Opus): 戦略決定、Worktree管理、ユーザー確認
-- **Manager** (Opus): タスク配分、Worktree情報伝達
-- **Developer** (Sonnet): 実装（worktree配下で作業）
+- **Aramaki** (Opus): 戦略決定、Worktree管理、ユーザー確認
+- **Kusanagi** (Opus): タスク配分、Worktree情報伝達
+- **Tachikoma** (Sonnet): 実装（worktree配下で作業）
 
-詳細: `agent-hierarchy`, `agent-po`, `agent-manager`, `agent-developer` スキル参照
+詳細: `agent-hierarchy`, `agent-aramaki`, `agent-kusanagi`, `agent-tachikoma` スキル参照
 
 ### 並列実行鉄則
-- Developer起動は1メッセージで同時実行
+- Tachikoma起動は1メッセージで同時実行
 - 独立タスクは絶対に並列化
 - Agent定義ファイルは最初に1回だけ読み込む
 
@@ -151,7 +151,7 @@ Task(subagent_type="developer-agent", model="sonnet", ...)
 
 ### CodeGuard（必須）
 - コード実装完了時に必ず実行: `/codeguard-security:software-security`
-- Developer Agentが実装後に自動実行
+- Tachikoma Agentが実装後に自動実行
 - 詳細: `security-codeguard` スキル参照
 
 ---

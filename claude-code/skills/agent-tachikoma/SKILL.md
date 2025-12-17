@@ -1,5 +1,5 @@
 ---
-name: agent-developer
+name: agent-tachikoma
 description: Developer Agent運用 - 実装担当。Worktree配下で作業、全ツール使用可。dev1-4が異なる専門性を持ち並列実装。
 ---
 
@@ -24,7 +24,7 @@ description: Developer Agent運用 - 実装担当。Worktree配下で作業、�
 
 ## 📋 定義ファイル
 
-**Agent定義**: `~/.claude/agents/developer-agent.md`
+**Agent定義**: `~/.claude/agents/tachikoma-agent.md`
 
 ## 🎯 基本的な役割
 
@@ -133,7 +133,7 @@ Developer Agentは4つの専門性を持ちます：
 ## 🔗 関連スキル
 
 - **agent-hierarchy**: Agent階層全体の理解
-- **agent-manager**: Managerからの指示の理解
+- **agent-kusanagi**: Managerからの指示の理解
 - **git-worktree**: Worktree作業の詳細
 - **mcp-serena**: serena MCPの詳細使用法
 - **security-codeguard**: CodeGuard実行の詳細

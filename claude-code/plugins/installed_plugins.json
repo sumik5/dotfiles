@@ -1,21 +1,27 @@
 {
-  "version": 1,
+  "version": 2,
   "plugins": {
-    "codeguard-security@project-codeguard-ja": {
-      "version": "1.0.0",
-      "installedAt": "2025-10-30T07:14:58.619Z",
-      "lastUpdated": "2025-10-30T07:14:58.619Z",
-      "installPath": "/Users/sumik/.claude/plugins/marketplaces/project-codeguard-ja/",
-      "gitCommitSha": "2cdfef736bbdda898126f86e92444082f8f5412d",
-      "isLocal": true
-    },
-    "claude-mem@thedotmack": {
-      "version": "4.3.0",
-      "installedAt": "2025-10-30T07:15:35.159Z",
-      "lastUpdated": "2025-10-30T07:15:35.159Z",
-      "installPath": "/Users/sumik/.claude/plugins/marketplaces/claude-mem/plugin",
-      "gitCommitSha": "44b69b737baeb9d1de1492e2fbf8f608b3fca5d3",
-      "isLocal": true
-    }
+    "codeguard-security@project-codeguard-ja": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/project-codeguard-ja/codeguard-security/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2025-10-30T07:14:58.619Z",
+        "lastUpdated": "2025-10-30T07:14:58.619Z",
+        "gitCommitSha": "2cdfef736bbdda898126f86e92444082f8f5412d",
+        "isLocal": true
+      }
+    ],
+    "claude-mem@thedotmack": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/thedotmack/claude-mem/7.0.10",
+        "version": "7.0.0",
+        "installedAt": "2025-12-09T05:33:00.000Z",
+        "lastUpdated": "2025-12-09T05:33:00.000Z",
+        "gitCommitSha": "",
+        "isLocal": true
+      }
+    ]
   }
 }

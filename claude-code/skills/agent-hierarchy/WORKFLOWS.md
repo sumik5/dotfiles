@@ -52,7 +52,7 @@
 ### 使用ツール
 ```bash
 # Agent定義読み込み
-Read ~/.claude/agents/po-agent.md
+Read ~/.claude/agents/aramaki-agent.md
 
 # Worktree作成（ユーザー承認後）
 Bash: git worktree add -b feature/xxx wt-feat-xxx main
@@ -98,7 +98,7 @@ mcp__sequentialthinking__sequentialthinking()
 ### 使用ツール
 ```bash
 # Agent定義読み込み
-Read ~/.claude/agents/manager-agent.md
+Read ~/.claude/agents/kusanagi-agent.md
 
 # 詳細なコード分析
 mcp__serena__find_symbol()
@@ -338,9 +338,9 @@ Worktree確認: wt-feat-user-auth配下で作業完了
 **最初のセッション開始時のみ**:
 ```bash
 # 3つのAgent定義を一度に読み込む
-Read ~/.claude/agents/po-agent.md
-Read ~/.claude/agents/manager-agent.md
-Read ~/.claude/agents/developer-agent.md
+Read ~/.claude/agents/aramaki-agent.md
+Read ~/.claude/agents/kusanagi-agent.md
+Read ~/.claude/agents/tachikoma-agent.md
 ```
 
 **以降のAgent起動時**:

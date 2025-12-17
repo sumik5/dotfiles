@@ -524,7 +524,7 @@ find . -name "*.temp" -delete
 詳細については、以下のスキルを参照してください：
 
 - **agent-hierarchy** - Agent階層全体の理解
-- **agent-manager** - Managerとのコミュニケーション
+- **agent-kusanagi** - Managerとのコミュニケーション
 - **git-worktree** - Worktree管理の詳細
 - **solid-clean-code** - コード品質基準
 - **type-safety** - 型安全性の原則

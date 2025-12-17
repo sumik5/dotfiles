@@ -38,6 +38,7 @@
       "Bash(terraform refresh:*)"
     ]
   },
+  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0",
   "hooks": {
     "Notification": [
       {
@@ -69,6 +70,5 @@
     "codeguard-security@project-codeguard-ja": true,
     "claude-mem@thedotmack": true
   },
-  "alwaysThinkingEnabled": true,
-  "model": "opus"
+  "alwaysThinkingEnabled": true
 }

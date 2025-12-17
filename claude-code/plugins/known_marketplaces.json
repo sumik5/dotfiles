@@ -13,6 +13,14 @@
       "path": "/Users/sumik/.claude/plugins/marketplaces/claude-mem"
     },
     "installLocation": "/Users/sumik/.claude/plugins/marketplaces/claude-mem",
-    "lastUpdated": "2025-10-30T07:15:21.083Z"
+    "lastUpdated": "2025-12-16T00:20:36.602Z"
+  },
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "/Users/sumik/.claude/plugins/marketplaces/claude-plugins-official",
+    "lastUpdated": "2025-12-16T08:39:31.904Z"
   }
 }
