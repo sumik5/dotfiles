@@ -22,6 +22,72 @@
         "gitCommitSha": "",
         "isLocal": true
       }
+    ],
+    "code-review@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/code-review/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
+        "installedAt": "2025-12-17T01:47:40.133Z",
+        "lastUpdated": "2025-12-17T02:00:45.130Z",
+        "gitCommitSha": "174c59a564c1d1609dc2156e56d923c69c99d8d6",
+        "isLocal": true
+      }
+    ],
+    "context7@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/context7/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
+        "installedAt": "2025-12-17T01:47:52.747Z",
+        "lastUpdated": "2025-12-17T02:00:45.132Z",
+        "gitCommitSha": "174c59a564c1d1609dc2156e56d923c69c99d8d6",
+        "isLocal": true
+      }
+    ],
+    "frontend-design@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/frontend-design/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
+        "installedAt": "2025-12-17T01:48:05.572Z",
+        "lastUpdated": "2025-12-17T02:00:45.134Z",
+        "gitCommitSha": "174c59a564c1d1609dc2156e56d923c69c99d8d6",
+        "isLocal": true
+      }
+    ],
+    "figma@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/figma/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2025-12-17T01:48:13.133Z",
+        "lastUpdated": "2025-12-17T01:48:13.133Z",
+        "gitCommitSha": "20aca44ee6ba6092037e943c151c067896828360",
+        "isLocal": false
+      }
+    ],
+    "playwright@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/playwright/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
+        "installedAt": "2025-12-17T02:11:35.912Z",
+        "lastUpdated": "2025-12-17T02:12:39.463Z",
+        "gitCommitSha": "174c59a564c1d1609dc2156e56d923c69c99d8d6",
+        "isLocal": true
+      }
+    ],
+    "security-guidance@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/Users/sumik/.claude/plugins/cache/claude-plugins-official/security-guidance/ab2b6d0cad88",
+        "version": "ab2b6d0cad88",
+        "installedAt": "2025-12-17T02:11:50.095Z",
+        "lastUpdated": "2025-12-17T02:12:39.465Z",
+        "gitCommitSha": "174c59a564c1d1609dc2156e56d923c69c99d8d6",
+        "isLocal": true
+      }
     ]
   }
 }
