@@ -394,3 +394,10 @@ fi
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
+
+# Added by Antigravity
+export PATH="/Users/sumik/.antigravity/antigravity/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/sumik/.lmstudio/bin"
+# End of LM Studio CLI section
