@@ -36,9 +36,10 @@
       "Bash(terraform state push:*)",
       "Bash(terraform state replace-provider:*)",
       "Bash(terraform refresh:*)"
-    ]
+    ],
+    "defaultMode": "default"
   },
-  "model": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+  "model": "opus",
   "hooks": {
     "Notification": [
       {
@@ -76,5 +77,6 @@
     "playwright@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true
   },
+  "outputStyle": "Explanatory",
   "alwaysThinkingEnabled": true
 }
