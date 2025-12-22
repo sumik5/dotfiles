@@ -1,6 +1,6 @@
 ---
 name: dockerfile-best-practices
-description: Dockerfileベストプラクティス - マルチステージビルド、キャッシュ最適化、セキュリティ強化、イメージサイズ最小化の指針。
+description: Dockerfile作成・修正時のベストプラクティス。DockerfileまたはDocker Compose検出時に使用してください。マルチステージビルド、キャッシュ最適化、セキュリティ強化、イメージサイズ最小化を支援。
 ---
 
 # Dockerfile ベストプラクティス

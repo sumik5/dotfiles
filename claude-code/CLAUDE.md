@@ -23,7 +23,6 @@
 ### Worktree管理
 - **新規作業時**: 必ずユーザー確認してworktree作成提案
 - **勝手な作成・削除禁止**
-- 詳細: `git-worktree` スキル参照
 
 ---
 
@@ -33,27 +32,9 @@
 1. `.serena`確認 → なければ`serena`初期化
 2. オンボーディング実施
 3. プロジェクト構造把握
-4. プロジェクト種別検出（Next.js/Python）→ 言語固有スキル適用
+4. プロジェクト種別検出（Next.js/Python）→ 言語固有スキル自動適用
 
 **注**: serena MCPは自動的にオンデマンドで起動されます
-
----
-
-## 🎨 品質基準
-
-### 普遍的基準
-`solid-clean-code`, `type-safety`, `testing`, `security-codeguard`, `technical-writing` スキル参照
-
-### 言語固有基準
-- **Next.js/React**: `nextjs-web-modern` スキル参照
-- **Python**: `python-modern` スキル参照
-- **Docker**: `dockerfile-best-practices` スキル参照
-
-### フロントエンドUI基準
-- **UI構築時**: `frontend-design` スキル参照
-  - Webコンポーネント、ページ、アプリケーション構築時
-  - Figmaデザインからの実装時
-  - 汎用AI美学（AIスロップ）を避け、独創的なデザインを実現
 
 **検出条件**:
 - Next.js: `package.json`に`"next"`または`next.config.*`存在
@@ -73,39 +54,20 @@
 
 ### 最優先MCP（必須）
 - **serena**: コード分析・編集（プロジェクト作業前に必ず初期化）
-  - プロジェクト初期化、シンボル検索、効率的なコード変更
-  - トリガー: 'edit code', 'refactor', 'find class/function', 'code analysis'
 - **next-devtools**: Next.js専用（診断・アップグレード）
-  - Next.js 16+のruntime診断、自動アップグレード、Cache Components最適化
-  - トリガー: 'Next.js', 'upgrade Next.js', 'Cache Components', 'Server Components'
 
 ### カテゴリ別MCP
-- 🔥 **開発**:
-  - **serena**: コード分析・編集（シンボル検索、効率的なコード変更、プロジェクト構造分析）
-  - **next-devtools**: Next.js専用開発ツール（診断、アップグレード、Cache Components最適化）
-  - **shadcn**: shadcn/ui UIコンポーネント管理（検索、追加、使用例）
-- 🔍 **検索**:
-  - **context7**: ライブラリドキュメント取得（最新公式ドキュメント、API参照）
-  - **deepwiki**: GitHubリポジトリ分析（オープンソースプロジェクト理解）
-- 🛠️ **インフラ**:
-  - **terraform**: Terraform IaCドキュメント（モジュール、プロバイダー、ポリシー）
-  - **docker**: Docker/Composeコンテナ管理（作成、デプロイ、ログ取得）
-- 🤖 **ブラウザ**:
-  - **playwright**: 高度なE2Eテスト（クロスブラウザ、フォーム自動化）
-  - **puppeteer**: 軽量ブラウザ自動化（スクリーンショット、PDF生成）
-  - **chrome-devtools**: パフォーマンス分析（Core Web Vitals、ネットワーク分析）
-- 📂 **変換**:
-  - **mcp-pandoc**: ドキュメント形式変換（Markdown ↔ Word/PDF/LaTeX）
-- 🧠 **思考**:
-  - **sequentialthinking**: 複雑な問題解決（段階的思考、仮説検証）
+- 🔥 **開発**: serena, next-devtools, shadcn
+- 🔍 **検索**: context7, deepwiki
+- 🛠️ **インフラ**: terraform, docker
+- 🤖 **ブラウザ**: playwright, puppeteer, chrome-devtools
+- 📂 **変換**: mcp-pandoc
+- 🧠 **思考**: sequentialthinking
 
 ### 優先順位
 1. **プロジェクト作業開始**: `.serena`確認 → serena初期化・オンボーディング
 2. **情報検索**: serena (コード) > context7 (ライブラリ) > deepwiki (GitHub)
-3. **開発タスク**:
-   - プロジェクト種別確認（Next.js/Python）→ 言語固有スキル適用
-   - コード作業: serena必須
-   - Next.js: next-devtools最優先
+3. **開発タスク**: serena必須、Next.jsはnext-devtools最優先
 4. **ブラウザ自動化**: playwright (複雑) > puppeteer (軽量) > chrome-devtools (分析)
 
 ---
@@ -129,9 +91,6 @@ Task(subagent_type="tachikoma-agent", model="sonnet", ...)
 
 **全Agentで活用可能な構造化開発コマンド**
 
-`/serena`コマンドは、トークン効率の高い構造化された問題解決を提供します。
-Claude Code本体、Tachikoma、その他すべてのAgentで活用してください。
-
 **使用タイミング**:
 - コンポーネント開発（UI作成、状態管理、ライブラリ統合）
 - API開発（REST/GraphQL、認証、スキーマ設計）
@@ -148,8 +107,6 @@ Claude Code本体、Tachikoma、その他すべてのAgentで活用してくだ�
 /serena "認証システム設計" -d -r     # 詳細分析+リサーチ
 ```
 
-詳細: `serena-expert` スキル参照
-
 ### 必須使用ケース
 コード修正は必ずAgent使用:
 - **複雑なマルチファイル変更**: Aramaki → Kusanagi → Tachikoma（並列）
@@ -164,8 +121,6 @@ Claude Code本体、Tachikoma、その他すべてのAgentで活用してくだ�
 - **Kusanagi** (Opus): タスク配分、Worktree情報伝達
 - **Tachikoma** (Sonnet): 実装（worktree配下で作業、`/serena`活用推奨）
 
-詳細: `agent-hierarchy`, `agent-aramaki`, `agent-kusanagi`, `agent-tachikoma`, `serena-expert` スキル参照
-
 ### 並列実行鉄則
 - Tachikoma起動は1メッセージで同時実行
 - 独立タスクは絶対に並列化
@@ -178,7 +133,6 @@ Claude Code本体、Tachikoma、その他すべてのAgentで活用してくだ�
 ### CodeGuard（必須）
 - コード実装完了時に必ず実行: `/codeguard-security:software-security`
 - Tachikoma Agentが実装後に自動実行
-- 詳細: `security-codeguard` スキル参照
 
 ---
 

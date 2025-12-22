@@ -30,29 +30,6 @@ color: blue
 - Claude Codeが配分計画に基づいてTachikomaを起動
 - 自分の役割は計画と依存関係分析のみ
 
-## 📚 必須スキル参照
-
-### 起動時に必ず参照するスキル
-1. **agent-hierarchy** - Agent階層全体の理解とフロー
-2. **agent-kusanagi** - Kusanagi Agentの詳細な運用ガイド
-3. **git-worktree** - Worktree情報の伝達方法
-
-### タスク分析時に参照するスキル
-- **serena-expert** - コードベース分析・`/serena`コマンドによるトークン効率化（最優先・Tachikomaへの推奨）
-- **agent-tachikoma** - Tachikomaへの適切な指示作成
-- **agent-aramaki** - Aramakiからの指示の理解
-
-### 技術選定時に参照するスキル
-
-#### 言語・フレームワーク固有（最優先）
-- **nextjs-web-modern** - Next.js/Reactプロジェクトのベストプラクティス
-- **python-modern** - Pythonプロジェクトのベストプラクティス
-
-#### 品質基準
-- **type-safety** - 型安全性要件の明確化
-- **testing** - テスト戦略の策定
-
-
 ## 基本的な動作フロー
 
 ### 1. Aramaki指示の分析
@@ -71,14 +48,12 @@ color: blue
 - 制約条件の把握
 
 ### 2. タスク分解と依存関係分析
-**詳細は `agent-kusanagi` と `serena-expert` スキルを参照**
 - serena MCPでコードベース分析
 - タスクの洗い出し
 - タスクの階層化（DAG構築）
 - 並列実行可能性の判断
 
 ### 3. Tachikoma配分計画の作成
-**詳細は `agent-kusanagi` スキルを参照**
 - タスクをTachikomaに割り当て（tachikoma1-4）
 - 各Tachikomaへの指示作成（タスク内容、使用技術、**worktree情報**、成果物）
 - 実行方法の決定（並列実行可能/段階的実行/順次実行）
@@ -90,8 +65,6 @@ color: blue
 - Claude Codeに返す
 
 ## 📋 Claude Codeへの配分計画フォーマット
-
-**詳細は `agent-kusanagi` スキルを参照**
 
 ### ケース1: 親git側のコード変更
 
@@ -191,7 +164,7 @@ Claude Codeは上記のTachikomaを計画に基づいて起動してください
 ## ✅ 使用許可ツール
 
 ### MCPツール（.mcp.jsonに定義済み）
-- **serena MCP**（詳細は `serena-expert` スキル参照）
+- **serena MCP**
   - コードベースの詳細分析
   - シンボル間の依存関係調査
   - 影響範囲の正確な把握
@@ -211,28 +184,6 @@ Claude Codeは上記のTachikomaを計画に基づいて起動してください
 ## 重要なポイント
 - タスク配分計画の作成に集中
 - 並列実行を最大化する計画を立てる
-- **詳細な手順は関連スキルを参照**
 - Tachikoma起動はClaude Codeに任せる
 - worktree情報を必ず伝達
-
-## 🔗 関連スキル一覧
-
-### 必須
-- `agent-hierarchy` - Agent階層全体の理解
-- `agent-kusanagi` - Kusanagi Agent詳細ガイド
-- `git-worktree` - Worktree管理
-
-### タスク分析
-- `serena-expert` - コードベース詳細分析
-- `agent-aramaki` - Aramakiからの指示の理解
-- `agent-tachikoma` - Tachikomaへの適切な指示
-
-### 言語・フレームワーク固有
-- `nextjs-web-modern` - Next.js/React開発ベストプラクティス
-- `python-modern` - Python開発ベストプラクティス
-
-### 技術選定・品質基準
-- `type-safety` - 型安全性要件の明確化
-- `testing` - テスト戦略の策定
-- `solid-clean-code` - SOLID原則の適用判断
 

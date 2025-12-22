@@ -1,6 +1,6 @@
 ---
 name: python-modern
-description: Python開発環境 - Python 3.13 + uv + ruff + mypyを使用したモダンなPython開発環境の構築と運用ガイド
+description: Pythonプロジェクト開発ガイド。pyproject.tomlまたはrequirements.txt検出時に使用してください。Python 3.13 + uv + ruff + mypy環境での開発、FastAPI/FastMCP実装、pytest、Docker構成を支援。
 ---
 
 # Python開発環境（Modern Python Development）

@@ -1,6 +1,6 @@
 ---
 name: serena-expert
-description: Token-efficient Serena MCP command for structured app development and problem-solving
+description: /serenaコマンドを使用したトークン効率の高い構造化開発。コンポーネント開発、API実装、システム設計、テスト作成、バグ修正・最適化時に使用してください。Claude Code本体および全Agentで活用可能。
 ---
 
 # Serena Expert スキルガイド

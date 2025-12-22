@@ -1,19 +1,11 @@
 {
-  "project-codeguard-ja": {
-    "source": {
-      "source": "directory",
-      "path": "/Users/sumik/dotfiles/claude-code/plugins/marketplaces/project-codeguard-ja"
-    },
-    "installLocation": "/Users/sumik/.claude/plugins/marketplaces/project-codeguard-ja",
-    "lastUpdated": "2025-10-29T00:29:05.500Z"
-  },
   "claude-plugins-official": {
     "source": {
       "source": "github",
       "repo": "anthropics/claude-plugins-official"
     },
     "installLocation": "/Users/sumik/.claude/plugins/marketplaces/claude-plugins-official",
-    "lastUpdated": "2025-12-22T03:33:04.074Z"
+    "lastUpdated": "2025-12-22T06:05:21.461Z"
   },
   "thedotmack": {
     "source": {
@@ -29,6 +21,6 @@
       "repo": "project-codeguard/rules"
     },
     "installLocation": "/Users/sumik/.claude/plugins/marketplaces/project-codeguard",
-    "lastUpdated": "2025-12-18T23:54:56.083Z"
+    "lastUpdated": "2025-12-22T04:14:23.874Z"
   }
 }

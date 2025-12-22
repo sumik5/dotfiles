@@ -1,3 +1,8 @@
+---
+name: nextjs-web-modern
+description: Next.js 16 / React 19開発ガイド。package.jsonに"next"またはnext.config.*検出時に使用してください。App Router、Server Components、Cache Components、TypeScript厳格設定、Tailwind CSS v4、Prisma ORM、Vitestを支援。
+---
+
 # Next.js 16 / React 19 Modern Web Development Skill
 
 ## 概要

@@ -1,6 +1,6 @@
 ---
 name: type-safety
-description: 型安全性の原則 - TypeScript/JavaScriptとPythonでのany/Any型使用禁止。strict mode、型ヒント、型ガードを徹底。
+description: TypeScript/Python実装時の型安全性ガイド。any/Any型は絶対禁止。APIレスポンス処理、外部ライブラリ統合、データバリデーション実装時に使用してください。strict mode有効化と型ガード実装を支援。
 ---
 
 # 型安全性の原則
