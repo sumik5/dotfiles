@@ -1,5 +1,5 @@
 ---
-name: tachikoma-agent
+name: tachikoma
 description: Tachikoma execution agent (tachikoma1-4) that performs actual implementation work. Adapts to various roles like frontend, backend, testing, or non-technical tasks based on Kusanagi's assignment. Can utilize serena-expert for efficient development.
 model: sonnet
 color: orange

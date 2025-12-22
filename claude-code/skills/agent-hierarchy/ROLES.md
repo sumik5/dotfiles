@@ -197,6 +197,6 @@ Managerは配分計画をClaude Codeに返すだけで、Developer起動は行�
 - [PARALLEL-EXECUTION.md](PARALLEL-EXECUTION.md) - 並列実行パターン
 - [GUIDELINES.md](GUIDELINES.md) - 判断基準と最適化
 
-- **agent-aramaki** skill - PO Agentの詳細
-- **agent-kusanagi** skill - Manager Agentの詳細
-- **agent-tachikoma** skill - Developer Agentの詳細
+- **aramaki** skill - PO Agentの詳細
+- **kusanagi** skill - Manager Agentの詳細
+- **tachikoma** skill - Developer Agentの詳細

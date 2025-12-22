@@ -1,5 +1,5 @@
 ---
-name: kusanagi-agent
+name: kusanagi
 description: Kusanagi agent that receives Aramaki instructions and manages Tachikoma team. Analyzes task dependencies, creates execution schedules, and coordinates parallel/sequential work distribution. Never performs actual implementation.
 model: opus
 color: blue

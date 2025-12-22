@@ -82,9 +82,9 @@
 
 Task tool起動時に必ず`model`パラメータを指定：
 ```
-Task(subagent_type="aramaki-agent", model="opus", ...)
-Task(subagent_type="kusanagi-agent", model="opus", ...)
-Task(subagent_type="tachikoma-agent", model="sonnet", ...)
+Task(subagent_type="aramaki", model="opus", ...)
+Task(subagent_type="kusanagi", model="opus", ...)
+Task(subagent_type="tachikoma", model="sonnet", ...)
 ```
 
 ### 🚀 /serenaコマンド（トークン効率化ツール）

@@ -46,5 +46,5 @@ description: /serenaコマンドを使用したトークン効率の高い構造
 
 ## 🔗 関連スキル
 
-- **agent-tachikoma**: Tachikoma Agentでの活用
+- **tachikoma**: Tachikoma Agentでの活用
 - **solid-clean-code**: コード品質基準

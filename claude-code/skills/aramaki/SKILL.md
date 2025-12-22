@@ -1,5 +1,5 @@
 ---
-name: agent-aramaki
+name: aramaki
 description: PO Agent運用 - 戦略決定とWorktree管理を担当。ユーザー要求分析、プロジェクト方針策定、新規worktree作成判断を実施。
 ---
 
@@ -17,7 +17,7 @@ PO Agentは以下の状況で起動します：
 ## 📋 PO Agentとは
 
 ### 定義ファイル
-**ファイルパス**: `~/.claude/agents/aramaki-agent.md`
+**ファイルパス**: `~/.claude/agents/aramaki.md`
 
 ### 役割
 
@@ -65,7 +65,7 @@ PO Agent専用ツールとその使い方：
 ## 🔗 関連スキル
 
 - **agent-hierarchy**: Agent階層全体の理解
-- **agent-kusanagi**: Managerへの適切な指示作成
+- **kusanagi**: Managerへの適切な指示作成
 - **git-worktree**: Worktree管理の詳細
 - **serena-expert**: プロジェクト分析の詳細
 

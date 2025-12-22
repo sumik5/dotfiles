@@ -39,9 +39,9 @@ description: Agent階層管理 - PO→Manager→Developer階層の必須使用�
 
 ```
 ~/.claude/agents/
-├── aramaki-agent.md        # PO Agent定義
-├── kusanagi-agent.md   # Manager Agent定義
-└── tachikoma-agent.md # Developer Agent定義
+├── aramaki.md      # PO Agent定義
+├── kusanagi.md     # Manager Agent定義
+└── tachikoma.md    # Developer Agent定義
 ```
 
 ## ✅ 直接実装可能な例外
@@ -90,9 +90,9 @@ description: Agent階層管理 - PO→Manager→Developer階層の必須使用�
 
 ## 🔗 関連スキル
 
-- **agent-aramaki**: PO Agentの詳細な使い方
-- **agent-kusanagi**: Manager Agentの詳細な使い方
-- **agent-tachikoma**: Developer Agentの詳細な使い方
+- **aramaki**: PO Agentの詳細な使い方
+- **kusanagi**: Manager Agentの詳細な使い方
+- **tachikoma**: Developer Agentの詳細な使い方
 - **git-worktree**: Worktree管理の詳細
 
 ## 🎓 学習パス
