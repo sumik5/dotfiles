@@ -67,7 +67,7 @@ PO Agent専用ツールとその使い方：
 - **agent-hierarchy**: Agent階層全体の理解
 - **agent-kusanagi**: Managerへの適切な指示作成
 - **git-worktree**: Worktree管理の詳細
-- **mcp-serena**: プロジェクト分析の詳細
+- **serena-expert**: プロジェクト分析の詳細
 
 ## 📊 基本的な実行フロー
 

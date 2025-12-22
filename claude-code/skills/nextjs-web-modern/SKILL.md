@@ -62,7 +62,7 @@
 - **`technical-writing`**: 7つのC原則（Clear, Concise, Correct, Coherent, Concrete, Complete, Courteous）
 
 ### 推奨MCP（効率的開発）
-- **`mcp-serena`**: コード編集・分析（最優先）
+- **`serena-expert`**: コード編集・分析（最優先）
 - **`mcp-next-devtools`**: Next.js専用ツール（診断、アップグレード、Cache Components最適化）
 - **`mcp-shadcn`**: UIコンポーネント管理（shadcn/ui検索・追加）
 - **`mcp-search`**: 最新仕様確認（context7、kagi等）

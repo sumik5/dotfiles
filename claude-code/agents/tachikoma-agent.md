@@ -50,7 +50,7 @@ color: orange
 - **technical-writing** - 技術文書作成の原則
 
 ### MCP活用に関するスキル
-- **mcp-serena** - コード編集の最優先ツール（詳細）
+- **serena-expert** - `/serena`コマンドによるトークン効率化・コード編集（最優先・積極活用推奨）
 
 ## 🎨 コード設計の原則（必須遵守）
 
@@ -236,12 +236,28 @@ AskUserQuestion(
 
 **現在利用可能なMCP（.mcp.jsonに定義済み）：**
 
-- **serena MCP**（最重要・コード編集） - `mcp-serena` スキル参照
+- **serena MCP**（最重要・コード編集） - `serena-expert` スキル参照
 - **sequentialthinking MCP**（複雑な問題解決）
 
 ## 🛠️ 開発タスクの実行方法
-### 重要: serena MCPを活用した効率的実装
-**開発タスクを受け取ったら、serena MCPを最大限活用して効率的に実装します。**
+### 重要: /serenaコマンドとserena MCPを活用した効率的実装
+**開発タスクを受け取ったら、`/serena`コマンドとserena MCPを最大限活用して効率的に実装します。**
+
+#### 🚀 /serenaコマンドの活用（トークン効率化）
+
+**積極的に活用すべき場面**:
+- コンポーネント開発、API実装、テスト作成
+- バグ修正、最適化、リファクタリング
+- 複雑な問題の段階的解決
+
+**基本コマンド**:
+```bash
+/serena "機能実装の説明" -q      # 高速実装
+/serena "バグ修正の説明" -c      # コード重視
+/serena "設計の説明" -d -r       # 詳細分析
+```
+
+詳細: `serena-expert` スキル参照
 
 #### 実装の進め方
 1. **タスク受信**: ManagerまたはClaude Codeからタスクと要件を受信
@@ -249,10 +265,11 @@ AskUserQuestion(
    - **変更対象を確認**（親git側 vs submodule内）
    - 親git側変更：`cd wt-feat-xxx`（親gitルート直下）
    - Submodule内変更のみ：`cd submodule1/wt-feat-xxx`（指定されたsubmodule内）
-3. **serena MCPでコード分析**: シンボル検索、依存関係分析（詳細は `mcp-serena` スキル参照）
-4. **serena MCPで編集**: シンボル単位の置換、挿入（詳細は `mcp-serena` スキル参照）
-5. **品質確認**: テスト、lint、型チェック実施（詳細は `testing` スキル参照）
-6. **完了報告**: 成果物と完了状況を報告
+3. **`/serena`コマンドで構造化実装**: トークン効率の高い開発（詳細は `serena-expert` スキル参照）
+4. **serena MCPでコード分析**: シンボル検索、依存関係分析（詳細は `serena-expert` スキル参照）
+5. **serena MCPで編集**: シンボル単位の置換、挿入（詳細は `serena-expert` スキル参照）
+6. **品質確認**: テスト、lint、型チェック実施（詳細は `testing` スキル参照）
+7. **完了報告**: 成果物と完了状況を報告
 
 ### 🌳 Git Worktree作業の必須ルール
 
@@ -292,14 +309,14 @@ AskUserQuestion(
 #### MCP活用の基本原則
 
 **現在利用可能なMCP：**
-1. **serena MCP**: コード編集（最優先・`mcp-serena` スキル参照）
+1. **serena MCP**: コード編集（最優先・`serena-expert` スキル参照）
 2. **sequentialthinking MCP**: 複雑な問題解決
 
 ## 重要な実装原則
 
 **Worktree作業**: 詳細は `git-worktree` スキル参照
 **品質基準**: 関連スキル（`solid-clean-code`、`testing`）参照
-**最適化**: `mcp-serena` スキル参照
+**最適化**: `serena-expert` スキル参照
 
 ## 🔕 待機時の絶対禁止事項
 - 自分から挨拶や提案をしない

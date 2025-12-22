@@ -125,10 +125,36 @@ Task(subagent_type="kusanagi-agent", model="opus", ...)
 Task(subagent_type="tachikoma-agent", model="sonnet", ...)
 ```
 
+### 🚀 /serenaコマンド（トークン効率化ツール）
+
+**全Agentで活用可能な構造化開発コマンド**
+
+`/serena`コマンドは、トークン効率の高い構造化された問題解決を提供します。
+Claude Code本体、Tachikoma、その他すべてのAgentで活用してください。
+
+**使用タイミング**:
+- コンポーネント開発（UI作成、状態管理、ライブラリ統合）
+- API開発（REST/GraphQL、認証、スキーマ設計）
+- システム実装（アーキテクチャ、デザインパターン、リアルタイム機能）
+- テスト（テストスイート、モック、E2E、CI/CD）
+- バグ修正・最適化
+- 複雑な問題の段階的解決
+
+**基本コマンド**:
+```bash
+/serena "ログインバグ修正"           # シンプルな問題解決
+/serena "検索フィルター追加" -q      # 高速実装
+/serena "クエリ最適化" -c            # コード重視
+/serena "認証システム設計" -d -r     # 詳細分析+リサーチ
+```
+
+詳細: `serena-expert` スキル参照
+
 ### 必須使用ケース
 コード修正は必ずAgent使用:
-- 複雑なタスク: Aramaki → Kusanagi → Tachikoma（並列）
-- 軽微な修正: Tachikoma直接起動（worktree情報渡す）
+- **複雑なマルチファイル変更**: Aramaki → Kusanagi → Tachikoma（並列）
+- **軽微な修正**: Tachikoma直接起動（worktree情報渡す）
+- **トークン効率重視**: 各Agentで`/serena`コマンドを積極活用
 
 ### 例外（自分で実行可能）
 ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示
@@ -136,9 +162,9 @@ Task(subagent_type="tachikoma-agent", model="sonnet", ...)
 ### Agent階層
 - **Aramaki** (Opus): 戦略決定、Worktree管理、ユーザー確認
 - **Kusanagi** (Opus): タスク配分、Worktree情報伝達
-- **Tachikoma** (Sonnet): 実装（worktree配下で作業）
+- **Tachikoma** (Sonnet): 実装（worktree配下で作業、`/serena`活用推奨）
 
-詳細: `agent-hierarchy`, `agent-aramaki`, `agent-kusanagi`, `agent-tachikoma` スキル参照
+詳細: `agent-hierarchy`, `agent-aramaki`, `agent-kusanagi`, `agent-tachikoma`, `serena-expert` スキル参照
 
 ### 並列実行鉄則
 - Tachikoma起動は1メッセージで同時実行

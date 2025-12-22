@@ -135,7 +135,7 @@ Developer Agentは4つの専門性を持ちます：
 - **agent-hierarchy**: Agent階層全体の理解
 - **agent-kusanagi**: Managerからの指示の理解
 - **git-worktree**: Worktree作業の詳細
-- **mcp-serena**: serena MCPの詳細使用法
+- **serena-expert**: serena MCPの詳細使用法
 - **security-codeguard**: CodeGuard実行の詳細
 - **solid-clean-code**: コード品質基準
 - **type-safety**: 型安全性の遵守

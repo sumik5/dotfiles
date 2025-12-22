@@ -502,7 +502,7 @@ find . -name "*.temp" -delete
 
 ### 最適化
 
-**詳細は`mcp-serena`スキルを参照してください。**
+**詳細は`serena-expert`スキルを参照してください。**
 
 **要点:**
 - serena MCPでシンボル単位編集
@@ -531,4 +531,4 @@ find . -name "*.temp" -delete
 - **testing** - テスト戦略
 - **security-codeguard** - セキュリティ基準
 - **technical-writing** - ドキュメント作成の原則
-- **mcp-serena** - 効率的なコード編集
+- **serena-expert** - 効率的なコード編集

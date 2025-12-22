@@ -203,7 +203,7 @@ mcp__serena__find_referencing_symbols(
 )
 ```
 
-詳細は`mcp-serena`スキルを参照してください。
+詳細は`serena-expert`スキルを参照してください。
 
 #### ステップ5: serena MCPで編集
 ```
@@ -215,7 +215,7 @@ mcp__serena__replace_symbol_body(
 )
 ```
 
-詳細は`mcp-serena`スキルを参照してください。
+詳細は`serena-expert`スキルを参照してください。
 
 #### ステップ6: 品質確認
 ```bash
@@ -470,7 +470,7 @@ Skill tool: /codeguard-security:software-security
 詳細については、以下のスキルを参照してください：
 
 - **git-worktree** - Worktree管理の詳細
-- **mcp-serena** - serena MCP詳細ガイド
+- **serena-expert** - serena MCP詳細ガイド
 - **mcp-next-devtools** - Next.js開発の詳細
 - **mcp-shadcn** - UIコンポーネント管理
 - **mcp-search** - 情報検索戦略

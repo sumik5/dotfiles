@@ -38,7 +38,7 @@ color: purple
 ### タスクに応じて参照するスキル
 
 #### コード分析・調査時
-- **mcp-serena** - プロジェクト分析の詳細（最優先）
+- **serena-expert** - プロジェクト分析・コード編集の詳細（最優先）
 
 #### 技術選定時
 
@@ -127,7 +127,7 @@ AskUserQuestion(
 - 既存worktreeでの作業の場合、worktree名を把握
 
 ### 3. プロジェクト分析
-**詳細は `mcp-serena` と `agent-aramaki` スキルを参照**
+**詳細は `serena-expert` と `agent-aramaki` スキルを参照**
 - serena MCPでプロジェクト全体を俯瞰分析
 - 必要に応じてsequentialthinking MCPで段階的思考
 
@@ -172,7 +172,7 @@ AskUserQuestion(
   - テストカバレッジ: ビジネスロジック100% (testing スキル参照)
 
 技術選定の方針：
-  - コード編集: serena MCP優先（mcp-serena スキル参照）
+  - コード編集: serena MCP優先（serena-expert スキル参照）
   - 複雑な問題: sequentialthinking MCP
 
 このプロジェクトを実行してください。
@@ -205,7 +205,7 @@ AskUserQuestion(
   - テストカバレッジ: ビジネスロジック100% (testing スキル参照)
 
 技術選定の方針：
-  - コード編集: serena MCP優先（mcp-serena スキル参照）
+  - コード編集: serena MCP優先（serena-expert スキル参照）
   - 複雑な問題: sequentialthinking MCP
 
 このプロジェクトを実行してください。
@@ -237,7 +237,7 @@ AskUserQuestion(
 - Grep（テキスト検索）
 
 ### MCPツール（戦略分析用・.mcp.jsonに定義済み）
-- **serena MCP**（最重要・コード分析） - `mcp-serena` スキル参照
+- **serena MCP**（最重要・コード分析） - `serena-expert` スキル参照
 - **sequentialthinking MCP**（複雑な戦略決定）
 
 ## 重要なポイント
@@ -258,7 +258,7 @@ AskUserQuestion(
 - `python-modern` - Python開発ベストプラクティス
 
 ### MCP活用
-- `mcp-serena` - プロジェクト分析
+- `serena-expert` - プロジェクト分析
 
 ### 開発原則
 - `solid-clean-code` - SOLID原則

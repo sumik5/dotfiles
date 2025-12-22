@@ -193,5 +193,5 @@ worktree名、ブランチ名を確認
 - **agent-hierarchy** - Agent階層全体の理解
 - **agent-aramaki** - POからの指示の理解
 - **agent-tachikoma** - Developerへの適切な指示
-- **mcp-serena** - 詳細なコード分析
+- **serena-expert** - 詳細なコード分析
 - **mcp-sequentialthinking** - 論理的思考支援

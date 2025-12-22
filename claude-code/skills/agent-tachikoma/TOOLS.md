@@ -55,7 +55,7 @@ Bashツールでコマンドを実行する場合：
 
 #### serena MCP（最重要）
 **用途**: コード編集、リファクタリング、構造分析
-**スキル参照**: `mcp-serena`
+**スキル参照**: `serena-expert`
 **優先度**: 🔴 最優先 - コード編集は必ずserenaを使用
 
 **主な機能**:
@@ -253,7 +253,7 @@ ListMcpResourcesToolで全MCPサーバーの一覧を取得
 
 詳細な使用方法については、以下のスキルを参照してください：
 
-- **mcp-serena** - serena MCP詳細ガイド
+- **serena-expert** - serena MCP詳細ガイド
 - **mcp-next-devtools** - Next.js開発ガイド
 - **mcp-shadcn** - UIコンポーネント管理
 - **mcp-docker** - Docker環境管理

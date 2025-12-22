@@ -487,7 +487,7 @@ POST /api/auth/login
 
 - **agent-hierarchy** - Agent階層全体の理解
 - **agent-kusanagi** - Managerからの指示の理解
-- **mcp-serena** - コード編集の詳細
+- **serena-expert** - コード編集の詳細
 - **mcp-next-devtools** - Next.js開発の詳細
 - **mcp-shadcn** - UIコンポーネント管理
 - **mcp-docker** - インフラ構築

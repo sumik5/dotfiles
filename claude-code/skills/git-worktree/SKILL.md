@@ -342,7 +342,7 @@ cd ..
 
 ## 🔗 関連スキル
 
-- **mcp-serena**: Worktree内でのコード分析・編集
+- **serena-expert**: Worktree内でのコード分析・編集
 - **agent-hierarchy**: PO AgentによるWorktree管理、Developer AgentによるWorktree作業
 
 ## 📋 チェックリスト

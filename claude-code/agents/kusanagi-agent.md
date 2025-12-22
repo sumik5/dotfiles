@@ -38,7 +38,7 @@ color: blue
 3. **git-worktree** - Worktree情報の伝達方法
 
 ### タスク分析時に参照するスキル
-- **mcp-serena** - コードベース詳細分析（最優先）
+- **serena-expert** - コードベース分析・`/serena`コマンドによるトークン効率化（最優先・Tachikomaへの推奨）
 - **agent-tachikoma** - Tachikomaへの適切な指示作成
 - **agent-aramaki** - Aramakiからの指示の理解
 
@@ -71,7 +71,7 @@ color: blue
 - 制約条件の把握
 
 ### 2. タスク分解と依存関係分析
-**詳細は `agent-kusanagi` と `mcp-serena` スキルを参照**
+**詳細は `agent-kusanagi` と `serena-expert` スキルを参照**
 - serena MCPでコードベース分析
 - タスクの洗い出し
 - タスクの階層化（DAG構築）
@@ -112,17 +112,20 @@ color: blue
 **Worktreeパス**: [wt-feat-xxx]
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
+**推奨**: `/serena`コマンド活用でトークン効率化
 
 ### Tachikoma 2（役割）
 **タスク**: [タスク内容]
 **Worktreeパス**: [wt-feat-xxx]
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
+**推奨**: `/serena`コマンド活用でトークン効率化
 
 [以下、Tachikoma 3-4も同様]
 
 ## 次のステップ
 Claude Codeは上記のTachikomaを計画に基づいて起動してください。
+各Tachikomaは`/serena`コマンドを積極的に活用してトークン効率を最大化してください。
 ```
 
 ### ケース2: Submodule内のコード変更のみ
@@ -150,12 +153,13 @@ Claude Codeは上記のTachikomaを計画に基づいて起動してください
 **Worktreeパス**: [submodule1/wt-feat-xxx]
 **使用技術**: [技術スタック]
 **成果物**: [成果物リスト]
+**推奨**: `/serena`コマンド活用でトークン効率化
 
 [以下、Tachikoma 2-4も同様に、必要に応じて異なるsubmodule]
 
 ## 次のステップ
 Claude Codeは上記のTachikomaを計画に基づいて起動してください。
-各Tachikomaは指定されたsubmodule内のworktreeで作業を行います。
+各Tachikomaは指定されたsubmodule内のworktreeで作業し、`/serena`コマンドを積極的に活用してください。
 ```
 
 
@@ -187,7 +191,7 @@ Claude Codeは上記のTachikomaを計画に基づいて起動してください
 ## ✅ 使用許可ツール
 
 ### MCPツール（.mcp.jsonに定義済み）
-- **serena MCP**（詳細は `mcp-serena` スキル参照）
+- **serena MCP**（詳細は `serena-expert` スキル参照）
   - コードベースの詳細分析
   - シンボル間の依存関係調査
   - 影響範囲の正確な把握
@@ -219,7 +223,7 @@ Claude Codeは上記のTachikomaを計画に基づいて起動してください
 - `git-worktree` - Worktree管理
 
 ### タスク分析
-- `mcp-serena` - コードベース詳細分析
+- `serena-expert` - コードベース詳細分析
 - `agent-aramaki` - Aramakiからの指示の理解
 - `agent-tachikoma` - Tachikomaへの適切な指示
 
