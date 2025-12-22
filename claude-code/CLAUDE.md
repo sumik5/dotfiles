@@ -32,15 +32,8 @@
 1. `.serena`確認 → なければ`serena`初期化
 2. オンボーディング実施
 3. プロジェクト構造把握
-4. プロジェクト種別検出（Next.js/Python）→ 言語固有スキル自動適用
 
 **注**: serena MCPは自動的にオンデマンドで起動されます
-
-**検出条件**:
-- Next.js: `package.json`に`"next"`または`next.config.*`存在
-- Python: `pyproject.toml`または`requirements.txt`存在
-- Docker: `Dockerfile`または`docker-compose.yml`存在
-- Frontend UI: Figma URL提供時、UI/コンポーネント構築指示時
 
 ---
 
@@ -125,14 +118,6 @@ Task(subagent_type="tachikoma", model="sonnet", ...)
 - Tachikoma起動は1メッセージで同時実行
 - 独立タスクは絶対に並列化
 - Agent定義ファイルは最初に1回だけ読み込む
-
----
-
-## 🔒 セキュリティ
-
-### CodeGuard（必須）
-- コード実装完了時に必ず実行: `/codeguard-security:software-security`
-- Tachikoma Agentが実装後に自動実行
 
 ---
 

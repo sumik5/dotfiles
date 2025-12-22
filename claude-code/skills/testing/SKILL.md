@@ -1,6 +1,6 @@
 ---
 name: testing
-description: テスト実装とTDDのための包括的ガイド。新機能実装前のテスト作成、バグ修正時の再現テスト、リファクタリング時の回帰テスト、コードレビュー時のカバレッジ確認に使用してください。AAAパターン、テストカバレッジ100%目標。
+description: Provides comprehensive testing and TDD guidance. Use for writing tests before implementing new features, creating reproduction tests for bug fixes, running regression tests during refactoring, and checking test coverage during code reviews. Enforces AAA pattern and 100% coverage goal.
 ---
 
 # テストファーストアプローチ
@@ -177,7 +177,7 @@ test('user registration flow', async ({ page }) => {
 
 ## 🔗 関連スキル
 
-- **solid-clean-code** - テスタブルな設計原則
-- **type-safety** - 型安全なテストコード
+- **applying-solid-principles** - テスタブルな設計原則
+- **enforcing-type-safety** - 型安全なテストコード
 - **mcp-browser-auto** - E2Eテスト実装
-- **agent-developer** - Developer Agent実装ガイド
+- **implementing-as-tachikoma** - Developer Agent実装ガイド
