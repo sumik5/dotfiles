@@ -67,7 +67,6 @@
     "padding": 0
   },
   "enabledPlugins": {
-    "codeguard-security@project-codeguard-ja": true,
     "claude-mem@thedotmack": true,
     "code-review@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
@@ -77,7 +76,15 @@
     "security-guidance@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
+    "gopls-lsp@claude-plugins-official": true,
+    "serena@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true,
+    "slack@claude-plugins-official": true,
+    "mcp-toolkit@docker": true,
+    "Notion@claude-plugins-official": true,
+    "codeguard-security@project-codeguard": true
   },
   "outputStyle": "Explanatory",
   "alwaysThinkingEnabled": true

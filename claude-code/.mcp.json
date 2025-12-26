@@ -1,14 +1,4 @@
 {
   "mcpServers": {
-    "mcp-router": {
-      "command": "/Users/sumik/.local/share/mise/shims/npx",
-      "args": [
-        "-y",
-        "modular-mcp"
-      ],
-      "env": {
-        "MODULAR_MCP_CONFIG": "/Users/sumik/.config/claude-code/modular-mcp.json"
-      }
-    }
   }
 }

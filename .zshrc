@@ -76,6 +76,7 @@ alias ll='ls -vl'
 alias greps='rg --hidden -p'
 alias claude='claude --dangerously-skip-permissions'
 alias brew="arch -arm64 brew"
+alias gcautog="gcauto -m gemini"
 
 
 # -------------------------------------------------
@@ -401,3 +402,6 @@ export PATH="/Users/sumik/.antigravity/antigravity/bin:$PATH"
 # Added by LM Studio CLI (lms)
 export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 # End of LM Studio CLI section
+#
+export ENABLE_LSP_TOOL=1
+
