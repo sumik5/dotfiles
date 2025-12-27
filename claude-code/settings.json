@@ -40,6 +40,17 @@
     "defaultMode": "default"
   },
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/format-on-save.sh"
+          }
+        ]
+      }
+    ],
     "Notification": [
       {
         "hooks": [
