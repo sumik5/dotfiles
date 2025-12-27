@@ -92,11 +92,13 @@
     "github@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
-    "slack@claude-plugins-official": true,
     "mcp-toolkit@docker": true,
-    "Notion@claude-plugins-official": true,
     "codeguard-security@project-codeguard": true
   },
   "outputStyle": "Explanatory",
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "fileSuggestion": {
+    "type": "command",
+    "command": "~/.claude/scripts/file-suggestion.sh"
+  }
 }
