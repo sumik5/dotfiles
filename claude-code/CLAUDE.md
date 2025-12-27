@@ -24,6 +24,11 @@
 - **新規作業時**: 必ずユーザー確認してworktree作成提案
 - **勝手な作成・削除禁止**
 
+### ライブラリ優先（車輪の再発明禁止）
+- **実装前に必ず既存ライブラリを調査**
+- 自作は「適切なライブラリが存在しない」場合のみ
+- 調査せずに実装を始めることは禁止
+
 ---
 
 ## 🎯 Quick Start
@@ -123,10 +128,15 @@ Task(subagent_type="tachikoma", model="sonnet", ...)
 
 ## 💡 ベストプラクティス
 
+### ツール選択
 - **検索**: Grepツール（ripgrep）最優先
 - **ファイル検索**: Globツール
 - **ファイル読込**: Readツール
 - **❌ 避ける**: Bashで`grep`, `find`, `cat`
+
+### 📦 ライブラリ調査（実装前必須）
+
+→ **詳細は [researching-libraries](~/.claude/skills/researching-libraries/SKILL.md) スキル参照**
 
 ---
 
