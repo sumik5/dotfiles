@@ -1,7 +1,12 @@
 {
+  "fileSuggestion": {
+    "type": "command",
+    "command": "~/.claude/scripts/file-suggestion.sh"
+  },
   "cleanupPeriodDays": 90,
   "env": {
-    "USE_BUILTIN_RIPGREP": "1"
+    "USE_BUILTIN_RIPGREP": "1",
+    "ENABLE_TOOL_SEARCH": "true"
   },
   "permissions": {
     "allow": [
@@ -80,25 +85,21 @@
   "enabledPlugins": {
     "claude-mem@thedotmack": true,
     "code-review@claude-plugins-official": true,
-    "context7@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "figma@claude-plugins-official": true,
     "playwright@claude-plugins-official": true,
     "security-guidance@claude-plugins-official": true,
-    "typescript-lsp@claude-plugins-official": true,
     "pyright-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true,
     "serena@claude-plugins-official": true,
     "github@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "plugin-dev@claude-plugins-official": true,
     "mcp-toolkit@docker": true,
-    "codeguard-security@project-codeguard": true
+    "codeguard-security@project-codeguard": true,
+    "context7-skill@context7-skill": false,
+    "typescript-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
   },
   "outputStyle": "Explanatory",
-  "alwaysThinkingEnabled": true,
-  "fileSuggestion": {
-    "type": "command",
-    "command": "~/.claude/scripts/file-suggestion.sh"
-  }
+  "alwaysThinkingEnabled": true
 }
