@@ -3,7 +3,7 @@
 ## 🌐 言語設定（絶対遵守）
 
 **CRITICAL: すべての応答は必ず日本語で行う**
-- Claude Code本体、全Agent（Aramaki/Kusanagi/Tachikoma）の応答
+- Claude Code本体、全Agentの応答
 - タスク報告、エラーメッセージ、コード内コメント
 - 例外: 技術用語、ライブラリ名、プログラミングキーワード
 
@@ -26,6 +26,7 @@
 
 ### ライブラリ優先（車輪の再発明禁止）
 - **実装前に必ず既存ライブラリを調査**
+- researching-libraries スキル参照して事前調査をおこなうこと
 - 自作は「適切なライブラリが存在しない」場合のみ
 - 調査せずに実装を始めることは禁止
 
@@ -43,17 +44,9 @@
 2. オンボーディング実施
 3. プロジェクト構造把握
 
-**注**: serena MCPは自動的にオンデマンドで起動されます
-
 ---
 
 ## 📚 MCP使用ガイド
-
-### modular-mcp の仕組み
-**すべてのMCPはmodular-mcpによってオンデマンドで起動されます**
-- コンテキスト量を大幅削減（常時起動なし）
-- 必要な時に自動的に適切なMCPを選択・起動
-- 設定: `~/.config/claude-code/modular-mcp.json`
 
 ### 最優先MCP（必須）
 - **serena**: コード分析・編集（プロジェクト作業前に必ず初期化）
@@ -76,19 +69,6 @@
 ---
 
 ## 🤖 Agent使用ルール
-
-### モデル選択（必須）
-- **Claude Code本体**: Opus（デフォルト）
-- **Aramaki Agent**: Opus（戦略決定に高性能モデル）
-- **Kusanagi Agent**: Opus（タスク分析に高性能モデル）
-- **Tachikoma Agent**: Sonnet（実装に効率的モデル）
-
-Task tool起動時に必ず`model`パラメータを指定：
-```
-Task(subagent_type="aramaki", model="opus", ...)
-Task(subagent_type="kusanagi", model="opus", ...)
-Task(subagent_type="tachikoma", model="sonnet", ...)
-```
 
 ### 🚀 /serenaコマンド（トークン効率化ツール）
 
@@ -131,46 +111,13 @@ Task(subagent_type="tachikoma", model="sonnet", ...)
 
 ---
 
-## 💡 ベストプラクティス
-
-### ツール選択
-- **検索**: Grepツール（ripgrep）最優先
-- **ファイル検索**: Globツール
-- **ファイル読込**: Readツール
-- **❌ 避ける**: Bashで`grep`, `find`, `cat`
-
-### 📦 ライブラリ調査（実装前必須）
-
-→ **詳細は [researching-libraries](~/.claude/skills/researching-libraries/SKILL.md) スキル参照**
-
----
-
-## 🎯 トークン管理
-
-### 監視（必須）
-- **95%以上**: 即座にコンパクション実行
-- **90%以上**: 次タスク前にコンパクション推奨
-- **85%以上**: コンパクション検討
-
-### コンパクション手順（自動化）
-1. ユーザー通知（使用率XX%）
-2. コンパクション実行
-3. `/reload`実行（必須）
-4. 確認メッセージ
-
-### トークン節約
-- serena MCP最大活用（ファイル全体読み込み避ける）
-- Task tool活用（大規模調査は専用エージェント委任）
-
----
-
 ## 🔄 メンテナンス
 
 ### 日次
-serena再アクティベート、worktree削除（`git worktree prune`）
+serena再アクティベート
 
 ### 週次
 serenaメモリ整理、claude-memデータベース整合性確認、worktree一覧確認
 
 ### 月次
-MCPサーバー更新確認、claude-memワーカー再起動
+claude-memワーカー再起動
