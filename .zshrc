@@ -35,19 +35,6 @@ autoload -Uz chpwd_recent_dirs cdr add-zsh-hook
 
 setopt prompt_subst
 
-
-#zstyle ':vcs_info:*' formats '(%s)-[%b]'
-#zstyle ':vcs_info:*' actionformats '(%s)-[%b|%a]'
-
-#function _update_vcs_info_msg() {
-#  psvar=()
-#  LANG=US.UTF-8 vcs_info
-#  psvar[1]="$vcs_info_msg_0_"
-#}
-#
-#add-zsh-hook precmd _update_vcs_info_msg
-#RPROMPT="%v"
-
 # 文字入力時にURLをエスケープする
 zle -N self-insert url-quote-magic
 
@@ -77,7 +64,6 @@ alias greps='rg --hidden -p'
 alias claude='claude --dangerously-skip-permissions'
 alias brew="arch -arm64 brew"
 alias gcautog="gcauto -m gemini"
-
 
 # -------------------------------------------------
 # user environment
@@ -160,7 +146,7 @@ zplug "mafredri/zsh-async", from:github
 # for MacOS
 zplug "modules/osx", from:prezto, if:"[[ $OSTYPE == *darwin* ]]"
 zplug "lib/clipboard", from:oh-my-zsh, if:"[[ $OSTYPE == *darwin* ]]"
-zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
+#zplug "spaceship-prompt/spaceship-prompt", use:spaceship.zsh, from:github, as:theme
 
 if ! zplug check; then
   zplug install
@@ -229,6 +215,8 @@ if command -v starship &> /dev/null; then
   eval "$(starship completions zsh)"
   eval "$(starship init zsh)"
 fi
+
+export STARSHIP_CONFIG="$HOME/.starship.toml"
 
 PYENV_VIRTUALENV_DISABLE_PROMPT=1
 
