@@ -27,16 +27,7 @@ echo ""
 
 # 各ファイル・ディレクトリのシンボリックリンクを作成
 create_symlink_if_not_exists "$DOTFILES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-create_symlink_if_not_exists "$DOTFILES_DIR/agents" "$CLAUDE_DIR/agents"
-create_symlink_if_not_exists "$DOTFILES_DIR/commands" "$CLAUDE_DIR/commands"
-create_symlink_if_not_exists "$DOTFILES_DIR/instructions" "$CLAUDE_DIR/instructions"
-create_symlink_if_not_exists "$DOTFILES_DIR/plugins" "$CLAUDE_DIR/plugins"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
-create_symlink_if_not_exists "$DOTFILES_DIR/statusline.js" "$CLAUDE_DIR/statusline.js"
-create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
-create_symlink_if_not_exists "$DOTFILES_DIR/skills" "$CLAUDE_DIR/skills"
-create_symlink_if_not_exists "$DOTFILES_DIR/modular-mcp.json" "$CLAUDE_DIR/modular-mcp.json"
-create_symlink_if_not_exists "$DOTFILES_DIR/scripts" "$CLAUDE_DIR/scripts"
 
 echo ""
 echo "完了しました"
