@@ -2,7 +2,7 @@ local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
 config.automatically_reload_config = true
-config.font_size = 11.0
+config.font_size = 21.0
 config.font = wezterm.font("Moralerspace Argon HW", {weight="Regular", stretch="Normal", style="Normal"})
 config.font = wezterm.font_with_fallback({
   { family = "Moralerspace Argon HW" }
