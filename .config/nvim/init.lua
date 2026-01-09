@@ -1,10 +1,5 @@
 vim.opt.clipboard = "unnamedplus"
 
-require("config.lazy")
-
-require("mason").setup()
-require("mason-lspconfig").setup()
-
 -- 以下は LS から受け取ったエラーなどの診断情報を表示するのに必要
 vim.diagnostic.config()
 
@@ -14,3 +9,7 @@ vim.g.maplocalleader = " "
 
 vim.keymap.set('n', '<Leader>ee', ':NvimTreeToggle<CR>')
 
+require("config.lazy")
+
+require("mason").setup()
+require("mason-lspconfig").setup()
