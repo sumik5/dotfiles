@@ -28,6 +28,7 @@ echo ""
 # 各ファイル・ディレクトリのシンボリックリンクを作成
 create_symlink_if_not_exists "$DOTFILES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
+create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
 
 echo ""
 echo "完了しました"
