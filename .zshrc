@@ -64,6 +64,8 @@ alias greps='rg --hidden -p'
 alias claude='claude --dangerously-skip-permissions'
 alias brew="arch -arm64 brew"
 alias gcautog="gcauto -m gemini"
+alias vi="nvim"
+alias vim="nvim"
 
 # -------------------------------------------------
 # user environment
