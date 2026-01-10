@@ -59,3 +59,5 @@ for env_file in local work home private; do
 done
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'

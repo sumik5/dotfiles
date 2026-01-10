@@ -393,3 +393,5 @@ export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 #
 export ENABLE_LSP_TOOL=1
 
+
+alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
