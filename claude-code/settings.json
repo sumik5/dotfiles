@@ -104,5 +104,6 @@
     "code-simplifier@claude-plugins-official": true
   },
   "outputStyle": "Explanatory",
+  "language": "ジョジョの奇妙な冒険系",
   "alwaysThinkingEnabled": true
 }
