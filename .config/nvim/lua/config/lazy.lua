@@ -40,3 +40,21 @@ vim.api.nvim_create_autocmd("VimEnter", {
     require("lazy").sync({ show = false })
   end,
 })
+
+-- 初期化 色などはsetup引数で調整可能
+local undo_glow = require('undo-glow')
+undo_glow.setup()
+
+-- u/Uでundo/redo
+vim.keymap.set('n', 'u', undo_glow.undo, { desc = 'Undo with highlight' })
+vim.keymap.set('n', 'U', undo_glow.redo, { desc = 'Redo with highlight' })
+
+-- p/Pでペーストし、`]でペースト範囲の末尾へ飛ぶ
+vim.keymap.set('n', 'p', function()
+  undo_glow.paste_below()
+  vim.cmd.normal({ args = { '`]' }, bang = true })
+end, { desc = 'Paste below with highlight' })
+vim.keymap.set('n', 'P', function()
+  undo_glow.paste_above()
+  vim.cmd.normal({ args = { '`]' }, bang = true })
+end, { desc = 'Paste above with highlight' })
