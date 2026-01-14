@@ -8,8 +8,6 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.opt.number = true
 
-vim.keymap.set('n', '<Leader>ee', ':NvimTreeToggle<CR>')
-
 require("config.lazy")
 
 require("mason").setup()
