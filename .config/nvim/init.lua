@@ -1,7 +1,22 @@
 vim.opt.clipboard = "unnamedplus"
 
 --LS から受け取ったエラーなどの診断情報を表示するのに必要
-vim.diagnostic.config()
+--vim.diagnostic.config({ severity_sort = true })
+vim.diagnostic.config({
+  virtual_text = {
+    format = function(diagnostic)
+      return string.format("%s (%s: %s)", diagnostic.message, diagnostic.source, diagnostic.code)
+    end,
+  },
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = "",
+      [vim.diagnostic.severity.WARN] = "",
+      [vim.diagnostic.severity.INFO] = "",
+      [vim.diagnostic.severity.HINT] = "",
+    },
+  },
+})
 
 -- Leaderキーをスペースに設定
 vim.g.mapleader = " "
@@ -11,8 +26,10 @@ vim.opt.conceallevel = 2
 
 require("config.lazy")
 
-require("mason").setup()
-require("mason-lspconfig").setup()
+require('mason').setup()
+require('mason-lspconfig').setup({
+    automatic_enable = true
+})
 
 -- telescope ---------------------------------------------------------------------------------
 
@@ -45,3 +62,10 @@ end, { desc = 'Paste above with highlight' })
 -- gitsigns  ---------------------------------------------------------------------------------
 
 require('gitsigns').setup {}
+
+require("nvim-treesitter").setup({})
+
+--vim.api.nvim_create_autocmd('FileType', {
+--  pattern = { '<filetype>' },
+--  callback = function() vim.treesitter.start() end,
+--})
