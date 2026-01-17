@@ -26,6 +26,9 @@ vim.opt.conceallevel = 2
 
 require("config.lazy")
 
+-- カラースキームを設定（Treesitterハイライトに必要）
+vim.cmd('colorscheme habamax')
+
 require('mason').setup()
 require('mason-lspconfig').setup({
     automatic_enable = true
@@ -64,8 +67,3 @@ end, { desc = 'Paste above with highlight' })
 require('gitsigns').setup {}
 
 require("nvim-treesitter").setup({})
-
---vim.api.nvim_create_autocmd('FileType', {
---  pattern = { '<filetype>' },
---  callback = function() vim.treesitter.start() end,
---})
