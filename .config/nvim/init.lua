@@ -62,8 +62,14 @@ vim.keymap.set('n', 'P', function()
   vim.cmd.normal({ args = { '`]' }, bang = true })
 end, { desc = 'Paste above with highlight' })
 
--- gitsigns  ---------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------
 
 require('gitsigns').setup {}
 
 require("nvim-treesitter").setup({})
+
+vim.lsp.config("lua_ls", {
+    settings = {
+        Lua = {
+            diagnostics = {
+                globals = { "vim" }}}}})
