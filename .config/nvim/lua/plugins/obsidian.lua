@@ -6,7 +6,6 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "hrsh7th/nvim-cmp",
-    "preservim/vim-markdown",
     "nvim-treesitter/nvim-treesitter"
   },
   opts = {
