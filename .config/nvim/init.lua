@@ -73,3 +73,6 @@ vim.lsp.config("lua_ls", {
         Lua = {
             diagnostics = {
                 globals = { "vim" }}}}})
+
+require "lsp_signature".setup({})
+

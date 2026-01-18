@@ -218,6 +218,10 @@ if command -v starship &> /dev/null; then
   eval "$(starship init zsh)"
 fi
 
+if command -v colima &> /dev/null; then
+  eval "$(colima completion zsh)"
+fi
+
 export STARSHIP_CONFIG="$HOME/.starship.toml"
 
 PYENV_VIRTUALENV_DISABLE_PROMPT=1
