@@ -65,8 +65,8 @@
 
 ### コード修正
 - **Claude Code本体は絶対にコードを直接修正しない**
-- コード修正は必ずAgent使用（Aramaki→Kusanagi→Tachikoma）
-- 例外: ファイル読み込み、質問回答のみ
+- コード修正は必ずTachikomaに委譲
+- 例外: ファイル読み込み、質問回答、計画・設計ドキュメント作成のみ
 
 ### Git操作禁止
 - **絶対禁止**: `git add`, `commit`, `push`, `merge`, `rebase`
@@ -143,19 +143,22 @@
 
 ---
 
-## 🤖 Agent階層システム
+## 🤖 Tachikomaシステム
 
-### Agent概要
+### 概要
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
-| **Aramaki** | Opus | 戦略決定、Worktree管理、ユーザー確認 | ❌コード編集、❌Git書込、❌Kusanagi直接起動 |
-| **Kusanagi** | Opus | タスク分解、配分計画作成 | ❌コード編集、❌Tachikoma直接起動、❌worktree作成 |
-| **Tachikoma** | Sonnet | 実装（worktree配下で作業） | ❌worktree勝手作成、❌Git書込、❌指定外worktreeでの作業 |
+| **Tachikoma** | Sonnet | 実装（worktree配下で作業）、軽微〜複雑なすべての実装タスク | ❌worktree勝手作成、❌Git書込、❌指定外worktreeでの作業 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
+
+**補足:**
+- Claude Code本体が計画・設計を担当（docs/に計画ドキュメント作成）
+- Tachikomaが実際の実装を担当
+- 並列実行時はtachikoma1-4として複数起動可能
 
 ### 🚀 /serenaコマンド（トークン効率化ツール）
 
-**全Agentで活用可能な構造化開発コマンド**
+**構造化開発コマンド**
 
 **使用タイミング**:
 - コンポーネント開発（UI作成、状態管理、ライブラリ統合）
@@ -174,17 +177,17 @@
 ```
 
 ### 必須使用ケース
-コード修正は必ずAgent使用:
-- **複雑なマルチファイル変更**: Aramaki → Kusanagi → Tachikoma（並列）
+コード修正はTachikomaに委譲:
+- **複雑なマルチファイル変更**: Claude Code本体が計画作成 → Tachikoma1-4（並列）
 - **軽微な修正**: Tachikoma直接起動（worktree情報渡す）
-- **トークン効率重視**: 各Agentで`/serena`コマンドを積極活用
+- **トークン効率重視**: `/serena`コマンドを積極活用
 
 ### 例外（Claude Code本体で実行可能）
-ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示
+ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示、計画・設計ドキュメント作成
 
-### 並列実行鉄則
-- Tachikoma起動は1メッセージで同時実行
-- 独立タスクは絶対に並列化
+### 並列実行
+- 複数タスクの場合、Tachikoma1-4を1メッセージで同時起動
+- 独立タスクは並列化
 - Agent定義ファイルは最初に1回だけ読み込む
 
 ### 実装フロー
@@ -193,18 +196,15 @@
     ↓
 Claude Code（状況判断）
     ↓
-【複雑なコード修正？】
-    ├─ Yes → Aramaki起動
-    │   ↓ 戦略決定 + Worktree作成判定（ユーザー確認）
-    │   ↓ Kusanagi起動
-    │   ↓ タスク分解 + 配分計画作成
-    │   ↓ Claude Code（計画に基づき）
-    │   ↓ Tachikoma1-4 並列起動
+【コード修正が必要？】
+    ├─ Yes → 計画をdocs/に作成（複雑な場合）
+    │   ↓ ユーザー確認（必要に応じてWorktree作成）
+    │   ↓ Tachikoma起動（複数タスク時は並列）
     │   ↓ /serena で効率的実装
     │   ↓ CodeGuard実行（必須）
     │   ↓ 完了報告
     │
-    └─ No → 直接実行（読み込み・質問等）
+    └─ No → 直接実行（読み込み・質問・設計等）
 ```
 
 ---
@@ -251,13 +251,10 @@ Claude Code（状況判断）
 
 ## 📚 スキル一覧
 
-### 🔴 Agent階層関連（最重要）
+### 🔴 Tachikoma関連
 | スキル | 用途 |
 |--------|------|
-| `managing-agent-hierarchy` | Agent階層全体管理（必読） |
-| `managing-as-aramaki` | PO Agent運用ガイド |
-| `coordinating-as-kusanagi` | Manager Agent運用ガイド |
-| `implementing-as-tachikoma` | Developer Agent運用ガイド |
+| `implementing-as-tachikoma` | Tachikoma Agent運用ガイド |
 
 ### 🟡 Worktree・Git管理
 | スキル | 用途 |
