@@ -10,7 +10,7 @@ mkdir -p "$CLAUDE_DIR"
 create_symlink_if_not_exists() {
     local source=$1
     local target=$2
-    
+
     if [ -L "$target" ]; then
         echo "スキップ: $target (既にシンボリックリンクが存在します)"
     elif [ -e "$target" ]; then
@@ -29,6 +29,7 @@ echo ""
 create_symlink_if_not_exists "$DOTFILES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
 create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
+create_symlink_if_not_exists "$DOTFILES_DIR/rules" "$CLAUDE_DIR/rules"
 
 echo ""
 echo "完了しました"

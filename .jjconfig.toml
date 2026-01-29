@@ -1,0 +1,10 @@
+[aliases]
+# fetch + rebase を一発で。これめっちゃ使う
+pull = ["util", "exec", "--", "sh", "-c", "jj git fetch && jj rebase -d main"]
+
+# 状態確認（stは打ちやすい）
+st = ["status"]
+l = ["log", "-n", "10"]
+
+# mainから新しい作業開始
+fresh = ["new", "main"]

@@ -68,18 +68,21 @@
 - コード修正は必ずTachikomaに委譲
 - 例外: ファイル読み込み、質問回答、計画・設計ドキュメント作成のみ
 
-### Git操作禁止
-- **絶対禁止**: `git add`, `commit`, `push`, `merge`, `rebase`
-- 許可: `git status`, `diff`, `log`, `branch`, `worktree list`, `submodule status`
+### バージョン管理（Jujutsu）
+- **Jujutsu (jj) を使用** - gitコマンドは原則使用禁止（`jj git`サブコマンドを除く）
+- **Conventional Commits形式必須**: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`等
+- **jj書込操作禁止**: `jj new`, `jj commit`, `jj describe`, `jj push`等はユーザー確認必須
+- 許可: `jj status`, `jj diff`, `jj log`, `jj bookmark list`
+- 詳細は `rules/jujutsu.md` 参照
 
-### Worktree管理（🔴 最重要）
-- **新規作業時**: 必ずユーザー確認してworktree作成提案
+### 作業管理（🔴 最重要）
+- **新規作業時**: 必ずユーザー確認して新しいchangeとbookmark作成を提案
 - **勝手な作成・削除禁止**
-- **Submodule環境での注意**:
-  1. 最初に `ls -la .gitmodules` と `git submodule status` で確認
-  2. 親git側コード変更 → 親gitルートにworktree作成
-  3. **Submodule内コード変更 → 対象submodule内にのみworktree作成**
-  4. ❌ **Submodule内変更なのに親gitにworktree作成は絶対禁止**
+- **基本ワークフロー**:
+  1. `jj new` で新しいchangeを開始
+  2. `jj bookmark set <name>` でbookmarkを設定
+  3. 別作業への移動は `jj edit <revision>`
+- 詳細は `rules/jujutsu.md` 参照
 
 ### ライブラリ優先（車輪の再発明禁止）
 - **実装前に必ず既存ライブラリを調査**
@@ -111,7 +114,7 @@
 
 ### プロジェクト開始手順
 1. `.serena`確認 → なければ`serena`初期化・オンボーディング
-2. `git submodule status` でSubmodule有無確認
+2. `jj status` で作業状態確認
 3. プロジェクト構造把握
 
 ---
@@ -148,7 +151,7 @@
 ### 概要
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
-| **Tachikoma** | Sonnet | 実装（worktree配下で作業）、軽微〜複雑なすべての実装タスク | ❌worktree勝手作成、❌Git書込、❌指定外worktreeでの作業 |
+| **Tachikoma** | Sonnet | 実装、軽微〜複雑なすべての実装タスク | ❌change勝手作成、❌jj書込操作、❌指定外changeでの作業 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
 
 **補足:**
@@ -256,10 +259,10 @@ Claude Code（状況判断）
 |--------|------|
 | `implementing-as-tachikoma` | Tachikoma Agent運用ガイド |
 
-### 🟡 Worktree・Git管理
+### 🟡 バージョン管理
 | スキル | 用途 |
 |--------|------|
-| `managing-git-worktrees` | Git Worktree並行開発（Submodule対応含む） |
+| `managing-git-worktrees` | 並行開発管理（レガシー環境用） |
 
 ### 🟡 コード品質・セキュリティ
 | スキル | 用途 |
@@ -355,8 +358,8 @@ Claude Code（状況判断）
 
 ### 週次
 - serenaメモリ整理
-- worktree一覧確認（`git worktree list`）
-- 不要なworktree削除
+- bookmark一覧確認（`jj bookmark list`）
+- 不要なbookmark整理
 
 ### コンテキスト復元
 - compaction後は `/reload` でCLAUDE.md再読み込み
