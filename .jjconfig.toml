@@ -8,3 +8,7 @@ l = ["log", "-n", "10"]
 
 # mainから新しい作業開始
 fresh = ["new", "main"]
+
+#[user]
+#name = "sumik5"
+#email = "kobayashi@legiotech.jp"
