@@ -26,9 +26,6 @@ vim.opt.conceallevel = 2
 
 require("config.lazy")
 
--- カラースキームを設定（Treesitterハイライトに必要）
-vim.cmd('colorscheme habamax')
-
 require('mason').setup()
 require('mason-lspconfig').setup({
     automatic_enable = true
