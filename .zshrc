@@ -410,3 +410,9 @@ export OBSIDIAN='~/Dropbox/obsidian/'
 autoload -U compinit
 compinit
 source <(jj util completion zsh)
+
+
+# =================================================
+# coderabbit
+# =================================================
+alias code-review="coderabbit review --prompt-only"
