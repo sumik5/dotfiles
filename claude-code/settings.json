@@ -21,7 +21,8 @@
       "Bash(rm:*)",
       "Bash(npm run build:*)",
       "Bash(grep:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "mcp__pencil"
     ],
     "deny": [
       "Bash(sudo:*)",
@@ -44,6 +45,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus",
   "hooks": {
     "PostToolUse": [
       {
@@ -100,7 +102,28 @@
     "sumik@sumik": true,
     "ralph-loop@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
+    "code-simplifier@claude-plugins-official": true,
+    "artifacts-builder@awesome-claude-skills": true,
+    "changelog-generator@awesome-claude-skills": true,
+    "content-research-writer@awesome-claude-skills": true,
+    "document-skills-docx@awesome-claude-skills": true,
+    "document-skills-pdf@awesome-claude-skills": true,
+    "document-skills-pptx@awesome-claude-skills": true,
+    "document-skills-xlsx@awesome-claude-skills": true,
+    "domain-name-brainstormer@awesome-claude-skills": true,
+    "file-organizer@awesome-claude-skills": true,
+    "image-enhancer@awesome-claude-skills": true,
+    "internal-comms@awesome-claude-skills": true,
+    "lead-research-assistant@awesome-claude-skills": true,
+    "meeting-insights-analyzer@awesome-claude-skills": true,
+    "skill-creator@awesome-claude-skills": true,
+    "slack-gif-creator@awesome-claude-skills": true,
+    "tailored-resume-generator@awesome-claude-skills": true,
+    "template-skill@awesome-claude-skills": true,
+    "theme-factory@awesome-claude-skills": true,
+    "video-downloader@awesome-claude-skills": true,
+    "webapp-testing@awesome-claude-skills": true,
+    "storybook-assistant@storybook-assistant": true
   },
   "outputStyle": "Explanatory",
   "language": "ジョジョの奇妙な冒険系",
