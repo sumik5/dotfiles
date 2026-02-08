@@ -105,10 +105,16 @@ jj diff --from @- --to @  # 前の変更セットとの比較
 ### 3. 変更の記録
 
 ```bash
-# 現在の変更セットにメッセージを設定
-jj describe -m "feat: 新機能を追加"
+# gcauto を使用してAI生成メッセージでコミット（推奨）
+gcauto
 
-# 新しい変更セットを開始（describe 後に実行）
+# gcauto が自動検出して以下を実行:
+#   1. jj diff で差分取得
+#   2. AI（Claude/Gemini）でConventional Commits形式のメッセージ生成
+#   3. ユーザー確認後 jj commit -m "<message>" を実行
+
+# 手動でメッセージを設定する場合（gcautoが使えない場合のみ）
+jj describe -m "feat: 新機能を追加"
 jj new
 
 # 一度にメッセージ設定と新規作成
@@ -140,6 +146,22 @@ jj git fetch
 # フェッチ後にリモートの変更を取り込む
 jj git fetch && jj rebase -o <bookmark>@origin
 ```
+
+---
+
+### 複数Claudeセッション並行実行時の変更分離
+
+異なるターミナルで複数の Claude Code セッションを同時実行した場合、全セッションの変更が1つの change（`@`）に混在する。
+
+```bash
+# 方法1: 混在したままコミット（変更が論理的にまとまっている場合）
+gcauto
+
+# 方法2: ファイル単位で分離してから個別コミット
+jj split          # 対話的にファイルを選択して分離
+```
+
+**注意**: タチコマの並列実行（同一タスク内）では分離は不要。同一タスクの変更は1つの change にまとめてよい。
 
 ---
 

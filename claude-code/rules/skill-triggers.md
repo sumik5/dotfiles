@@ -14,6 +14,7 @@
 | `enforcing-type-safety` | TypeScript/Python実装時 | any/Any禁止、型ガード |
 | `testing` | 機能実装・バグ修正時 | TDD、Vitest/RTL/Playwright |
 | `securing-code` | 🔴 **実装完了後に必ず実行** | CodeGuardセキュリティチェック |
+| `removing-ai-smell` | すべてのテキスト出力時 | AI臭除去（コメント・文章の自然化） |
 
 ---
 
