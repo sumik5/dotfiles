@@ -105,13 +105,13 @@ jj diff --from @- --to @  # 前の変更セットとの比較
 ### 3. 変更の記録
 
 ```bash
-# gcauto を使用してAI生成メッセージでコミット（推奨）
-gcauto
+# gcauto を使用してAI生成メッセージでコミット（推奨・非対話式）
+gcauto -y
 
-# gcauto が自動検出して以下を実行:
+# gcauto -y が自動検出して以下を実行:
 #   1. jj diff で差分取得
 #   2. AI（Claude/Gemini）でConventional Commits形式のメッセージ生成
-#   3. ユーザー確認後 jj commit -m "<message>" を実行
+#   3. 確認なしで jj commit -m "<message>" を自動実行
 
 # 手動でメッセージを設定する場合（gcautoが使えない場合のみ）
 jj describe -m "feat: 新機能を追加"
@@ -155,7 +155,7 @@ jj git fetch && jj rebase -o <bookmark>@origin
 
 ```bash
 # 方法1: 混在したままコミット（変更が論理的にまとまっている場合）
-gcauto
+gcauto -y
 
 # 方法2: ファイル単位で分離してから個別コミット
 jj split          # 対話的にファイルを選択して分離

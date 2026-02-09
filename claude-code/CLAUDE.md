@@ -21,8 +21,8 @@
 - **Jujutsu (jj) を使用** - gitコマンドは原則使用禁止（`jj git`サブコマンドを除く）
 - **Conventional Commits形式必須**: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`等
 - **jj書込操作禁止**: `jj new`, `jj commit`, `jj describe`, `jj push`等はユーザー確認必須
-- **コミットメッセージ生成**: `jj describe -m "..."` ではなく `gcauto` を使用
-  - gcautoがjjリポジトリを自動検出し、`jj diff` → AI生成 → `jj commit` を実行
+- **コミットメッセージ生成**: `jj describe -m "..."` ではなく `gcauto -y` を使用
+  - gcauto -y がjjリポジトリを自動検出し、`jj diff` → AI生成 → 確認なしで `jj commit` を自動実行
 - 許可: `jj status`, `jj diff`, `jj log`, `jj bookmark list`
 - 詳細は `rules/jujutsu.md` 参照
 
