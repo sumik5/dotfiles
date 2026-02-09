@@ -82,8 +82,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bun x ccusage statusline --context-low-threshold 80 --context-medium-threshold 90 --visual-burn-rate emoji",
-    "padding": 0
+    "command": "cat | bash ~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": false,

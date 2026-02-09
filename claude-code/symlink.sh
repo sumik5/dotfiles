@@ -30,6 +30,7 @@ create_symlink_if_not_exists "$DOTFILES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
 create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
 create_symlink_if_not_exists "$DOTFILES_DIR/rules" "$CLAUDE_DIR/rules"
+create_symlink_if_not_exists "$DOTFILES_DIR/statusline.sh" "$CLAUDE_DIR/statusline.sh"
 
 echo ""
 echo "完了しました"
