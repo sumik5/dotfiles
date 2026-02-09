@@ -12,7 +12,7 @@
 |--------|---------|------|
 | `writing-clean-code` | すべてのコード実装・レビュー時 | SOLID原則含むクリーンコード実践 |
 | `enforcing-type-safety` | TypeScript/Python実装時 | any/Any禁止、型ガード |
-| `testing` | 機能実装・バグ修正時 | TDD、Vitest/RTL/Playwright |
+| `testing-code` | 機能実装・バグ修正時 | TDD、テスト設計、Vitest/RTL/Playwright |
 | `securing-code` | 🔴 **実装完了後に必ず実行** | CodeGuardセキュリティチェック |
 | `removing-ai-smell` | すべてのテキスト出力時 | AI臭除去（コメント・文章の自然化） |
 
@@ -24,16 +24,26 @@
 
 | 検出条件 | スキル | 概要 |
 |---------|--------|------|
-| `package.json` に `next` | `developing-nextjs` | Next.js 16 / React 19 開発 |
+| `package.json` に `next` | `developing-nextjs` | Next.js 16 / React 19開発 |
 | `package.json` に `next` | `using-next-devtools` | Next.js DevTools MCP活用 |
-| `package.json` に `react` | `react-best-practices` | React性能最適化（Vercel） |
-| `components.json` 存在 | `using-shadcn` | shadcn/ui コンポーネント管理 |
-| `.stories.tsx` / `.stories.ts` | `storybook-guidelines` | Storybook story作成 |
+| `package.json` に `next` + stripe/auth系 | `building-nextjs-saas` | Next.js SaaSアプリケーション構築 |
+| `package.json` に `react`（next無し） | `developing-nextjs` | React Internals/Performance統合済み |
+| `package.json` に express/nestjs/fastify/koa/hapi | `developing-fullstack-javascript` | NestJS/Express フルスタックJS |
+| `package.json` に `@playwright/test` | `automating-browser` | Playwright ブラウザ自動化・E2Eテスト |
+| `package.json` に `@opentelemetry/*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
+| `tsconfig.json` 存在 | `mastering-typescript` | TypeScript型システム・パターン |
+| `components.json` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
+| `.stories.tsx` / `.stories.ts` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
+| `playwright.config.*` 存在 | `automating-browser` | Playwright ブラウザ自動化・E2Eテスト |
 | `go.mod` 存在 | `developing-go` | Go開発ガイド |
-| `pyproject.toml` / `requirements.txt` | `developing-python` | Python開発ガイド |
+| `go.mod` に `hashicorp/terraform` | `developing-terraform` | Terraform IaC開発 |
+| `pyproject.toml` / `requirements.txt` 存在 | `developing-python` | Python開発ガイド |
+| Python依存に `google-adk` | `building-adk-agents` | Google ADK AIエージェント開発 |
+| Python依存に `opentelemetry-*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
 | `.tf` ファイル存在 | `developing-terraform` | Terraform IaC開発 |
-| `Dockerfile` / `docker-compose.yml` | `managing-docker` | Docker開発環境・Dockerfile最適化 |
-| `.tex` ファイル | `writing-latex` | LaTeX文書作成（日本語対応） |
+| `Dockerfile` / `docker-compose.*` 存在 | `managing-docker` | Docker開発環境・コンテナ管理 |
+| `.tex` ファイル存在 | `writing-latex` | LaTeX文書作成（日本語対応） |
+| `*.cedar` ファイル存在 | `implementing-dynamic-authorization` | Cedar/ABAC/ReBAC 動的認可 |
 
 ---
 
@@ -44,29 +54,23 @@
 ### Go
 | スキル | 役割 |
 |--------|------|
-| `developing-go` | 言語基礎・プロジェクト構造・クリーンコード実践 |
-| `applying-go-design-patterns` | デザインパターン・アーキテクチャ |
-| `mastering-go-internals` | 内部構造・性能最適化（上級） |
+| `developing-go` | 言語基礎・デザインパターン・内部構造（統合済み） |
 
 ### TypeScript
 | スキル | 役割 |
 |--------|------|
-| `mastering-typescript` | 言語機能・型システム全体 |
-| `writing-effective-typescript` | ベストプラクティス・判断基準 |
+| `mastering-typescript` | 言語機能・型システム・ベストプラクティス（統合済み） |
 | `enforcing-type-safety` | 型安全性の強制ルール |
 
 ### Python
 | スキル | 役割 |
 |--------|------|
-| `developing-python` | プロジェクト環境・ツール設定 |
-| `writing-effective-python` | Pythonic なコード・125のベストプラクティス |
+| `developing-python` | プロジェクト環境・Pythonicコード（統合済み） |
 
 ### React / Next.js
 | スキル | 役割 |
 |--------|------|
-| `developing-nextjs` | Next.js フレームワーク全体 |
-| `mastering-react-internals` | React内部構造・高度なパターン |
-| `react-best-practices` | Vercel推奨の性能最適化 |
+| `developing-nextjs` | Next.js + React Internals + Performance（統合済み） |
 | `using-next-devtools` | Next.js DevTools MCP |
 
 ### フルスタック JavaScript
@@ -86,9 +90,9 @@
 ### デザイン・フロントエンド
 | トリガー | スキル | 概要 |
 |---------|--------|------|
-| UI/UXデザイン判断 | `design-guidelines` | 設計原則（理論） |
+| UI/UXデザイン判断 | `applying-design-guidelines` | 設計原則（理論） |
 | UIコンポーネント実装 | `designing-frontend` | フロントエンドコード生成 |
-| Figma URL・デザイン実装依頼 | `implement-design` | Figma→コード変換 |
+| Figma URL・デザイン実装依頼 | `implementing-design` | Figma→コード変換 |
 
 ### API・アーキテクチャ
 | トリガー | スキル | 概要 |
@@ -102,15 +106,13 @@
 ### ブラウザ自動化
 | トリガー | スキル | 概要 |
 |---------|--------|------|
-| 簡単なブラウザ操作 | `playwright` | 軽量ブラウザ自動化（Playwright MCP） |
-| 複雑なブラウザ操作（状態管理・ネットワーク傍受等） | `agent-browser` | 高機能ブラウザ自動化 |
-| E2Eテスト設計・実装 | `mastering-playwright-testing` | Playwright Test E2E |
+| ブラウザ操作・E2Eテスト | `automating-browser` | Playwright MCP・Agent・E2Eテスト（統合済み） |
 
 ### ドキュメント・品質
 | トリガー | スキル | 概要 |
 |---------|--------|------|
 | 技術文書作成 | `writing-technical-docs` | 7つのC原則 |
-| コードレビュー依頼 | `coderabbit` | CodeRabbit AI レビュー |
+| コードレビュー依頼 | `reviewing-with-coderabbit` | CodeRabbit AI レビュー |
 | Web検索・情報収集 | `searching-web` | gemini CLI 検索 |
 
 ### ツール・効率化
@@ -119,4 +121,3 @@
 | `/serena` コマンド使用 | `using-serena` | Serena MCP構造化開発 |
 | タチコマとして動作 | `implementing-as-tachikoma` | タチコマ Agent運用 |
 | 新しいスキル作成 | `authoring-skills` | スキル作成ガイド |
-| Markdownからスキル変換 | `converting-markdown-to-skill` | Markdown→Skill変換 |

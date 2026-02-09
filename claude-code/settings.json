@@ -122,8 +122,7 @@
     "template-skill@awesome-claude-skills": true,
     "theme-factory@awesome-claude-skills": true,
     "video-downloader@awesome-claude-skills": true,
-    "webapp-testing@awesome-claude-skills": true,
-    "storybook-assistant@storybook-assistant": true
+    "webapp-testing@awesome-claude-skills": true
   },
   "outputStyle": "Explanatory",
   "language": "ジョジョの奇妙な冒険系",
