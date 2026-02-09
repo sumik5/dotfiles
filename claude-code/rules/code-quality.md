@@ -8,7 +8,7 @@
 - **I**: インターフェース分離（必要なメソッドのみ）
 - **D**: 依存関係逆転（抽象に依存）
 
-詳細は `applying-solid-principles` スキルを参照。
+詳細は `writing-clean-code` スキルを参照。
 
 ---
 

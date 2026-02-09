@@ -10,7 +10,7 @@
 
 | スキル | トリガー | 概要 |
 |--------|---------|------|
-| `applying-solid-principles` | すべてのコード実装・レビュー時 | SOLID原則とクリーンコード |
+| `writing-clean-code` | すべてのコード実装・レビュー時 | SOLID原則含むクリーンコード実践 |
 | `enforcing-type-safety` | TypeScript/Python実装時 | any/Any禁止、型ガード |
 | `testing` | 機能実装・バグ修正時 | TDD、Vitest/RTL/Playwright |
 | `securing-code` | 🔴 **実装完了後に必ず実行** | CodeGuardセキュリティチェック |
@@ -32,8 +32,7 @@
 | `go.mod` 存在 | `developing-go` | Go開発ガイド |
 | `pyproject.toml` / `requirements.txt` | `developing-python` | Python開発ガイド |
 | `.tf` ファイル存在 | `developing-terraform` | Terraform IaC開発 |
-| `Dockerfile` / `docker-compose.yml` | `managing-docker` | Docker開発環境 |
-| `Dockerfile` 作成・編集時 | `writing-dockerfiles` | Dockerfile最適化 |
+| `Dockerfile` / `docker-compose.yml` | `managing-docker` | Docker開発環境・Dockerfile最適化 |
 | `.tex` ファイル | `writing-latex` | LaTeX文書作成（日本語対応） |
 
 ---
@@ -45,8 +44,7 @@
 ### Go
 | スキル | 役割 |
 |--------|------|
-| `developing-go` | 言語基礎・プロジェクト構造 |
-| `writing-clean-go` | コード品質・リファクタリング |
+| `developing-go` | 言語基礎・プロジェクト構造・クリーンコード実践 |
 | `applying-go-design-patterns` | デザインパターン・アーキテクチャ |
 | `mastering-go-internals` | 内部構造・性能最適化（上級） |
 
