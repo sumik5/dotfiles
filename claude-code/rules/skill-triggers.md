@@ -103,7 +103,12 @@
 | ドメイン境界設計・データ分解 | `applying-domain-driven-design` | DDD戦略/戦術パターン・データ分解・データメッシュ |
 | マルチテナントSaaS | `building-multi-tenant-saas` | SaaSアーキテクチャ |
 | 認可・アクセス制御設計 | `implementing-dynamic-authorization` | ABAC/ReBAC/Cedar |
-| 分散システム可観測性 | `implementing-opentelemetry` | OpenTelemetry実装 |
+
+### 監視・オブザーバビリティ
+| トリガー | スキル | 概要 |
+|---------|--------|------|
+| 監視システム設計・SLO設計・アラート設計 | `designing-monitoring` | 監視デザインパターン・オブザーバビリティ・SLO・サンプリング・成熟度モデル |
+| 分散システム可観測性・OTel計装 | `implementing-opentelemetry` | OpenTelemetry SDK/API実装 |
 
 ### ブラウザ自動化
 | トリガー | スキル | 概要 |
