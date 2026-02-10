@@ -98,7 +98,9 @@
 | トリガー | スキル | 概要 |
 |---------|--------|------|
 | REST API設計 | `designing-web-apis` | API設計ベストプラクティス |
-| レガシーシステム刷新 | `modernizing-architecture` | 社会技術的アーキテクチャ |
+| レガシーシステム刷新・トレードオフ分析 | `modernizing-architecture` | 社会技術的アーキテクチャ・トレードオフ分析手法 |
+| マイクロサービス設計・粒度判断 | `architecting-microservices` | CQRS/Saga/粒度決定/データ所有権/ワークフロー |
+| ドメイン境界設計・データ分解 | `applying-domain-driven-design` | DDD戦略/戦術パターン・データ分解・データメッシュ |
 | マルチテナントSaaS | `building-multi-tenant-saas` | SaaSアーキテクチャ |
 | 認可・アクセス制御設計 | `implementing-dynamic-authorization` | ABAC/ReBAC/Cedar |
 | 分散システム可観測性 | `implementing-opentelemetry` | OpenTelemetry実装 |
