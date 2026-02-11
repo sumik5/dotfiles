@@ -82,7 +82,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "cat | bash ~/.claude/statusline.sh"
+    "command": "npx ccstatusline@latest"
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": false,
