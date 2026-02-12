@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "lines": [
+    [
+      {
+        "id": "1",
+        "type": "model",
+        "color": "cyan"
+      },
+      {
+        "id": "3",
+        "type": "context-length",
+        "color": "brightBlack"
+      },
+      {
+        "id": "bdc29585-aa5a-4dae-99a6-b42160ba4f34",
+        "type": "tokens-total",
+        "backgroundColor": "bgRed"
+      },
+      {
+        "id": "efe0f0e9-1bf6-4b3f-be95-34844f59f831",
+        "type": "context-length",
+        "backgroundColor": "bgBrightGreen"
+      },
+      {
+        "id": "353a92dd-e3bc-485b-a918-65daf7fcd707",
+        "type": "context-percentage",
+        "backgroundColor": "bgBrightYellow"
+      },
+      {
+        "id": "b6ed2e15-8aa2-4f4d-83fa-c4cc127f86d0",
+        "type": "session-clock",
+        "backgroundColor": "bgBrightRed"
+      }
+    ],
+    [
+      {
+        "id": "c38e5e4e-9f0b-4809-a129-77c215578a8b",
+        "type": "block-timer",
+        "backgroundColor": "bgBrightGreen"
+      },
+      {
+        "id": "858e05b7-aafd-4bdb-a84c-614579e25849",
+        "type": "session-clock",
+        "backgroundColor": "bgWhite"
+      },
+      {
+        "id": "0654238e-6429-4265-9be3-842bb7953684",
+        "type": "session-cost",
+        "backgroundColor": "bgBrightCyan"
+      },
+      {
+        "id": "c3093fdb-e061-4827-a8e4-0f7c32e7df12",
+        "type": "block-timer",
+        "backgroundColor": "bgBrightGreen",
+        "metadata": {
+          "display": "progress"
+        }
+      }
+    ],
+    [
+      {
+        "id": "e98ebf4a-f156-46c7-b0d7-88a4fb5956e9",
+        "type": "claude-session-id",
+        "backgroundColor": "bgBrightMagenta"
+      },
+      {
+        "id": "f0041ccf-c3ef-4a60-85c3-e6a8db475ea3",
+        "type": "current-working-dir",
+        "backgroundColor": "bgBrightCyan"
+      }
+    ]
+  ],
+  "flexMode": "full-minus-40",
+  "compactThreshold": 60,
+  "colorLevel": 3,
+  "defaultPadding": " ",
+  "inheritSeparatorColors": true,
+  "globalBold": true,
+  "powerline": {
+    "enabled": true,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [
+      ""
+    ],
+    "endCaps": [
+      ""
+    ],
+    "theme": "tokyonight",
+    "autoAlign": false
+  }
+}
