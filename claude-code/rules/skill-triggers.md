@@ -42,7 +42,13 @@
 | Python依存に `opentelemetry-*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
 | `.tf` ファイル存在 | `developing-terraform` | Terraform IaC開発 |
 | `Dockerfile` / `docker-compose.*` 存在 | `managing-docker` | Docker開発環境・コンテナ管理 |
+| `cloudbuild.yaml` / `.gcloudignore` 存在 | `deploying-google-cloud` | Google Cloud デプロイ（Cloud Run中心） |
 | `.tex` ファイル存在 | `writing-latex` | LaTeX文書作成（日本語対応） |
+| `.tex` ファイル存在 | WRITING_SKILLS グループ | writing-technical-docs, writing-academic-papers, searching-web も有効化 |
+| `components.json` / `.stories.*` / `tailwind.config.*` 存在 | DESIGN_SKILLS グループ | applying-design-guidelines, applying-behavior-design, implementing-design |
+| `schema.prisma` / `.sql` / DB系パッケージ | DATABASE_SKILLS グループ | avoiding-sql-antipatterns, understanding-database-internals, designing-relational-databases |
+| `@opentelemetry/*` / `prometheus.yml` | OBSERVABILITY_SKILLS グループ | designing-monitoring |
+| `@modelcontextprotocol/sdk` / `fastmcp` | MCP_DEV_SKILLS グループ | developing-mcp |
 | `*.cedar` ファイル存在 | `implementing-dynamic-authorization` | Cedar/ABAC/ReBAC 動的認可 |
 
 ---
@@ -77,6 +83,44 @@
 | スキル | 役割 |
 |--------|------|
 | `developing-fullstack-javascript` | NestJS/Express バックエンド + React フロントエンド |
+
+---
+
+## 🔵 スキルグループ（自動検出連携）
+
+`detect-project-skills.sh` がファイル構成から検出するスキルグループ。個別スキルに加え、関連スキルをまとめて推奨する:
+
+### ✏️ Writing Skills (.tex 検出時)
+| スキル | 役割 |
+|--------|------|
+| `writing-latex` | LaTeX文書作成 |
+| `writing-technical-docs` | 技術ドキュメント（7Cs原則） |
+| `writing-academic-papers` | アカデミックライティング（エッセイ・論文・Harvard参照） |
+| `searching-web` | Web検索（gemini CLI） |
+
+### 🎨 Design Skills (フロントエンド/デザイン検出時)
+| スキル | 役割 |
+|--------|------|
+| `applying-design-guidelines` | UI/UX設計原則（理論） |
+| `applying-behavior-design` | 行動変容デザイン |
+| `implementing-design` | Figmaデザイン→コード |
+
+### 🗄️ Database Skills (DB関連検出時)
+| スキル | 役割 |
+|--------|------|
+| `avoiding-sql-antipatterns` | SQLアンチパターン回避 |
+| `understanding-database-internals` | DB内部構造・分散システム |
+| `designing-relational-databases` | リレーショナルDB設計・PostgreSQL実装 |
+
+### 📊 Observability Skills (監視・可観測性検出時)
+| スキル | 役割 |
+|--------|------|
+| `designing-monitoring` | 監視・オブザーバビリティ設計 |
+
+### 🔌 MCP Dev Skills (MCP開発検出時)
+| スキル | 役割 |
+|--------|------|
+| `developing-mcp` | MCP開発ガイド |
 
 ---
 
@@ -119,6 +163,7 @@
 | トリガー | スキル | 概要 |
 |---------|--------|------|
 | 技術文書作成 | `writing-technical-docs` | 7つのC原則 |
+| アカデミック文書作成 | `writing-academic-papers` | エッセイ・論文・dissertation・Harvard参照 |
 | コードレビュー依頼 | `reviewing-with-coderabbit` | CodeRabbit AI レビュー |
 | Web検索・情報収集 | `searching-web` | gemini CLI 検索 |
 
