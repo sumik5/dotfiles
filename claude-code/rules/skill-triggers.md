@@ -167,6 +167,15 @@
 | コードレビュー依頼 | `reviewing-with-coderabbit` | CodeRabbit AI レビュー |
 | Web検索・情報収集 | `searching-web` | gemini CLI 検索 |
 
+### CLAUDE.md管理（生きたドキュメント運用）
+| トリガー | スキル | 概要 |
+|---------|--------|------|
+| Claudeが同じミスを繰り返した時 | `managing-claude-md` | If X then Y形式で罠を追記 |
+| ユーザーがClaudeの行動を訂正した時 | `managing-claude-md` | 訂正内容を長期記憶に記録 |
+| プロジェクト固有の暗黙知を発見した時 | `managing-claude-md` | CLAUDE.mdへの追記提案 |
+| 同じ説明をセッション内で2回以上した時 | `managing-claude-md` | チャット→長期記憶への移動 |
+| CLAUDE.md改善・リファクタリング時 | `managing-claude-md` | 8原則に基づく改善（300行以下、段階的開示等） |
+
 ### ツール・効率化
 | トリガー | スキル | 概要 |
 |---------|--------|------|
