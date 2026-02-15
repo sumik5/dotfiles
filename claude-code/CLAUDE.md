@@ -31,6 +31,7 @@ Claude Code グローバル設定。開発ワークフロー（Team Builder並�
 | 複数ファイル変更の実装前 | `docs/` に計画ドキュメント作成（1ファイル軽微修正は例外） |
 | コード実装時 | SOLID原則・型安全性（any/Any禁止）・テストファースト遵守 |
 | 実装完了後 | CodeGuardセキュリティチェック実行（`/codeguard-security:software-security`） |
+| Web検索・情報収集時 | Exa MCP（`searching-with-exa` スキル）を第一優先で使用（gemini CLI / WebSearch は fallback） |
 | プロジェクトファイル検出時 | `rules/skill-triggers.md` に基づきスキル自動ロード |
 | 作業中にCLAUDE.mdへ取り込むべき知見を発見した時 | `managing-claude-md` スキル参照し、適切なファイルにIf X then Y形式で追記提案（AskUserQuestionで確認後に追記） |
 

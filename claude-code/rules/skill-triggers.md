@@ -42,7 +42,7 @@
 | Python依存に `opentelemetry-*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
 | `.tf` ファイル存在 | `developing-terraform` | Terraform IaC開発 |
 | `Dockerfile` / `docker-compose.*` 存在 | `managing-docker` | Docker開発環境・コンテナ管理 |
-| `cloudbuild.yaml` / `.gcloudignore` 存在 | `deploying-google-cloud` | Google Cloud デプロイ（Cloud Run中心） |
+| `cloudbuild.yaml` / `.gcloudignore` 存在 | `developing-google-cloud` | Google Cloud 開発（Cloud Run + セキュリティ + サービス選定 + アプリアーキテクチャ） |
 | `.tex` ファイル存在 | `writing-latex` | LaTeX文書作成（日本語対応） |
 | `.tex` ファイル存在 | WRITING_SKILLS グループ | writing-technical-docs, writing-academic-papers, searching-web も有効化 |
 | `components.json` / `.stories.*` / `tailwind.config.*` 存在 | DESIGN_SKILLS グループ | applying-design-guidelines, applying-behavior-design, implementing-design |
@@ -147,6 +147,12 @@
 | ドメイン境界設計・データ分解 | `applying-domain-driven-design` | DDD戦略/戦術パターン・データ分解・データメッシュ |
 | マルチテナントSaaS | `building-multi-tenant-saas` | SaaSアーキテクチャ |
 | 認可・アクセス制御設計 | `implementing-dynamic-authorization` | ABAC/ReBAC/Cedar |
+
+### インフラ・DevOps
+| トリガー | スキル | 概要 |
+|---------|--------|------|
+| インフラ設計・IaC・CI/CDパイプライン構築 | `practicing-devops` | DevOps進化ステージ・IaCツール選定・オーケストレーション比較 |
+| Feature Toggle戦略・CD導入・デプロイとリリース分離 | `practicing-continuous-deployment` | Feature Toggles・Expand/Contract・垂直スライシング・カナリアリリース |
 
 ### 監視・オブザーバビリティ
 | トリガー | スキル | 概要 |
