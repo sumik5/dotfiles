@@ -28,8 +28,8 @@ return {
           local item = ctx.item
 
           vim.bo[bufnr].modifiable = true     -- バッファを書き込み可能にする
-          vim.api.nvim_set_option_value("foldenable", false, { scope = "local", win = win })
-          vim.api.nvim_set_option_value("wrap", true, { scope = "local", win = win })
+          vim.api.nvim_set_option_value("foldenable", false, { scope = "local", win = ctx.win })
+          vim.api.nvim_set_option_value("wrap", true, { scope = "local", win = ctx.win })
 
           local display_lines = {}
           if item and item.lines then
@@ -49,6 +49,26 @@ return {
         end,
 
         format = "text",
+
+        -- vim風キーバインド設定
+        win = {
+          input = {
+            keys = {
+              -- Insert/Normalモードでvim風の上下移動
+              ["<C-j>"] = { "list_down", mode = { "i", "n" } },
+              ["<C-k>"] = { "list_up", mode = { "i", "n" } },
+              ["<C-n>"] = { "list_down", mode = { "i", "n" } },
+              ["<C-p>"] = { "list_up", mode = { "i", "n" } },
+            },
+          },
+          list = {
+            keys = {
+              -- Normalモードでvim標準の移動
+              ["<C-d>"] = "preview_scroll_down",
+              ["<C-u>"] = "preview_scroll_up",
+            },
+          },
+        },
       })
     end
 
