@@ -48,6 +48,30 @@
   },
   "model": "opus",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/read-handover.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/generate-handover.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
@@ -127,5 +151,6 @@
   },
   "outputStyle": "Explanatory",
   "language": "ジョジョの奇妙な冒険系",
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "autoMemoryEnabled": true
 }
