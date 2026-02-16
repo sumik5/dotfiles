@@ -147,6 +147,7 @@
 | ドメイン境界設計・データ分解 | `applying-domain-driven-design` | DDD戦略/戦術パターン・データ分解・データメッシュ |
 | マルチテナントSaaS | `building-multi-tenant-saas` | SaaSアーキテクチャ |
 | 認可・アクセス制御設計 | `implementing-dynamic-authorization` | ABAC/ReBAC/Cedar |
+| LLMアプリ本番運用・LLMOpsパイプライン構築 | `practicing-llmops` | LLMOps運用フレームワーク（データ・モデル適応・API・評価・セキュリティ・スケーリング） |
 
 ### インフラ・DevOps
 | トリガー | スキル | 概要 |
