@@ -11,4 +11,5 @@ TAGS
 .idea
 .tmux/plugins/tmux-*
 brew/Brewfile.lock.json
+HANDOVER.md
 .claude/settings.local.json
