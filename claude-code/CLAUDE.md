@@ -78,6 +78,7 @@ Claude Code グローバル設定。開発ワークフロー（Team Builder並�
 | トリガー（If X） | 行動（then Y） |
 |----------------|--------------|
 | セッション開始時 | serena再アクティベート |
+| 会話が長く多くのツール呼び出し・ファイル変更を行った時（compaction前） | `/handover` を実行してHANDOVER.mdを生成（PreCompact hookはAI推論不可のため、Claude自身が先手を打つ） |
 | compaction発生後 | `/reload` でCLAUDE.md再読み込み |
 | 週次 | serenaメモリ整理、`jj bookmark list` で不要bookmark整理 |
 | Claudeが同じミスを2回繰り返した時 | `managing-claude-md` スキル参照 → If X then Y形式で罠を追記 |
