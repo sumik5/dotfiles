@@ -38,6 +38,7 @@
 | `go.mod` 存在 | `developing-go` | Go開発ガイド |
 | `go.mod` に `hashicorp/terraform` | `developing-terraform` | Terraform IaC開発 |
 | `pyproject.toml` / `requirements.txt` 存在 | `developing-python` | Python開発ガイド |
+| `.sh` ファイル存在 | `developing-bash` | Bash シェルスクリプティング・自動化 |
 | Python依存に `google-adk` | `building-adk-agents` | Google ADK AIエージェント開発 |
 | Python依存に `opentelemetry-*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
 | `.tf` ファイル存在 | `developing-terraform` | Terraform IaC開発 |
@@ -50,6 +51,10 @@
 | `@opentelemetry/*` / `prometheus.yml` | OBSERVABILITY_SKILLS グループ | designing-monitoring |
 | `@modelcontextprotocol/sdk` / `fastmcp` | MCP_DEV_SKILLS グループ | developing-mcp |
 | `*.cedar` ファイル存在 | `implementing-dynamic-authorization` | Cedar/ABAC/ReBAC 動的認可 |
+| `cdk.json` / `samconfig.toml` / `serverless.yml` / `template.yaml` 存在 | `developing-aws` | AWS開発（システム設計・サーバーレス・CDK・EKS・SRE・コスト最適化・Bedrock） |
+| `package.json` に `@aws-sdk/*` / `aws-cdk` | `developing-aws` | AWS開発 |
+| Python依存に `boto3` / `aws-cdk-lib` | `developing-aws` | AWS開発 |
+| `buildspec.yml` 存在 | `developing-aws` | AWS開発 |
 
 ---
 
