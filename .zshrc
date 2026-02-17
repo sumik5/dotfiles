@@ -66,7 +66,7 @@ alias brew="arch -arm64 brew"
 alias gcautog="gcauto -m gemini"
 alias vi="nvim"
 alias vim="nvim"
-alias tmuxx="tmux -CC new -A -s"
+alias tmuxx="tmux --teammate-mode tmux -CC new -A -s"
 
 # -------------------------------------------------
 # user environment

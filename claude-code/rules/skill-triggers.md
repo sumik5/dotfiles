@@ -29,12 +29,12 @@
 | `package.json` に `next` + stripe/auth系 | `building-nextjs-saas` | Next.js SaaSアプリケーション構築 |
 | `package.json` に `react`（next無し） | `developing-nextjs` | React Internals/Performance統合済み |
 | `package.json` に express/nestjs/fastify/koa/hapi | `developing-fullstack-javascript` | NestJS/Express フルスタックJS |
-| `package.json` に `@playwright/test` | `automating-browser` | Playwright ブラウザ自動化・E2Eテスト |
+| `package.json` に `@playwright/test` | `testing-e2e-with-playwright` | Playwright E2Eテスト設計・実装 |
 | `package.json` に `@opentelemetry/*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
 | `tsconfig.json` 存在 | `mastering-typescript` | TypeScript型システム・パターン |
 | `components.json` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
 | `.stories.tsx` / `.stories.ts` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
-| `playwright.config.*` 存在 | `automating-browser` | Playwright ブラウザ自動化・E2Eテスト |
+| `playwright.config.*` 存在 | `testing-e2e-with-playwright` | Playwright E2Eテスト設計・実装 |
 | `go.mod` 存在 | `developing-go` | Go開発ガイド |
 | `go.mod` に `hashicorp/terraform` | `developing-terraform` | Terraform IaC開発 |
 | `pyproject.toml` / `requirements.txt` 存在 | `developing-python` | Python開発ガイド |
@@ -164,7 +164,8 @@
 ### ブラウザ自動化
 | トリガー | スキル | 概要 |
 |---------|--------|------|
-| ブラウザ操作・E2Eテスト | `automating-browser` | Playwright MCP・Agent・E2Eテスト（統合済み） |
+| ブラウザ操作自動化（スクレイピング等） | `automating-browser` | Browser Agent CLIによるブラウザ操作（セマンティックロケーター・状態永続化） |
+| E2Eテスト設計・実装 | `testing-e2e-with-playwright` | Playwright Testによる包括的E2Eテスト（ロケーター・フィクスチャ・モッキング・CI/CD・アクセシビリティ等） |
 
 ### ドキュメント・品質
 | トリガー | スキル | 概要 |
