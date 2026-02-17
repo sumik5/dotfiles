@@ -140,5 +140,6 @@
   "outputStyle": "Explanatory",
   "language": "ジョジョの奇妙な冒険系",
   "alwaysThinkingEnabled": true,
-  "autoMemoryEnabled": true
+  "autoMemoryEnabled": true,
+  "teammateMode": "tmux"
 }
