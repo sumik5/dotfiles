@@ -1,55 +1,70 @@
 #!/bin/bash
 
-# attach to an existing tmux session, or create one if none exist
-# also set up access to the system clipboard from within tmux when possible
-#
-# e.g.
-# https://gist.github.com/1462391
-# https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
-
 if ! type tmux >/dev/null 2>&1; then
-    echo 'Error: tmux command not found' 2>&1
+    echo 'Error: tmux command not found' >&2
     exit 1
 fi
 
+# Check for help option early
+for arg in "$@"; do
+    if [[ "$arg" == "--help" || "$arg" == "-h" ]]; then
+        cat <<EOF
+Usage: tmuxx [SESSION_NAME] [OPTIONS]
+
+Arguments:
+  SESSION_NAME    Name of tmux session (prompted if not provided)
+
+Options:
+  --wide          Create 4-pane wide layout (2x2 split)
+  --help, -h      Show this help message
+
+Examples:
+  tmuxx main
+  tmuxx dev --wide
+  tmuxx
+EOF
+        exit 0
+    fi
+done
+
 if [ -n "$TMUX" ]; then
-    echo "Error: tmux session has been already attached" 2>&1
+    echo "Error: tmux session has been already attached" >&2
     exit 1
 fi
 
 # Parse arguments
+SESSION_NAME=""
 LAYOUT_MODE=""
-if [ "$1" = "wide" ]; then
-    LAYOUT_MODE="wide"
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --wide)
+            LAYOUT_MODE="wide"
+            shift
+            ;;
+        *)
+            SESSION_NAME="$1"
+            shift
+            ;;
+    esac
+done
+
+# Prompt for session name if not provided
+if [ -z "$SESSION_NAME" ]; then
+    read -p "Enter tmux session name: " SESSION_NAME
+    if [ -z "$SESSION_NAME" ]; then
+        echo "Error: session name cannot be empty" >&2
+        exit 1
+    fi
 fi
 
-if tmux has-session >/dev/null 2>&1 && tmux list-sessions | grep -qE '.*]$'; then
-    # detached session exists
-    tmux attach && echo "tmux attached session "
-else
-    # Create new session with specified layout
-    if [[ ( $OSTYPE == darwin* ) && ( -x $(which reattach-to-user-namespace 2>/dev/null) ) ]]; then
-        # on OS X force tmux's default command to spawn a shell in the user's namespace
-        tmux_config=$(cat $HOME/.tmux.conf <(echo 'set-option -g default-command "reattach-to-user-namespace -l $SHELL"'))
-        tmux -f <(echo "$tmux_config") new-session -d
-        SESSION_NAME=$(tmux display-message -p '#S')
-    else
-        tmux new-session -d
-        SESSION_NAME=$(tmux display-message -p '#S')
-    fi
+# Create or attach to session
+tmux -CC new -A -s "$SESSION_NAME"
 
-    # Apply wide layout if requested
-    if [ "$LAYOUT_MODE" = "wide" ]; then
-        # Split horizontally to create center pane
-        tmux split-window -h -t "$SESSION_NAME:1"
-        # Split horizontally again to create right panes
-        tmux split-window -h -t "$SESSION_NAME:1"
-        # Split the rightmost pane vertically
-        tmux split-window -v -t "$SESSION_NAME:1.3"
-        # Select the first (left) pane
-        tmux select-pane -t "$SESSION_NAME:1.1"
-    fi
-
-    # Attach to the session
-    tmux attach -t "$SESSION_NAME" && echo "tmux created new session with $LAYOUT_MODE layout"
+# Apply wide layout if requested (only for new sessions)
+if [ "$LAYOUT_MODE" = "wide" ]; then
+    tmux split-window -h -t "$SESSION_NAME:1"
+    tmux split-window -h -t "$SESSION_NAME:1"
+    tmux split-window -v -t "$SESSION_NAME:1.3"
+    tmux select-pane -t "$SESSION_NAME:1.1"
 fi

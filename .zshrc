@@ -61,12 +61,12 @@ fi
 
 alias ll='ls -vl'
 alias greps='rg --hidden -p'
-alias claude='claude --dangerously-skip-permissions'
+alias claude='claude --teammate-mode tmux --dangerously-skip-permissions'
 alias brew="arch -arm64 brew"
 alias gcautog="gcauto -m gemini"
 alias vi="nvim"
 alias vim="nvim"
-alias tmuxx="tmux --teammate-mode tmux -CC new -A -s"
+alias tmux="tmuxx"
 
 # -------------------------------------------------
 # user environment
