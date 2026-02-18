@@ -74,27 +74,25 @@
 ```
 ユーザー要求
     ↓
-Claude Code本体（タスク分析）
+Claude Code本体（ファイルを読まない・分析しない）
     ↓
-【コード修正が必要？】
-    ├─ No → 直接実行（読み込み・質問・設計等）
+【並列実行が必要そう？】（要求内容から即座に判断）
+    ├─ Yes → **`orchestrating-teams` スキルロード → 即座にTeamCreate**
+    │         Phase 1（現状把握・計画策定 → planner に全委譲）:
+    │         1. TeamCreate でチーム作成
+    │         2. planner タチコマ起動（model: opus、ユーザー要求をそのまま渡す）
+    │            → 現状把握・コードベース分析・docs/plan作成
+    │         3. 計画レビュー・ユーザー確認
+    │         Phase 2（実装 → implementer 並列起動）:
+    │         4. TaskCreate + implementer タチコマ複数を並列起動
+    │         5. SendMessage で進捗管理・調整
+    │         6. 全メンバー完了後に統合・TeamDelete
     │
-    └─ Yes →
-        ↓
-    【独立サブタスクに分解可能？】（上記判断基準を適用）
-        ├─ Yes → **`orchestrating-teams` スキルロード → 2フェーズ方式**
-        │         Phase 1（計画策定）:
-        │         1. TeamCreate でチーム作成
-        │         2. planner タチコマ起動 → コードベース分析・docs/plan作成
-        │         3. 計画レビュー・ユーザー確認
-        │         Phase 2（実装）:
-        │         4. TaskCreate + implementer タチコマ複数を並列起動
-        │         5. SendMessage で進捗管理・調整
-        │         6. 全メンバー完了後に統合・TeamDelete
-        │
-        └─ No  → タチコマ1体を直接起動（Task tool）
-        ↓
-    CodeGuard実行（必須）
+    ├─ No（軽微修正） → タチコマ1体を直接起動（Task tool）
+    │
+    └─ No（読み込み・質問等） → 直接実行
+    ↓
+CodeGuard実行（必須）
     ↓ 完了報告
 ```
 
