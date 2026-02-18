@@ -154,6 +154,11 @@
 | 認可・アクセス制御設計 | `implementing-dynamic-authorization` | ABAC/ReBAC/Cedar |
 | LLMアプリ本番運用・LLMOpsパイプライン構築 | `practicing-llmops` | LLMOps運用フレームワーク（データ・モデル適応・API・評価・セキュリティ・スケーリング） |
 
+### セキュリティ
+| トリガー | スキル | 概要 |
+|---------|--------|------|
+| サーバーレスアプリのセキュリティ設計・脆弱性調査 | `securing-serverless` | AWS Lambda・Cloud Run・Azure Functionsの攻撃・防御パターン（IAM・ストレージ・コード注入・権限昇格） |
+
 ### インフラ・DevOps
 | トリガー | スキル | 概要 |
 |---------|--------|------|

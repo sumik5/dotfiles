@@ -12,7 +12,7 @@ Claude Code グローバル設定。開発ワークフロー（Team Builder並�
 |----------------|--------------|
 | すべての応答時 | 必ず日本語で応答（例外: 技術用語・ライブラリ名・プログラミングキーワード） |
 | コードファイル変更時（軽微: 1ファイル・単一関心事） | タチコマ1体に委譲（例外: ファイル読み込み・質問回答・計画/設計ドキュメント作成は本体で実行可） |
-| コードファイル変更時（複数ファイル・複雑なタスク） | Claude Code本体がリーダーとしてチーム編成・並列処理（`team-builder.md` 参照、docs先行必須） |
+| コードファイル変更時（複数ファイル・複雑なタスク） | Task toolで `sumik:team-builder` agentを起動しチーム編成・並列処理を委譲（docs先行必須） |
 | jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto -y` を使用） |
 | 新規作業開始時 | ユーザー確認してchangeとbookmark作成を提案（勝手な作成・削除禁止） |
 | 要件・仕様が曖昧な場合 | AskUserQuestionツールで質問（推測での作業進行禁止） |
@@ -66,7 +66,7 @@ Claude Code グローバル設定。開発ワークフロー（Team Builder並�
 | ファイル | 内容 | 参照タイミング |
 |---------|------|--------------|
 | `rules/jujutsu.md` | Jujutsu バージョン管理ルール | jj操作の詳細確認時 |
-| `rules/tachikoma-system.md` | Agent Team編成・タチコマシステム・並列実行・ドキュメント先行開発（Claude Code本体がリーダー） | 並列実行判断時 |
+| `rules/tachikoma-system.md` | Agent Team編成・タチコマシステム・並列実行・ドキュメント先行開発（`sumik:team-builder` agent委譲） | 並列実行判断時 |
 | `rules/code-quality.md` | SOLID・型安全性・テスト・セキュリティ | コード実装・レビュー時 |
 | `rules/plugins-and-commands.md` | プラグイン環境・MCP・スラッシュコマンド | プラグイン・MCP利用時 |
 | `rules/skill-triggers.md` | スキル自動トリガー条件・使い分けガイド | スキル選択判断時 |
