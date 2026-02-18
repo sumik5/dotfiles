@@ -4,17 +4,15 @@
 
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
-| **Claude Code本体（リーダー）** | Opus | タスク判断・`sumik:team-builder` agent起動・最終確認 | - |
-| **Team Builder Agent** | Opus | チーム編成・タスク分解・タチコマ並列起動・進捗管理（`sumik:team-builder`） | - |
+| **Claude Code本体（リーダー）** | Opus | タスク判断・`orchestrating-teams` スキルでAgent Team API直接操作・最終確認 | - |
 | **タチコマ** | Sonnet | 実装ワーカー（軽微修正は単体直接起動、複雑タスクはClaude Code本体配下でTeam member化） | ❌change勝手作成、❌jj書込操作、❌指定外changeでの作業 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
 
 **補足:**
-- **Claude Code本体の役割**: タスク分析・並列化判断を行い、Task toolで `sumik:team-builder` agentを起動してチーム編成を委譲
-- **Team Builder Agentの役割**: TeamCreate/TaskCreate/SendMessage等の公式Agent Team APIでチーム操作を実行（docs先行開発、タチコマ並列起動、進捗管理、失敗回復）
-- **軽微な修正（1ファイル・単一関心事）**: タチコマ1体を直接起動（team-builder不要）
-- **複数ファイル・複雑なタスク**: Claude Code本体 → `sumik:team-builder` agent → タチコマ複数をTeam memberとして並列起動
-- Team Builder Agentがファイル所有権パターン設計・タスク分解・モデル戦略選択・進捗管理を担当
+- **Claude Code本体の役割**: タスク分析・並列化判断を行い、`orchestrating-teams` スキルの知識に基づきAgent Team APIを直接操作してチーム編成・並列実行を実施
+- **軽微な修正（1ファイル・単一関心事）**: タチコマ1体を直接起動（チーム不要）
+- **複数ファイル・複雑なタスク**: Claude Code本体が直接 TeamCreate → TaskCreate → Task tool でタチコマ複数をTeam memberとして並列起動
+- Claude Code本体がファイル所有権パターン設計・タスク分解・モデル戦略選択・進捗管理を担当（`orchestrating-teams` スキル参照）
 
 ---
 
@@ -41,7 +39,7 @@
 ## 必須使用ケース
 
 コード修正の委譲先:
-- **マルチファイル・マルチ関心事**: **Team Builder**（`team-builder` Agent）でチーム編成 → タチコマ複数並列処理
+- **マルチファイル・マルチ関心事**: `orchestrating-teams` スキルロード → Claude Code本体が直接チーム編成 → タチコマ複数並列処理
 - **単一ファイル・単一関心事の軽微修正**: タチコマ1体を直接起動
 - **トークン効率重視**: `/serena`コマンドを積極活用
 
@@ -53,7 +51,7 @@
 
 ## 並列実行の判断基準（🔴 必須チェック）
 
-**以下のいずれかに該当 → `sumik:team-builder` agentをTask toolで起動:**
+**以下のいずれかに該当 → `orchestrating-teams` スキルロード → Claude Code本体が直接Agent Team APIで実行:**
 1. **2つ以上のファイルを変更** かつ変更が相互に独立
 2. **異なる関心事** が含まれる（例: UI + API + テスト）
 3. **2つ以上の独立したサブタスク** に分解可能
@@ -63,11 +61,11 @@
 - 1ファイルのみの変更
 - 密結合した変更（前のタスクの出力が次の入力に必要）
 
-### Team Builder Agentによるチーム編成と並列実行
-- Claude Code本体がTask toolで `sumik:team-builder` agentを起動
-- Team Builder Agentがタスク分解・ファイル所有権設計・モデル戦略選択を実施
-- Team Builder AgentがTeamCreate/TaskCreate/Task tool/SendMessageで各メンバー（タチコマ）を起動・調整・進捗管理
-- 詳細仕様: plugin の `agents/team-builder.md` 参照
+### Claude Code本体によるチーム編成と並列実行
+- Claude Code本体が `orchestrating-teams` スキルをロードし、Agent Team APIを直接操作
+- Claude Code本体がタスク分解・ファイル所有権設計・モデル戦略選択を実施
+- Claude Code本体がTeamCreate/TaskCreate/Task tool/SendMessageで各メンバー（タチコマ）を起動・調整・進捗管理
+- 詳細仕様: plugin の `skills/orchestrating-teams/` 参照
 
 ---
 
@@ -85,8 +83,8 @@ Claude Code本体（タスク分析）
         ↓ ユーザー確認
         ↓
     【独立サブタスクに分解可能？】（上記判断基準を適用）
-        ├─ Yes → **Task toolで `sumik:team-builder` agentを起動**
-        │         team-builderが以下を実行:
+        ├─ Yes → **`orchestrating-teams` スキルロード → Claude Code本体が直接実行**
+        │         Claude Code本体が以下を実行:
         │         1. docs/plan-*.md 作成 → ユーザー確認
         │         2. TeamCreate でチーム作成
         │         3. TaskCreate でタスク一覧作成
@@ -112,12 +110,12 @@ Claude Code本体（タスク分析）
   - 移行手順・実行順序
   - 注意事項・リスク
 - **並列実行時は「チーム構成」「タスクリスト」「ファイル所有権パターン」「実行ログ」「回復手順」セクションを追加**:
-  - Team Builder Agentが参照するチーム構成・ファイル所有権パターン
+  - Claude Code本体が参照するチーム構成・ファイル所有権パターン
   - 各メンバーの担当範囲・要件・排他情報
   - タスクリスト（`- [ ]` チェックリスト形式、進捗追跡用）
   - 実行ログ（進捗・完了状況を記録）
   - 回復手順（失敗時の再開手順）
-  - → 詳細: plugin の `agents/team-builder.md` 参照
+  - → 詳細: plugin の `skills/orchestrating-teams/` 参照
 - ドキュメント作成後、ユーザー確認を経てから実装開始
 - 例外: 1ファイル内の軽微な修正（typo修正、1行変更など）
 - **ドキュメントは将来の参照用として残す**（作業完了後も削除しない）

@@ -51,7 +51,7 @@
 | `@opentelemetry/*` / `prometheus.yml` | OBSERVABILITY_SKILLS グループ | designing-monitoring |
 | `@modelcontextprotocol/sdk` / `fastmcp` | MCP_DEV_SKILLS グループ | developing-mcp |
 | `*.cedar` ファイル存在 | `implementing-dynamic-authorization` | Cedar/ABAC/ReBAC 動的認可 |
-| `cdk.json` / `samconfig.toml` / `serverless.yml` / `template.yaml` 存在 | `developing-aws` | AWS開発（システム設計・サーバーレス・CDK・EKS・SRE・コスト最適化・Bedrock） |
+| `cdk.json` / `samconfig.toml` / `serverless.yml` / `template.yaml` 存在 | `developing-aws` | AWS開発（システム設計・サーバーレス・CDK・EKS・SRE・コスト最適化・セキュリティ・Bedrock・DB・データエンジニアリング・SageMaker・CI/CD・SysOps） |
 | `package.json` に `@aws-sdk/*` / `aws-cdk` | `developing-aws` | AWS開発 |
 | Python依存に `boto3` / `aws-cdk-lib` | `developing-aws` | AWS開発 |
 | `buildspec.yml` 存在 | `developing-aws` | AWS開発 |
@@ -197,6 +197,7 @@
 ### ツール・効率化
 | トリガー | スキル | 概要 |
 |---------|--------|------|
+| 複数ファイル・複数関心事の並列開発 | `orchestrating-teams` | Agent Team編成・タチコマ並列起動・進捗管理 |
 | `/serena` コマンド使用 | `using-serena` | Serena MCP構造化開発 |
 | タチコマとして動作 | `implementing-as-tachikoma` | タチコマ Agent運用 |
 | 新しいスキル作成 | `authoring-skills` | スキル作成ガイド |
