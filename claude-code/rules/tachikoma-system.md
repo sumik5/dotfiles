@@ -79,16 +79,16 @@ Claude Code本体（タスク分析）
 【コード修正が必要？】
     ├─ No → 直接実行（読み込み・質問・設計等）
     │
-    └─ Yes → 計画をdocs/plan-xxx.mdに作成（複雑な場合）
-        ↓ ユーザー確認
+    └─ Yes →
         ↓
     【独立サブタスクに分解可能？】（上記判断基準を適用）
-        ├─ Yes → **`orchestrating-teams` スキルロード → Claude Code本体が直接実行**
-        │         Claude Code本体が以下を実行:
-        │         1. docs/plan-*.md 作成 → ユーザー確認
-        │         2. TeamCreate でチーム作成
-        │         3. TaskCreate でタスク一覧作成
-        │         4. Task tool でタチコマ複数を並列起動（run_in_background: true）
+        ├─ Yes → **`orchestrating-teams` スキルロード → 2フェーズ方式**
+        │         Phase 1（計画策定）:
+        │         1. TeamCreate でチーム作成
+        │         2. planner タチコマ起動 → コードベース分析・docs/plan作成
+        │         3. 計画レビュー・ユーザー確認
+        │         Phase 2（実装）:
+        │         4. TaskCreate + implementer タチコマ複数を並列起動
         │         5. SendMessage で進捗管理・調整
         │         6. 全メンバー完了後に統合・TeamDelete
         │
