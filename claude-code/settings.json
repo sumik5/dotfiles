@@ -141,5 +141,6 @@
   "language": "ジョジョの奇妙な冒険系",
   "alwaysThinkingEnabled": true,
   "autoMemoryEnabled": true,
-  "teammateMode": "tmux"
+  "teammateMode": "tmux",
+  "skipDangerousModePermissionPrompt": true
 }
