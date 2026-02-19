@@ -31,6 +31,8 @@
 | `package.json` に express/nestjs/fastify/koa/hapi | `developing-fullstack-javascript` | NestJS/Express フルスタックJS |
 | `package.json` に `@playwright/test` | `testing-e2e-with-playwright` | Playwright E2Eテスト設計・実装 |
 | `package.json` に `@opentelemetry/*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
+| `package.json` に `ai` (Vercel AI SDK) | `integrating-ai-web-apps` | Vercel AI SDK + LangChain.js WebアプリAI統合 |
+| `package.json` に `@langchain/*` | `integrating-ai-web-apps` | Vercel AI SDK + LangChain.js WebアプリAI統合 |
 | `tsconfig.json` 存在 | `mastering-typescript` | TypeScript型システム・パターン |
 | `components.json` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
 | `.stories.tsx` / `.stories.ts` 存在 | `designing-frontend` | フロントエンドUI/UXコンポーネント |
