@@ -1,178 +1,272 @@
 #!/bin/bash
-# Claude Code Enhanced Status Line
-# Model | Context | In/Out | Remaining | ETA | Compression | Burn Rate | D/W/M
 
-CLAUDE_DIR="$HOME/.claude"
-SESSION_FILE="$CLAUDE_DIR/.sl_session.json"
-LAST_STATE_FILE="$CLAUDE_DIR/.sl_last_state.json"
-USAGE_LOG="$CLAUDE_DIR/.sl_usage_log.csv"
-COMPRESS_FILE="$CLAUDE_DIR/.sl_compress.json"
+set -euo pipefail
 
-input=$(cat)
+# Environment detection
+detect_os() {
+  case "$OSTYPE" in
+    darwin*)  echo "macos" ;;
+    linux*)   echo "linux" ;;
+    msys*|mingw*|cygwin*) echo "windows" ;;
+    *)        echo "unknown" ;;
+  esac
+}
 
-# Extract data
-model=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
-total_input=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
-total_output=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
-context_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
-used_pct=$(echo "$input" | jq -r '.context_window.used_percentage // 0')
-session_id=$(echo "$input" | jq -r '.session_id // "unknown"')
+OS_TYPE=$(detect_os)
 
-used_tokens=$((total_input + total_output))
-current_used=$(awk "BEGIN {printf \"%.0f\", ($used_pct * $context_size) / 100}")
-remaining_tokens=$((context_size - current_used))
-[ "$remaining_tokens" -lt 0 ] && remaining_tokens=0
-current_time=$(date +%s)
+# Cross-platform math calculation
+safe_math() {
+  local expression=$1
 
-# Format number with k/M suffix
-fmt() {
-  local n=$1
-  if [ "$n" -ge 1000000 ] 2>/dev/null; then
-    awk "BEGIN {printf \"%.1fM\", $n/1000000}"
-  elif [ "$n" -ge 1000 ] 2>/dev/null; then
-    awk "BEGIN {printf \"%.1fk\", $n/1000}"
+  if command -v bc &> /dev/null; then
+    echo "$expression" | bc -l 2>/dev/null || echo "0"
+  elif command -v powershell.exe &> /dev/null; then
+    powershell.exe -Command "($expression)" 2>/dev/null || echo "0"
+  elif command -v awk &> /dev/null; then
+    echo "" | awk "BEGIN {print $expression}" 2>/dev/null || echo "0"
   else
-    echo "${n:-0}"
+    echo "0"
   fi
 }
 
-# Initialize usage log
-[ ! -f "$USAGE_LOG" ] && echo "ts,sid,tokens" > "$USAGE_LOG"
+# Cross-platform number formatting
+format_number_with_commas() {
+  local number=$1
 
-# Session & burn rate tracking
-burn_rate_str="--"
-eta_str="--"
-br_val=0
-new_session=0
+  if command -v numfmt &> /dev/null; then
+    numfmt --grouping "$number" 2>/dev/null || echo "$number"
+  elif command -v powershell.exe &> /dev/null; then
+    powershell.exe -Command "[int]$number | ForEach-Object { '{0:N0}' -f \$_ }" 2>/dev/null || echo "$number"
+  elif printf "%'d" "$number" &>/dev/null; then
+    printf "%'d" "$number"
+  elif command -v sed &> /dev/null; then
+    echo "$number" | sed ':a;s/\B[0-9]\{3\}\>/,&/;ta'
+  else
+    echo "$number"
+  fi
+}
 
-if [ -f "$LAST_STATE_FILE" ]; then
-  last_sid=$(jq -r '.sid // ""' "$LAST_STATE_FILE" 2>/dev/null)
-  last_tok=$(jq -r '.tok // 0' "$LAST_STATE_FILE" 2>/dev/null)
+# Cross-platform time calculation
+calculate_reset_time() {
+  local minutes=$1
 
-  if [ "$session_id" != "$last_sid" ] || [ "$current_used" -lt "${last_tok:-0}" ]; then
-    new_session=1
-    if [ -n "$last_sid" ] && [ "${last_tok:-0}" -gt 0 ]; then
-      echo "$current_time,$last_sid,$last_tok" >> "$USAGE_LOG"
-    fi
-    printf '{"ts":%d,"tok":0}' "$current_time" > "$SESSION_FILE"
-    printf '{"sid":"%s","count":0,"last_used":%d}' "$session_id" "$current_used" > "$COMPRESS_FILE"
+  case "$OS_TYPE" in
+    "macos")
+      date -v +"$minutes"M "+%H:%M" 2>/dev/null || echo "N/A"
+      ;;
+    "linux")
+      date -d "+$minutes minutes" "+%H:%M" 2>/dev/null || echo "N/A"
+      ;;
+    "windows")
+      powershell.exe -Command "(Get-Date).AddMinutes($minutes).ToString('HH:mm')" 2>/dev/null || echo "N/A"
+      ;;
+    *)
+      echo "N/A"
+      ;;
+  esac
+}
+
+# Cross-platform token limit extraction
+extract_token_limit() {
+  local ccusage_output
+  ccusage_output=$(npx ccusage blocks 2>&1)
+
+  if command -v grep &> /dev/null; then
+    echo "$ccusage_output" | grep -o "assuming [0-9,]* token limit" | grep -o "[0-9,]*" | tr -d ','
+  elif command -v powershell.exe &> /dev/null; then
+    echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "assuming ([0-9,]*) token limit" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }'
+  else
+    echo "$ccusage_output" | sed -n 's/.*assuming \([0-9,]*\) token limit.*/\1/p' | tr -d ','
+  fi
+}
+
+# Dependency check
+check_dependencies() {
+  local missing_deps=()
+
+  if ! command -v npx &> /dev/null; then
+    missing_deps+=("npx (Node.js)")
+  fi
+
+  if ! command -v jq &> /dev/null; then
+    missing_deps+=("jq")
+  fi
+
+  if ! command -v bc &> /dev/null && ! command -v powershell.exe &> /dev/null && ! command -v awk &> /dev/null; then
+    missing_deps+=("bc or PowerShell or awk")
+  fi
+
+  if [ ${#missing_deps[@]} -gt 0 ]; then
+    echo "Error: Missing dependencies: ${missing_deps[*]}"
+    echo "Please install the required tools for your platform."
+    exit 1
+  fi
+}
+
+# $1: remaining minutes
+# Output: formatted remaining time (e.g., "1h 3m left") or "N/A"
+format_remaining_time() {
+  local minutes=$1
+  if [ "$minutes" != "null" ]; then
+    local h=$((minutes / 60))
+    local m=$((minutes % 60))
+    printf "%dh %dm left" "$h" "$m"
+  else
+    echo "N/A"
+  fi
+}
+
+# $1: UTC time string
+# $2: desired output format (e.g., "%H:%M")
+# Output: formatted local time or "N/A"
+format_time_local() {
+  local utc_time=$1
+  local format_str=$2
+
+  if [ "$utc_time" != "null" ] && [ -n "$utc_time" ]; then
+    case "$OS_TYPE" in
+      "macos")
+        date -j -f "%Y-%m-%dT%H:%M:%S" "${utc_time%.*}" "+$format_str" 2>/dev/null || echo "N/A"
+        ;;
+      "linux")
+        date -d "$utc_time" "+$format_str" 2>/dev/null || echo "N/A"
+        ;;
+      "windows")
+        powershell.exe -Command "Get-Date '$utc_time' -Format '$format_str'" 2>/dev/null || echo "N/A"
+        ;;
+      *)
+        echo "N/A"
+        ;;
+    esac
+  else
+    echo "N/A"
+  fi
+}
+
+
+# Check dependencies first
+check_dependencies
+
+# Read Claude input from stdin first
+claude_input=$(cat)
+
+ccusage=$(npx ccusage blocks --json 2>/dev/null)
+if [ -z "$ccusage" ]; then
+  echo "Error: Failed to fetch data from 'npx ccusage blocks --json'."
+  echo "Please ensure ccusage is installed and functioning correctly."
+  exit 1
+fi
+
+# Get the assumed token limit from ccusage text output
+assumed_limit=$(extract_token_limit)
+if [ -z "$assumed_limit" ]; then
+  assumed_limit="null"
+fi
+
+
+active_block=$(echo "$ccusage" | jq '.blocks[] | select(.isActive == true)')
+if [ -z "$active_block" ]; then
+  echo "No active usage block found."
+  exit 0
+fi
+
+# Now Model
+model_name=$(echo "$claude_input" | jq -r '.model.display_name')                  # e.g: Sonnet 4
+
+# Information
+id=$(echo "$active_block" | jq -r '.id')                                          # e.g: 2025-09-21T00:00:00.000Z
+start_time=$(echo "$active_block" | jq -r '.startTime')                           # e.g: 2025-09-21T00:00:00.000Z
+end_time=$(echo "$active_block" | jq -r '.endTime')                               # e.g: 2025-09-21T05:00:00.000Z
+actual_end_time=$(echo "$active_block" | jq -r '.actualEndTime')                  # e.g: 2025-09-21T03:33:17.285Z
+entries=$(echo "$active_block" | jq -r '.entries')                                # e.g: 166
+
+# Used tokens
+input_tokens=$(echo "$active_block" | jq -r '.tokenCounts.inputTokens')           # e.g: 503
+output_tokens=$(echo "$active_block" | jq -r '.tokenCounts.outputTokens')         # e.g: 22814
+cache_creation_tokens=$(echo "$active_block" | jq -r '.tokenCounts.cacheCreationInputTokens') # e.g: 404511
+cache_read_tokens=$(echo "$active_block" | jq -r '.tokenCounts.cacheReadInputTokens')     # e.g: 10004316
+total_tokens=$(echo "$active_block" | jq -r '.totalTokens')                             # e.g: 10432144
+
+# Now Cost (USD)
+cost=$(echo "$active_block" | jq -r '.costUSD')                                   # e.g: 8.285881650000004
+
+# Burn rate
+tokens_per_minute=$(echo "$active_block" | jq -r '.burnRate.tokensPerMinute')     # e.g: 54098.75843023459
+tokens_per_minute_for_indicator=$(echo "$active_block" | jq -r '.burnRate.tokensPerMinuteForIndicator') # e.g: 120.91673104951197
+cost_per_hour=$(echo "$active_block" | jq -r '.burnRate.costPerHour')             # e.g: 2.5781234026190427
+
+# Projection
+projected_tokens=$(echo "$active_block" | jq -r '.projection.totalTokens')        # e.g: 13845592
+projected_cost=$(echo "$active_block" | jq -r '.projection.totalCost')            # e.g: 11
+remaining_minutes=$(echo "$active_block" | jq -r '.projection.remainingMinutes')  # e.g: 63
+
+# Calculate usage percentage using assumed limit
+if [ "$assumed_limit" != "null" ] && [ "$assumed_limit" != "0" ]; then
+  usage_percent=$(safe_math "$total_tokens / $assumed_limit * 100")
+  usage_percent=$(printf "%.1f" "$usage_percent")
+else
+  usage_percent="N/A"
+fi
+
+
+# Reset Time
+remaining_time_str=$(format_remaining_time "$remaining_minutes")                  # e.g: 1h 3m left
+
+# Calculate reset time (current time + remaining minutes)
+if [ "$remaining_minutes" != "null" ]; then
+  reset_time=$(calculate_reset_time "$remaining_minutes")
+  if [ "$reset_time" != "N/A" ]; then
+    reset_time_str="$remaining_time_str ($reset_time)"
+  else
+    reset_time_str="$remaining_time_str"
   fi
 else
-  new_session=1
-  printf '{"ts":%d,"tok":0}' "$current_time" > "$SESSION_FILE"
-  printf '{"sid":"%s","count":0,"last_used":%d}' "$session_id" "$current_used" > "$COMPRESS_FILE"
+  reset_time_str="$remaining_time_str"
 fi
 
-# Detect context compression (used_tokens drops significantly within same session)
-compress_count=0
-if [ -f "$COMPRESS_FILE" ]; then
-  c_sid=$(jq -r '.sid // ""' "$COMPRESS_FILE" 2>/dev/null)
-  c_count=$(jq -r '.count // 0' "$COMPRESS_FILE" 2>/dev/null)
-  c_last=$(jq -r '.last_used // 0' "$COMPRESS_FILE" 2>/dev/null)
+# Output formatting
+model_str=$(printf "🤖 %s" "$model_name")
+cost_str=$(printf "💵 \$%.2f" "$cost")
 
-  if [ "$session_id" = "$c_sid" ]; then
-    compress_count=$c_count
-    if [ "$c_last" -gt 0 ] && [ "$current_used" -gt 0 ]; then
-      drop=$((c_last - current_used))
-      threshold=$((c_last / 5))
-      if [ "$drop" -gt "$threshold" ] && [ "$drop" -gt 10000 ]; then
-        compress_count=$((compress_count + 1))
-      fi
-    fi
-    printf '{"sid":"%s","count":%d,"last_used":%d}' "$session_id" "$compress_count" "$current_used" > "$COMPRESS_FILE"
-  fi
-fi
-
-# Update last state
-printf '{"sid":"%s","tok":%d,"ts":%d}' "$session_id" "$current_used" "$current_time" > "$LAST_STATE_FILE"
-
-# Calculate burn rate & ETA
-if [ -f "$SESSION_FILE" ]; then
-  s_start=$(jq -r '.ts' "$SESSION_FILE" 2>/dev/null || echo "$current_time")
-  elapsed=$((current_time - s_start))
-  if [ "$elapsed" -gt 10 ] && [ "$current_used" -gt 0 ]; then
-    br_val=$(awk "BEGIN {v=($current_used * 60.0) / $elapsed; printf \"%.0f\", v}")
-    burn_rate_str="$(fmt "$br_val")/min"
-
-    if [ "$br_val" -gt 0 ] 2>/dev/null; then
-      eta_sec=$(awk "BEGIN {printf \"%.0f\", ($remaining_tokens * 60.0) / $br_val}")
-      if [ "$eta_sec" -ge 3600 ] 2>/dev/null; then
-        eta_str="$(awk "BEGIN {printf \"%.1f\", $eta_sec/3600}")h"
-      elif [ "$eta_sec" -ge 60 ] 2>/dev/null; then
-        eta_str="$(awk "BEGIN {printf \"%.0f\", $eta_sec/60}")min"
-      else
-        eta_str="${eta_sec}s"
-      fi
-    fi
-  fi
-fi
-
-# Aggregate daily/weekly/monthly
-day_start=$(date -j -v0H -v0M -v0S +%s 2>/dev/null || echo $((current_time - 86400)))
-week_ago=$((current_time - 604800))
-month_ago=$((current_time - 2592000))
-
-d_total=0; w_total=0; m_total=0
-if [ -f "$USAGE_LOG" ]; then
-  while IFS=, read -r ts sid tok; do
-    [ "$ts" = "ts" ] && continue
-    [[ "$tok" =~ ^[0-9]+$ ]] || continue
-    [ "${ts:-0}" -ge "$day_start" ] 2>/dev/null && d_total=$((d_total + tok))
-    [ "${ts:-0}" -ge "$week_ago" ] 2>/dev/null && w_total=$((w_total + tok))
-    [ "${ts:-0}" -ge "$month_ago" ] 2>/dev/null && m_total=$((m_total + tok))
-  done < "$USAGE_LOG"
-fi
-
-d_total=$((d_total + used_tokens))
-w_total=$((w_total + used_tokens))
-m_total=$((m_total + used_tokens))
-
-# Prune old entries occasionally
-if [ $((RANDOM % 50)) -eq 0 ] && [ -f "$USAGE_LOG" ]; then
-  cutoff=$((current_time - 7776000))
-  tmp="$USAGE_LOG.tmp"
-  head -1 "$USAGE_LOG" > "$tmp"
-  tail -n +2 "$USAGE_LOG" | awk -F, -v c="$cutoff" '$1 >= c' >> "$tmp"
-  mv "$tmp" "$USAGE_LOG"
-fi
-
-# Build progress bar
-pct_int=$(awk "BEGIN {printf \"%.0f\", ${used_pct:-0}}" 2>/dev/null || echo "0")
-filled=$((pct_int / 10))
-[ "$filled" -gt 10 ] && filled=10
-empty=$((10 - filled))
-bar=""
-for ((i=0; i<filled; i++)); do bar+="█"; done
-for ((i=0; i<empty; i++)); do bar+="░"; done
-
-# Performance zone indicator
-if [ "$pct_int" -ge 90 ]; then
-  perf="🔴 Critical"
-elif [ "$pct_int" -ge 70 ]; then
-  perf="🟠 Warning"
-elif [ "$pct_int" -ge 50 ]; then
-  perf="🟡 Caution"
+# Token with limit
+if [ "$assumed_limit" != "null" ] && [ "$assumed_limit" != "0" ]; then
+  token_str=$(printf "🔢 %s / %s (assuming)" "$(format_number_with_commas "$total_tokens")" "$(format_number_with_commas "$assumed_limit")")
 else
-  perf="🟢 Good"
+  token_str=$(printf "🔢 %s" "$(format_number_with_commas "$total_tokens")")
 fi
 
-# Output (2 lines)
-# Line 1: Session context status
-# Line 2: Burn rate + Usage history
-printf "🤖 %s │ 📊 %s/%s %s %d%% %s │ ⬇%s ⬆%s │ 💡残%s │ ⏳~%s │ 🔄%d回\n🔥 %s │ 🕐 Daily:%s  🗓 Weekly:%s  📊 Monthly:%s" \
-  "$model" \
-  "$(fmt $current_used)" \
-  "$(fmt $context_size)" \
-  "$bar" \
-  "$pct_int" \
-  "$perf" \
-  "$(fmt $total_input)" \
-  "$(fmt $total_output)" \
-  "$(fmt $remaining_tokens)" \
-  "$eta_str" \
-  "$compress_count" \
-  "$burn_rate_str" \
-  "$(fmt $d_total)" \
-  "$(fmt $w_total)" \
-  "$(fmt $m_total)"
+# Usage percentage with color indicator
+if [ "$usage_percent" != "N/A" ]; then
+  usage_float=$(printf "%.0f" "$usage_percent" 2>/dev/null || echo "0")
+  if [ "$usage_float" -le 25 ]; then
+    usage_indicator="🟢"
+  elif [ "$usage_float" -le 50 ]; then
+    usage_indicator="🟡"
+  elif [ "$usage_float" -le 75 ]; then
+    usage_indicator="🟠"
+  else
+    usage_indicator="🔴"
+  fi
+  using_str=$(printf "%s %s%%" "$usage_indicator" "$usage_percent")
+else
+  using_str="📊 N/A"
+fi
+
+reset_str=$(printf "⏱️  %s" "$reset_time_str")
+
+# Burn rate indicator with percentage
+if [ "$tokens_per_minute_for_indicator" != "null" ]; then
+  burn_percentage=$(printf "%.0f" "$tokens_per_minute_for_indicator" 2>/dev/null || echo "0")
+
+  if [ "$burn_percentage" -gt 100 ]; then
+    burn_str=$(printf "🔥\033[31m %s%%\033[90m" "$burn_percentage")
+  else
+    burn_str=$(printf "🔥 %s%%" "$burn_percentage")
+  fi
+else
+  burn_str="🔥 N/A"
+fi
+
+# Output the status line
+printf "\033[90m%s │ %s │ %s │ %s │ %s │ %s" "$model_str" "$cost_str" "$token_str" "$using_str" "$burn_str" "$reset_str"
 

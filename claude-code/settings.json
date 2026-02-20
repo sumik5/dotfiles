@@ -114,7 +114,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bun x ccusage statusline"
+    "command": "bash ~/.claude/statusline.sh"
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": false,
