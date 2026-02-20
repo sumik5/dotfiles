@@ -114,8 +114,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "npx -y ccstatusline@latest",
-    "padding": 0
+    "command": "bun x ccusage statusline"
   },
   "enabledPlugins": {
     "claude-mem@thedotmack": false,

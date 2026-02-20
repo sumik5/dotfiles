@@ -15,6 +15,8 @@
 | `testing-code` | 機能実装・バグ修正時 | TDD、テスト設計、Vitest/RTL/Playwright |
 | `securing-code` | 🔴 **実装完了後に必ず実行** | CodeGuardセキュリティチェック |
 | `removing-ai-smell` | すべてのテキスト出力時 | AI臭除去（コメント・文章の自然化） |
+| `applying-semantic-versioning` | すべてのバージョン判断時 | SemVer 2.0.0仕様準拠のバージョン判定 |
+| `writing-conventional-commits` | コミットメッセージ作成時 | Conventional Commits 1.0.0準拠フォーマット |
 
 ---
 
