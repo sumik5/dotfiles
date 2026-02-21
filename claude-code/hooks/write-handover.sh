@@ -52,16 +52,6 @@ if [ -n "$CWD" ] && [ -d "$CWD" ]; then
     GIT_DIFF_STAT=$(cd "$CWD" && git diff --stat 2>/dev/null || true)
 fi
 
-# 「今回やったこと」セクション用にgit logを箇条書きに変換
-GIT_LOG_BULLETS=""
-if [ -n "$GIT_LOG" ]; then
-    while IFS= read -r line; do
-        GIT_LOG_BULLETS="${GIT_LOG_BULLETS}- ${line}"$'\n'
-    done <<< "$GIT_LOG"
-else
-    GIT_LOG_BULLETS="- （今日のコミットなし）"$'\n'
-fi
-
 # トランスクリプト（JSONL形式）から編集ファイル一覧を抽出
 FILES_TOUCHED=""
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
@@ -74,6 +64,19 @@ if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     fi
 fi
 
+# 意味あるデータがない場合はファイルを生成しない
+if [ -z "$GIT_LOG" ] && [ -z "$FILES_TOUCHED" ]; then
+    exit 0
+fi
+
+# 「今回のコミット」セクション用にgit logを箇条書きに変換
+GIT_LOG_BULLETS=""
+if [ -n "$GIT_LOG" ]; then
+    while IFS= read -r line; do
+        GIT_LOG_BULLETS="${GIT_LOG_BULLETS}- ${line}"$'\n'
+    done <<< "$GIT_LOG"
+fi
+
 # 「関連ファイル」セクション用に箇条書きに変換
 FILES_BULLETS=""
 if [ -n "$FILES_TOUCHED" ]; then
@@ -81,33 +84,24 @@ if [ -n "$FILES_TOUCHED" ]; then
         [ -z "$line" ] && continue
         FILES_BULLETS="${FILES_BULLETS}- ${line}"$'\n'
     done <<< "$FILES_TOUCHED"
-else
-    FILES_BULLETS="- （ファイル操作の記録なし）"$'\n'
 fi
 
 # handoverファイルを生成
-cat > "$FILEPATH" << EOF
-# セッション引き継ぎノート - ${DATETIME}
+{
+    printf '# セッション引き継ぎノート（自動生成） - %s\n' "${DATETIME}"
 
-## 今回やったこと
-${GIT_LOG_BULLETS}
-## 決定事項
-<!-- 次回 /handover コマンドで追記 -->
+    if [ -n "$GIT_LOG_BULLETS" ]; then
+        printf '\n## 今回のコミット\n'
+        printf '%s' "${GIT_LOG_BULLETS}"
+    fi
 
-## 捨てた選択肢と理由
-<!-- 次回 /handover コマンドで追記 -->
+    if [ -n "$FILES_BULLETS" ]; then
+        printf '\n## 関連ファイル\n'
+        printf '%s' "${FILES_BULLETS}"
+    fi
 
-## ハマりどころ
-<!-- 次回 /handover コマンドで追記 -->
-
-## 学び
-<!-- 次回 /handover コマンドで追記 -->
-
-## 次にやること
-<!-- 次回 /handover コマンドで追記 -->
-
-## 関連ファイル
-${FILES_BULLETS}
-EOF
+    printf '\n---\n'
+    printf '*このファイルはSessionEnd/PreCompact hookによる自動生成です。詳細な引き継ぎは `/handover` コマンドで生成してください。*\n'
+} > "$FILEPATH"
 
 exit 0

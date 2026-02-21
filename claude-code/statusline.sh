@@ -164,8 +164,44 @@ format_time_local() {
 # Check dependencies first
 check_dependencies
 
+# セッション名を取得（マーカーファイル → sessions-index.json → session_id短縮）
+get_session_name() {
+    local session_id=$1
+    local transcript_path=$2
+
+    # 方法1: マーカーファイルから（高速）
+    local marker_file="/tmp/claude-rename-${session_id}"
+    if [ -f "$marker_file" ]; then
+        cat "$marker_file"
+        return
+    fi
+
+    # 方法2: sessions-index.json から
+    if [ -n "$transcript_path" ] && [ -f "$transcript_path" ]; then
+        local project_dir
+        project_dir=$(dirname "$transcript_path")
+        local sessions_index="${project_dir}/sessions-index.json"
+        if [ -f "$sessions_index" ]; then
+            local name
+            name=$(jq -r --arg sid "$session_id" '.entries[] | select(.sessionId == $sid) | .summary // empty' "$sessions_index" 2>/dev/null || true)
+            if [ -n "$name" ]; then
+                echo "$name"
+                return
+            fi
+        fi
+    fi
+
+    # フォールバック: session_id の先頭8文字
+    echo "${session_id:0:8}…"
+}
+
 # Read Claude input from stdin first
 claude_input=$(cat)
+
+# セッション名を取得
+session_id=$(echo "$claude_input" | jq -r '.session_id // empty')
+transcript_path=$(echo "$claude_input" | jq -r '.transcript_path // empty')
+session_name=$(get_session_name "$session_id" "$transcript_path")
 
 ccusage=$(npx ccusage blocks --json 2>/dev/null)
 if [ -z "$ccusage" ]; then
@@ -285,5 +321,6 @@ else
 fi
 
 # Output the status line
-printf "\033[90m%s │ %s │ %s │ %s │ %s │ %s" "$model_str" "$cost_str" "$token_str" "$using_str" "$burn_str" "$reset_str"
+session_str=$(printf "📋 %s" "$session_name")
+printf "\033[90m%s │ %s │ %s │ %s │ %s │ %s │ %s" "$session_str" "$model_str" "$cost_str" "$token_str" "$using_str" "$burn_str" "$reset_str"
 
