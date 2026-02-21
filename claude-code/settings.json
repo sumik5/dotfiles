@@ -110,6 +110,44 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/retrospective.sh",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/write-handover.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/write-handover.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME\"/.claude/hooks/auto-rename-session.sh",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

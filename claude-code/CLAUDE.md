@@ -16,8 +16,6 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto -y` を使用） |
 | 新規作業開始時 | ユーザー確認してchangeとbookmark作成を提案（勝手な作成・削除禁止） |
 | 要件・仕様が曖昧な場合 | AskUserQuestionツールで質問（推測での作業進行禁止） |
-| 最初の作業完了後 | `/rename` でNamed Sessionに命名（接頭辞: `feature-`, `bugfix-`, `refactor-`, `docs-`, `chore-` + 作業内容の要約） |
-| 作業内容が大きく変わった時 | `/rename` でセッション名を更新（現在の作業内容を反映） |
 
 ---
 
@@ -50,7 +48,6 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | `gcauto -y` | AI生成メッセージでコミット（非対話式） | コミット作成時 |
 | `/reload` | CLAUDE.md再読み込み | compaction後のコンテキスト復元時 |
 | `/serena "問題"` | トークン効率的な構造化開発 | コンポーネント開発・API実装・バグ修正時 |
-| `/rename` | セッションに名前を付ける（Named Session） | 最初の作業完了後、作業内容変更時 |
 | `/resume [名前]` | Named Sessionの再開 | 中断したセッションの再開時 |
 
 ---
@@ -108,6 +105,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | `docs-` | ドキュメント作成・更新 | `docs-claude-md-update` |
 | `chore-` | 設定変更・メンテナンス | `chore-deps-upgrade` |
 
-- 命名は **最初の作業完了直後** に行う（後から探しやすくするため）
-- 作業内容が変わったら都度 `/rename` で更新
+- 命名は UserPromptSubmit hook (`auto-rename-session.sh`) で自動実行される
+- ファイル操作・ユーザープロンプトから自動でプレフィックス＋内容を判定
+- 手動で変更したい場合は `/rename` も利用可能
 - `/resume` で過去セッションを再開可能（`/resume` 画面で `P` プレビュー、`/` 検索）
