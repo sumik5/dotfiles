@@ -86,12 +86,18 @@ ${SESSION_BLOCK}
 EOF
 else
     # 作業実績セクション（🧠セクションの直前）にセッションデータを挿入
+    # NOTE: awk -v は改行を含む文字列を扱えないため head/tail で分割挿入
     TMPFILE=$(mktemp)
-    awk -v block="$SESSION_BLOCK" '
-        /^## 🧠/ { print block; print "" }
-        { print }
-    ' "$FILEPATH" > "$TMPFILE"
-    mv "$TMPFILE" "$FILEPATH"
+    LINE_NUM=$(grep -n "^## 🧠" "$FILEPATH" | head -1 | cut -d: -f1)
+    if [ -n "$LINE_NUM" ]; then
+        head -n $((LINE_NUM - 1)) "$FILEPATH" > "$TMPFILE"
+        printf '%s\n\n' "$SESSION_BLOCK" >> "$TMPFILE"
+        tail -n +"$LINE_NUM" "$FILEPATH" >> "$TMPFILE"
+        mv "$TMPFILE" "$FILEPATH"
+    else
+        printf '%s\n' "$SESSION_BLOCK" >> "$FILEPATH"
+        rm -f "$TMPFILE"
+    fi
 fi
 
 exit 0
