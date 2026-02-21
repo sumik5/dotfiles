@@ -72,11 +72,28 @@ extract_token_limit() {
   ccusage_output=$(npx ccusage blocks 2>&1)
 
   if command -v grep &> /dev/null; then
-    echo "$ccusage_output" | grep -o "assuming [0-9,]* token limit" | grep -o "[0-9,]*" | tr -d ','
+    local result
+    # 新フォーマット: "Using max tokens from previous sessions: 460,946,797"
+    result=$(echo "$ccusage_output" | grep -o "Using max tokens from previous sessions: [0-9,]*" | grep -o "[0-9,]*" | tr -d ',' || true)
+    # 旧フォーマットにフォールバック: "assuming 460,946,797 token limit"
+    if [ -z "$result" ]; then
+      result=$(echo "$ccusage_output" | grep -o "assuming [0-9,]* token limit" | grep -o "[0-9,]*" | tr -d ',' || true)
+    fi
+    echo "$result"
   elif command -v powershell.exe &> /dev/null; then
-    echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "assuming ([0-9,]*) token limit" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }'
+    local result
+    result=$(echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "Using max tokens from previous sessions: ([0-9,]*)" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }' || true)
+    if [ -z "$result" ]; then
+      result=$(echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "assuming ([0-9,]*) token limit" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }' || true)
+    fi
+    echo "$result"
   else
-    echo "$ccusage_output" | sed -n 's/.*assuming \([0-9,]*\) token limit.*/\1/p' | tr -d ','
+    local result
+    result=$(echo "$ccusage_output" | sed -n 's/.*Using max tokens from previous sessions: \([0-9,]*\).*/\1/p' | tr -d ',' || true)
+    if [ -z "$result" ]; then
+      result=$(echo "$ccusage_output" | sed -n 's/.*assuming \([0-9,]*\) token limit.*/\1/p' | tr -d ',' || true)
+    fi
+    echo "$result"
   fi
 }
 
