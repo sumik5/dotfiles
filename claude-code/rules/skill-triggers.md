@@ -28,8 +28,9 @@
 |---------|--------|------|
 | `package.json` に `next` | `developing-nextjs` | Next.js 16 / React 19開発 |
 | `package.json` に `next` | `using-next-devtools` | Next.js DevTools MCP活用 |
+| `package.json` に `next` | `developing-react` | React Internals・パフォーマンス・アニメーション・RTL |
 | `package.json` に `next` + stripe/auth系 | `building-nextjs-saas` | Next.js SaaSアプリケーション構築 |
-| `package.json` に `react`（next無し） | `developing-nextjs` | React Internals/Performance統合済み |
+| `package.json` に `react`（next無し） | `developing-react` | React 19.x 開発（Internals・パフォーマンス・アニメーション・RTL） |
 | `package.json` に express/nestjs/fastify/koa/hapi | `developing-fullstack-javascript` | NestJS/Express フルスタックJS |
 | `package.json` に `@playwright/test` | `testing-e2e-with-playwright` | Playwright E2Eテスト設計・実装 |
 | `package.json` に `@opentelemetry/*` | `implementing-opentelemetry` | OpenTelemetry 分散トレーシング |
@@ -85,7 +86,8 @@
 ### React / Next.js
 | スキル | 役割 |
 |--------|------|
-| `developing-nextjs` | Next.js + React Internals + Performance（統合済み） |
+| `developing-react` | React 19.x（Internals・パフォーマンス・アニメーション・RTL） |
+| `developing-nextjs` | Next.js 16.x（App Router・Server Components）。React固有は developing-react |
 | `using-next-devtools` | Next.js DevTools MCP |
 
 ### フルスタック JavaScript
