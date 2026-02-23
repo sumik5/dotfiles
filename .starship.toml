@@ -7,19 +7,18 @@ $git_branch\
 $git_state\
 $git_status\
 $git_metrics\
-$fill\
 $conda\
 $python\
 $nodejs\
 $golang\
 $lua\
 $rust\
-$gcloud\
-$aws\
 \n$character\
 """
 
 right_format = """
+$gcloud\
+$aws\
 $cmd_duration\
 $time\
 """
@@ -122,8 +121,9 @@ format = """
 """
 
 [fill]
+disabled = true
 symbol = '─'
-style = 'fg:#89b4fa) bg:none'
+style = 'fg:#89b4fa bg:none'
 
 [python]
 pyenv_version_name = false

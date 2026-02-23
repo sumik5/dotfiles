@@ -66,7 +66,6 @@ alias brew="arch -arm64 brew"
 alias gcautog="gcauto -m gemini"
 alias vi="nvim"
 alias vim="nvim"
-alias tmux="tmuxx"
 
 # -------------------------------------------------
 # user environment

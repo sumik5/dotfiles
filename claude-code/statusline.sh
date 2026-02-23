@@ -312,7 +312,7 @@ if [ "$tokens_per_minute_for_indicator" != "null" ]; then
   burn_percentage=$(printf "%.0f" "$tokens_per_minute_for_indicator" 2>/dev/null || echo "0")
 
   if [ "$burn_percentage" -gt 100 ]; then
-    burn_str=$(printf "🔥\033[31m %s%%\033[97m" "$burn_percentage")
+    burn_str=$(printf "🔥 %s%%" "$burn_percentage")
   else
     burn_str=$(printf "🔥 %s%%" "$burn_percentage")
   fi
@@ -322,5 +322,5 @@ fi
 
 # Output the status line
 session_str=$(printf "📋 %s" "$session_name")
-printf "\033[1m\033[97m%s\033[0m\033[97m │ %s │ %s │ %s │ %s │ %s │ %s" "$session_str" "$model_str" "$cost_str" "$token_str" "$using_str" "$burn_str" "$reset_str"
+printf "%s │ %s │ %s │ %s │ %s │ %s │ %s" "$session_str" "$model_str" "$cost_str" "$token_str" "$using_str" "$burn_str" "$reset_str"
 
