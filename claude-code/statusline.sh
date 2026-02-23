@@ -66,43 +66,12 @@ calculate_reset_time() {
   esac
 }
 
-# Cross-platform token limit extraction
-extract_token_limit() {
-  local ccusage_output
-  ccusage_output=$(npx ccusage blocks 2>&1)
-
-  if command -v grep &> /dev/null; then
-    local result
-    # 新フォーマット: "Using max tokens from previous sessions: 460,946,797"
-    result=$(echo "$ccusage_output" | grep -o "Using max tokens from previous sessions: [0-9,]*" | grep -o "[0-9,]*" | tr -d ',' || true)
-    # 旧フォーマットにフォールバック: "assuming 460,946,797 token limit"
-    if [ -z "$result" ]; then
-      result=$(echo "$ccusage_output" | grep -o "assuming [0-9,]* token limit" | grep -o "[0-9,]*" | tr -d ',' || true)
-    fi
-    echo "$result"
-  elif command -v powershell.exe &> /dev/null; then
-    local result
-    result=$(echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "Using max tokens from previous sessions: ([0-9,]*)" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }' || true)
-    if [ -z "$result" ]; then
-      result=$(echo "$ccusage_output" | powershell.exe -Command '\$input | Select-String "assuming ([0-9,]*) token limit" | ForEach-Object { \$_.Matches[0].Groups[1].Value -replace ",","" }' || true)
-    fi
-    echo "$result"
-  else
-    local result
-    result=$(echo "$ccusage_output" | sed -n 's/.*Using max tokens from previous sessions: \([0-9,]*\).*/\1/p' | tr -d ',' || true)
-    if [ -z "$result" ]; then
-      result=$(echo "$ccusage_output" | sed -n 's/.*assuming \([0-9,]*\) token limit.*/\1/p' | tr -d ',' || true)
-    fi
-    echo "$result"
-  fi
-}
-
 # Dependency check
 check_dependencies() {
   local missing_deps=()
 
-  if ! command -v npx &> /dev/null; then
-    missing_deps+=("npx (Node.js)")
+  if ! command -v ccusage &> /dev/null; then
+    missing_deps+=("ccusage")
   fi
 
   if ! command -v jq &> /dev/null; then
@@ -203,15 +172,60 @@ session_id=$(echo "$claude_input" | jq -r '.session_id // empty')
 transcript_path=$(echo "$claude_input" | jq -r '.transcript_path // empty')
 session_name=$(get_session_name "$session_id" "$transcript_path")
 
-ccusage=$(npx ccusage blocks --json 2>/dev/null)
+# キャッシュ設定
+CCUSAGE_CACHE_JSON="/tmp/ccusage-cache.json"
+CCUSAGE_CACHE_TTL=120  # seconds (active block data)
+TOKEN_LIMIT_CACHE="/tmp/ccusage-token-limit"
+TOKEN_LIMIT_TTL=3600  # seconds (token limit changes rarely)
+
+# キャッシュ有効性チェック（macOS/Linux対応）
+cache_is_valid() {
+  local cache_file=$1
+  local ttl=$2
+  if [ ! -f "$cache_file" ]; then
+    return 1
+  fi
+  local now mtime
+  now=$(date +%s)
+  mtime=$(stat -c "%Y" "$cache_file" 2>/dev/null || stat -f "%m" "$cache_file" 2>/dev/null || echo 0)
+  [ $((now - mtime)) -lt "$ttl" ]
+}
+
+# 1. Active block data (fast: --active --offline, TTL=120s)
+if cache_is_valid "$CCUSAGE_CACHE_JSON" "$CCUSAGE_CACHE_TTL"; then
+  ccusage=$(cat "$CCUSAGE_CACHE_JSON")
+else
+  ccusage=$(ccusage blocks --active --offline --json 2>/dev/null)
+  if [ -n "$ccusage" ]; then
+    printf '%s' "$ccusage" > "$CCUSAGE_CACHE_JSON"
+  fi
+fi
+
 if [ -z "$ccusage" ]; then
-  echo "Error: Failed to fetch data from 'npx ccusage blocks --json'."
+  echo "Error: Failed to fetch data from 'ccusage blocks --active --offline --json'."
   echo "Please ensure ccusage is installed and functioning correctly."
   exit 1
 fi
 
-# Get the assumed token limit from ccusage text output
-assumed_limit=$(extract_token_limit)
+# 2. Token limit (slow: full blocks scan, TTL=3600s — limit changes rarely)
+if cache_is_valid "$TOKEN_LIMIT_CACHE" "$TOKEN_LIMIT_TTL"; then
+  assumed_limit=$(cat "$TOKEN_LIMIT_CACHE")
+else
+  # バックグラウンドで取得（statusline表示をブロックしない）
+  # NOTE: "Using max tokens" メッセージはstdoutに出力される
+  (
+    set +euo pipefail
+    limit=$(ccusage blocks --offline 2>/dev/null | grep -m1 "Using max tokens from previous sessions" | grep -o "[0-9,]*" | tr -d ',')
+    if [ -z "$limit" ]; then
+      limit=$(ccusage blocks --offline 2>/dev/null | grep -m1 "assuming .* token limit" | grep -o "[0-9,]*" | tr -d ',')
+    fi
+    if [ -n "$limit" ]; then
+      printf '%s' "$limit" > "$TOKEN_LIMIT_CACHE"
+    fi
+  ) &disown 2>/dev/null
+  # キャッシュがあれば古い値を使用、なければnull
+  assumed_limit=$(cat "$TOKEN_LIMIT_CACHE" 2>/dev/null || echo "null")
+fi
 if [ -z "$assumed_limit" ]; then
   assumed_limit="null"
 fi

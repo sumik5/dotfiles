@@ -4,11 +4,12 @@
 TARGET_PANE="$1"
 
 # 一時ファイルを作成
-TMPFILE="$(mktemp /tmp/claude-prompt-XXXXXX.md)"
+# 注意: macOS BSD mktemp はサフィックス(.md等)があるとX展開しないため付けない
+TMPFILE="$(mktemp /tmp/claude-prompt-XXXXXX)"
 
-# tmux セッションの中で動いているか確認（保険）
-if [ -z "${TMUX:-}" ]; then
-  echo "Error: This script must be run inside a tmux session." >&2
+# tmux サーバーに接続可能か確認（run-shell 経由だと TMUX 変数が未設定の場合がある）
+if ! tmux has-session 2>/dev/null; then
+  echo "Error: tmux server is not running." >&2
   exit 1
 fi
 
