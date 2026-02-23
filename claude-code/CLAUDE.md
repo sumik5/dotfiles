@@ -79,6 +79,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | トリガー（If X） | 行動（then Y） |
 |----------------|--------------|
 | セッション開始時 | serena再アクティベート |
+| セッション開始後、作業内容が明確になった時点 | sessions-index.jsonの最新エントリの `summary` を `{prefix}-{english-slug}` 形式（英語・kebab-case・50文字以内）で更新 |
 | 会話が長く多くのツール呼び出し・ファイル変更を行った時（compaction前） | `/handover` を実行してHANDOVER.mdを生成（PreCompact hookはAI推論不可のため、Claude自身が先手を打つ） |
 | compaction発生後 | `/reload` でCLAUDE.md再読み込み |
 | 週次 | serenaメモリ整理、`jj bookmark list` で不要bookmark整理 |
@@ -105,7 +106,6 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | `docs-` | ドキュメント作成・更新 | `docs-claude-md-update` |
 | `chore-` | 設定変更・メンテナンス | `chore-deps-upgrade` |
 
-- 命名は UserPromptSubmit hook (`auto-rename-session.sh`) で自動実行される
-- ファイル操作・ユーザープロンプトから自動でプレフィックス＋内容を判定
-- 手動で変更したい場合は `/rename` も利用可能
-- `/resume` で過去セッションを再開可能（`/resume` 画面で `P` プレビュー、`/` 検索）
+- Claude自身が作業内容からセッション名を判定し、sessions-index.jsonの `summary` を更新
+- 対象: `~/.claude/projects/{project-key}/sessions-index.json` の最新 `modified` エントリ（project-key = CWDの `/` → `-` 置換）
+- 手動: `/rename` も利用可能、`/resume` で再開可能（`P` プレビュー、`/` 検索）

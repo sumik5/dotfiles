@@ -138,17 +138,7 @@
         ]
       }
     ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$HOME\"/.claude/hooks/auto-rename-session.sh",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
+    "UserPromptSubmit": []
   },
   "statusLine": {
     "type": "command",
