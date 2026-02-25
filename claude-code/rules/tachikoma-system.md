@@ -4,15 +4,40 @@
 
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
-| **Claude Code本体（リーダー）** | Opus | タスク判断・`orchestrating-teams` スキルでAgent Team API直接操作・最終確認 | - |
-| **タチコマ** | Sonnet | 実装ワーカー（軽微修正は単体直接起動、複雑タスクはClaude Code本体配下でTeam member化） | ❌change勝手作成、❌jj書込操作、❌指定外changeでの作業 |
+| **Claude Code本体（リーダー）** | Opus | タスク分析・専門タチコマ選択・委譲・監視・jj操作のみ。**実装コードは書かない** | ❌実装コード記述 |
+| **専門タチコマ（19体）** | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） | ❌change勝手作成、❌jj書込操作 |
+| **汎用タチコマ** | Sonnet | 専門タチコマでカバーされないタスクのフォールバック | ❌change勝手作成、❌jj書込操作 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
 
 **補足:**
-- **Claude Code本体の役割**: タスク分析・並列化判断を行い、`orchestrating-teams` スキルの知識に基づきAgent Team APIを直接操作してチーム編成・並列実行を実施
-- **軽微な修正（1ファイル・単一関心事）**: タチコマ1体を直接起動（チーム不要）
-- **複数ファイル・複雑なタスク**: Claude Code本体が直接 TeamCreate → TaskCreate → Task tool でタチコマ複数をTeam memberとして並列起動
-- Claude Code本体がファイル所有権パターン設計・タスク分解・モデル戦略選択・進捗管理を担当（`orchestrating-teams` スキル参照）
+- **Claude Code本体の役割**: タスク分析 → `rules/skill-triggers.md` のルーティング表で専門タチコマ選択 → 委譲 → 監視 → jj操作
+- **軽微な修正（1ファイル・単一関心事）**: TeamCreate → 適切な専門タチコマ1体を `team_name` + `run_in_background: true` で起動（tmux pane表示）→ 完了後TeamDelete
+- **複数ファイル・複雑なタスク**: `orchestrating-teams` スキルロード → Claude Code本体が直接 TeamCreate → planner（`sumik:タチコマ（アーキテクチャ）`）起動 → implementer（ドメイン別専門タチコマ）並列起動
+- **コア品質スキル**: `writing-clean-code`, `enforcing-type-safety`, `testing-code`, `securing-code` は各専門タチコマにプリロード済み。本体がロードする必要はない
+
+### 専門タチコマ一覧（19体）
+
+| # | subagent_type | モデル | 専門領域 |
+|---|--------------|--------|---------|
+| 1 | `sumik:タチコマ（Next.js）` | Sonnet | Next.js/React開発 |
+| 2 | `sumik:タチコマ（フロントエンド）` | Sonnet | UI/UX・shadcn・Figma |
+| 3 | `sumik:タチコマ（フルスタックJS）` | Sonnet | NestJS/Express |
+| 4 | `sumik:タチコマ（TypeScript）` | Sonnet | TypeScript型設計 |
+| 5 | `sumik:タチコマ（Python）` | Sonnet | Python・ADK |
+| 6 | `sumik:タチコマ（Go）` | Sonnet | Go開発 |
+| 7 | `sumik:タチコマ（Bash）` | Sonnet | シェルスクリプト |
+| 8 | `sumik:タチコマ（インフラ）` | Sonnet | Docker/CI-CD/DevOps |
+| 9 | `sumik:タチコマ（Terraform）` | Sonnet | Terraform IaC |
+| 10 | `sumik:タチコマ（AWS）` | Sonnet | AWS全般 |
+| 11 | `sumik:タチコマ（Google Cloud）` | Sonnet | GCP全般 |
+| 12 | `sumik:タチコマ（アーキテクチャ）` | **Opus** | 設計・DDD（読取専用） |
+| 13 | `sumik:タチコマ（セキュリティ）` | **Opus** | セキュリティ監査（読取専用） |
+| 14 | `sumik:タチコマ（データベース）` | Sonnet | DB設計・SQL |
+| 15 | `sumik:タチコマ（AI/ML）` | Sonnet | AI/RAG/MCP/LLM |
+| 16 | `sumik:タチコマ（テスト）` | Sonnet | ユニット/統合テスト |
+| 17 | `sumik:タチコマ（E2Eテスト）` | Sonnet | Playwright E2E |
+| 18 | `sumik:タチコマ（オブザーバビリティ）` | Sonnet | 監視・OTel・ログ |
+| 19 | `sumik:タチコマ（ドキュメント）` | Sonnet | 技術文書・記事 |
 
 ---
 
@@ -39,13 +64,13 @@
 ## 必須使用ケース
 
 コード修正の委譲先:
-- **マルチファイル・マルチ関心事**: `orchestrating-teams` スキルロード → Claude Code本体が直接チーム編成 → タチコマ複数並列処理
-- **単一ファイル・単一関心事の軽微修正**: タチコマ1体を直接起動
+- **マルチファイル・マルチ関心事**: `orchestrating-teams` スキルロード → Claude Code本体が直接チーム編成 → **ドメイン別専門タチコマ**複数並列処理
+- **単一ファイル・単一関心事の軽微修正**: TeamCreate → **適切な専門タチコマ**1体を `team_name` + `run_in_background: true` で起動（tmux pane）→ 完了後TeamDelete
 - **トークン効率重視**: `/serena`コマンドを積極活用
 
 ### 例外（Claude Code本体で実行可能）
 
-ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示、計画・設計ドキュメント作成
+ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示、計画・設計ドキュメント作成、`researching-libraries` によるライブラリ調査
 
 ---
 
@@ -74,26 +99,63 @@
 ```
 ユーザー要求
     ↓
-Claude Code本体（ファイルを読まない・分析しない）
+Claude Code本体（実装コードを書かない）
     ↓
 【並列実行が必要そう？】（要求内容から即座に判断）
     ├─ Yes → **`orchestrating-teams` スキルロード → 即座にTeamCreate**
     │         Phase 1（現状把握・計画策定 → planner に全委譲）:
     │         1. TeamCreate でチーム作成
-    │         2. planner タチコマ起動（model: opus、ユーザー要求をそのまま渡す）
-    │            → 現状把握・コードベース分析・docs/plan作成
+    │         2. planner タチコマ起動（subagent_type: `sumik:タチコマ（アーキテクチャ）`, model: opus）
+    │            → 現状把握・コードベース分析・docs/plan作成・各タスクの推奨専門タチコマ明記
     │         3. 計画レビュー・ユーザー確認
-    │         Phase 2（実装 → implementer 並列起動）:
-    │         4. TaskCreate + implementer タチコマ複数を並列起動
+    │         Phase 2（実装 → ドメイン別専門タチコマ並列起動）:
+    │         4. TaskCreate + **ドメイン別専門タチコマ**を `team_name` + `run_in_background: true` で並列起動（tmux pane）
     │         5. SendMessage で進捗管理・調整
     │         6. 全メンバー完了後に統合・TeamDelete
     │
-    ├─ No（軽微修正） → タチコマ1体を直接起動（Task tool）
+    ├─ No（軽微修正） → `rules/skill-triggers.md` ルーティング表で専門タチコマ選択
+    │                    → TeamCreate → Task tool（`team_name` + `run_in_background: true`）
+    │                    → tmux pane起動 → 完了後TeamDelete
     │
     └─ No（読み込み・質問等） → 直接実行
     ↓
 CodeGuard実行（必須）
     ↓ 完了報告
+```
+
+---
+
+## 🔴 tmux pane起動ルール（絶対遵守）
+
+**`run_in_background: true` だけではtmux paneに表示されない。** tmux pane起動にはAgent Teams API（TeamCreate + `team_name`）が必須。
+
+| ルール | 詳細 |
+|-------|------|
+| TeamCreate 必須 | タチコマ起動前に**必ず** TeamCreate でチームを作成（軽微修正でも必須） |
+| `team_name` + `run_in_background: true` | Task tool呼び出し時に**両方**指定。`team_name` がtmux pane起動の鍵 |
+| 1メッセージ複数Task | 並列起動時は1メッセージ内で複数のTask tool呼び出しを行う |
+| Bash tool禁止 | Bash toolでのタチコマ起動は禁止（`--team` 等のCLIオプションは存在しない） |
+| 同一専門タチコマ複数起動可 | 同じsubagent_typeを複数並列起動可能（例: `sumik:タチコマ（Next.js）` ×2） |
+| 完了後TeamDelete | 単体タスク完了後はTeamDeleteでチームを解放（1セッション1チーム制約） |
+
+### tmux pane起動の正しいフロー
+
+```
+1. TeamCreate（team_name: "task-name"）
+2. Task tool（team_name: "task-name", run_in_background: true, subagent_type: "sumik:タチコマ（...）"）
+   → tmux pane で起動 ✓
+3. タチコマ完了待ち
+4. TeamDelete
+```
+
+### ❌ よくある間違い
+
+```
+# NG: run_in_background だけ → pane なし（バックグラウンドのみ）
+Task tool（run_in_background: true）  ← team_name なし = pane なし
+
+# OK: TeamCreate + team_name → pane あり
+TeamCreate → Task tool（team_name + run_in_background: true） ← pane あり ✓
 ```
 
 ---

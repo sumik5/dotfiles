@@ -11,8 +11,9 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | トリガー（If X） | 行動（then Y） |
 |----------------|--------------|
 | すべての応答時 | 必ず日本語で応答（例外: 技術用語・ライブラリ名・プログラミングキーワード） |
-| コードファイル変更時（軽微: 1ファイル・単一関心事） | タチコマ1体に委譲（例外: ファイル読み込み・質問回答・計画/設計ドキュメント作成は本体で実行可） |
-| コードファイル変更時（複数ファイル・複雑なタスク） | `orchestrating-teams` スキルをロードし、Claude Code本体がAgent Team APIで直接チーム編成・並列処理を実行（docs先行必須） |
+| コードファイル変更時（軽微: 1ファイル・単一関心事） | **適切な専門タチコマ**1体に委譲（TeamCreate → `team_name` + `run_in_background: true` でtmux pane起動 → 完了後TeamDelete）。例外: ファイル読み込み・質問回答・計画/設計ドキュメント作成は本体で実行可 |
+| コードファイル変更時（複数ファイル・複雑なタスク） | `orchestrating-teams` スキルをロードし、TeamCreate → **専門タチコマ**を `team_name` 付きで並列起動（tmux pane）。docs先行必須 |
+| コード実装の委譲時 | Claude Code本体は実装コードを一切書かない（分析・計画・委譲・監視・jj操作のみ）。`rules/skill-triggers.md` のルーティング表で適切な専門タチコマを選択 |
 | jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto -y` を使用） |
 | 新規作業開始時 | ユーザー確認してchangeとbookmark作成を提案（勝手な作成・削除禁止） |
 | 要件・仕様が曖昧な場合 | AskUserQuestionツールで質問（推測での作業進行禁止） |
@@ -29,10 +30,9 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | コミットメッセージ作成時 | Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`等） |
 | 新機能の実装開始前 | `researching-libraries` スキルで既存ライブラリを調査（車輪の再発明禁止） |
 | 複数ファイル変更の実装前 | `docs/` に計画ドキュメント作成（1ファイル軽微修正は例外） |
-| コード実装時 | SOLID原則・型安全性（any/Any禁止）・テストファースト遵守 |
+| コード品質確認時 | 専門タチコマがSOLID原則・型安全性を遵守（各タチコマにコア品質スキルがプリロード済み）。本体は直接チェックしない |
 | 実装完了後 | CodeGuardセキュリティチェック実行（`/codeguard-security:software-security`） |
 | Web検索・情報収集時 | Exa MCP（`searching-with-exa` スキル）を第一優先で使用（gemini CLI / WebSearch は fallback） |
-| プロジェクトファイル検出時 | `rules/skill-triggers.md` に基づきスキル自動ロード |
 | 作業中にCLAUDE.mdへ取り込むべき知見を発見した時 | `managing-claude-md` スキル参照し、適切なファイルにIf X then Y形式で追記提案（AskUserQuestionで確認後に追記） |
 
 ---
@@ -70,7 +70,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | `rules/tachikoma-system.md` | Agent Teamオーケストレーション・タチコマシステム・並列実行・ドキュメント先行開発（`orchestrating-teams` スキル参照） | 並列実行判断時 |
 | `rules/code-quality.md` | SOLID・型安全性・テスト・セキュリティ | コード実装・レビュー時 |
 | `rules/plugins-and-commands.md` | プラグイン環境・MCP・スラッシュコマンド | プラグイン・MCP利用時 |
-| `rules/skill-triggers.md` | スキル自動トリガー条件・使い分けガイド | スキル選択判断時 |
+| `rules/skill-triggers.md` | サブエージェント委譲ガイド・ルーティング表 | コード実装委譲時の専門タチコマ選択 |
 
 ---
 

@@ -33,7 +33,13 @@ if command -v ccusage &>/dev/null; then
     now=$(date +%s)
     mtime=$(stat -c "%Y" "$CCUSAGE_CACHE" 2>/dev/null) && [ -n "$mtime" ] \
       || mtime=$(stat -f "%m" "$CCUSAGE_CACHE" 2>/dev/null) || mtime=0
-    [ $((now - mtime)) -lt "$CCUSAGE_TTL" ] && cache_age_ok=true
+    has_data=$(jq -r '.blocks | length > 0' "$CCUSAGE_CACHE" 2>/dev/null || echo "false")
+    if [ "$has_data" = "true" ]; then
+      ttl=$CCUSAGE_TTL
+    else
+      ttl=30
+    fi
+    [ $((now - mtime)) -lt "$ttl" ] && cache_age_ok=true
   fi
 
   if [ -f "$CCUSAGE_CACHE" ]; then

@@ -1,0 +1,13 @@
+{
+  "enabledMcpjsonServers": [
+    "context7",
+    "serena",
+    "playwright",
+    "kagi",
+    "deepwiki",
+    "sequentialthinking",
+    "docset",
+    "terraform"
+  ],
+  "enableAllProjectMcpServers": true
+}
