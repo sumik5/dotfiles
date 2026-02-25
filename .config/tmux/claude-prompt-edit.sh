@@ -1,48 +1,116 @@
 #!/usr/bin/env bash
+#
+# claude-prompt-edit.sh - Neovim/vi エディタで Claude Code 入力を編集
+#
+# 概要:
+#   エディタで書いたテキストを呼び出し元の tmux pane にペーストする。
+#   nvim がなければ vi にフォールバック。
+#
+# 動作モード:
+#   1. tmux keybinding（通常 tmux）
+#      → display-popup でオーバーレイエディタを開く
+#   2. iTerm2 coprocess（tmux -CC モード）
+#      → -CC では display-popup が使えないため split-window で下部にエディタを開く
+#      → coprocess 環境では tmux バイナリとソケットを明示指定して接続
+#
+# セットアップ:
+#   ── 通常 tmux の場合 ──
+#   .tmux.conf に追加（TPM より前に記述）:
+#     bind-key -n C-e run-shell "bash ~/.config/tmux/claude-prompt-edit.sh '#{pane_id}'"
+#
+#   ── iTerm2 + tmux -CC の場合 ──
+#   -CC モードでは tmux keybinding が発火しないため iTerm2 側で設定:
+#     iTerm2 → Settings → Profiles → Keys → Key Mappings
+#     Shortcut: Ctrl+E  /  Action: Run Coprocess
+#     Command:  bash ~/.config/tmux/claude-prompt-edit.sh
+#
+# 注意:
+#   - macOS では M-e (Alt+E) は dead key として OS に消費されるため使用不可
+#   - split-window / coprocess は最小限の PATH で起動されるため
+#     nvim, tmux 等は絶対パスのフォールバック検索を行う
 
-# 呼び出し元 pane の ID（tmux.conf から渡す）
-TARGET_PANE="$1"
+# stderr をログに退避（coprocess 経由のエラーダイアログ防止）
+LOGFILE="/tmp/claude-prompt-debug.log"
+exec 2>>"$LOGFILE"
 
-# 一時ファイルを作成
-# 注意: macOS BSD mktemp はサフィックス(.md等)があるとX展開しないため付けない
-TMPFILE="$(mktemp /tmp/claude-prompt-XXXXXX)"
+# ── ユーティリティ ─────────────────────────────────
 
-# tmux サーバーに接続可能か確認（run-shell 経由だと TMUX 変数が未設定の場合がある）
-if ! tmux has-session 2>/dev/null; then
-  echo "Error: tmux server is not running." >&2
-  exit 1
+# コマンドを PATH → 既知パスの順で探す
+find_cmd() {
+  local cmd="$1"; shift
+  local found
+  found="$(command -v "$cmd" 2>/dev/null)"
+  if [ -n "$found" ] && [ -x "$found" ]; then
+    echo "$found"; return
+  fi
+  for p in "$@"; do
+    [ -x "$p" ] && echo "$p" && return
+  done
+}
+
+# tmux 接続: $TMUX があれば直接、なければソケット明示指定
+run_tmux() {
+  if [ -n "$TMUX" ]; then
+    "$TMUX_CMD" "$@"
+  else
+    "$TMUX_CMD" -S "/tmp/tmux-$(id -u)/default" "$@"
+  fi
+}
+
+# ── エディタモード（split-window 内で呼ばれる） ────
+
+if [ "$1" = "--editor" ]; then
+  TMPFILE="$2"
+  TARGET_PANE="$3"
+
+  NVIM_CMD="$(find_cmd nvim /opt/homebrew/bin/nvim /usr/local/bin/nvim /usr/bin/nvim)"
+  EDITOR_CMD="${NVIM_CMD:-$(find_cmd vi /usr/bin/vi)}"
+  TMUX_CMD="$(find_cmd tmux /opt/homebrew/bin/tmux /usr/local/bin/tmux /usr/bin/tmux)"
+
+  "$EDITOR_CMD" "$TMPFILE"
+
+  if [ -s "$TMPFILE" ]; then
+    "$TMUX_CMD" set-buffer -b claude_prompt -- "$(cat "$TMPFILE")"
+    "$TMUX_CMD" paste-buffer -b claude_prompt -t "$TARGET_PANE"
+  fi
+
+  rm -f "$TMPFILE"
+  exit 0
 fi
 
-# popup の中で「いつものシェル環境 + nvim」を起動
-# -E: コマンド(nvim)が終わったら popup を閉じる
-tmux display-popup -E -w 80% -h 70% -T "Claude Prompt" \
-  "$SHELL -i -c 'nvim \"$TMPFILE\"'"
+# ── ランチャーモード ───────────────────────────────
 
-# ==== ここから先は nvim を閉じたあとに実行される ====
+TMUX_CMD="$(find_cmd tmux /opt/homebrew/bin/tmux /usr/local/bin/tmux /usr/bin/tmux)"
+[ -z "$TMUX_CMD" ] && exit 1
 
-# デバッグ：TMPFILE のパスとサイズを tmux ステータスに表示
-if [ -f "$TMPFILE" ]; then
-  SIZE="$(wc -c < "$TMPFILE" 2>/dev/null || echo 0)"
-  tmux display-message "claude-popup: file=$TMPFILE size=${SIZE}B"
+run_tmux has-session 2>/dev/null || exit 1
+
+# ターゲットペインの決定
+TARGET_PANE="${1:-$(run_tmux display-message -p '#{pane_id}' 2>/dev/null)}"
+if [ -z "$TARGET_PANE" ]; then
+  TARGET_PANE="$(run_tmux list-panes -a \
+    -F '#{pane_active} #{pane_id} #{window_active} #{session_attached}' 2>/dev/null \
+    | awk '$1==1 && $3==1 && $4==1 {print $2; exit}')"
+fi
+[ -z "$TARGET_PANE" ] && exit 1
+
+# 一時ファイル作成
+TMPFILE="$(mktemp /tmp/claude-prompt-XXXXXX)" || exit 1
+
+# スクリプトの絶対パス（--editor で再帰呼び出し用）
+SCRIPT_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+
+# display-popup を試行 → 失敗時は split-window にフォールバック
+if [ -n "$TMUX" ] && run_tmux display-popup -E -w 80% -h 70% -T "Claude Prompt" \
+    "$SHELL -i -c 'nvim \"$TMPFILE\"'" 2>/dev/null; then
+  if [ -s "$TMPFILE" ]; then
+    run_tmux set-buffer -b claude_prompt -- "$(cat "$TMPFILE")"
+    run_tmux paste-buffer -b claude_prompt -t "$TARGET_PANE"
+  fi
+  rm -f "$TMPFILE"
 else
-  tmux display-message "claude-popup: TMPFILE not found: $TMPFILE"
+  run_tmux split-window -t "$TARGET_PANE" -v -l 70% \
+    "bash '$SCRIPT_PATH' --editor '$TMPFILE' '$TARGET_PANE'"
 fi
-
-# 一時ファイルに中身があれば貼り付け
-if [ -s "$TMPFILE" ]; then
-  CONTENT="$(cat "$TMPFILE")"
-
-  # バッファに入れる
-  tmux set-buffer -b claude_prompt -- "$CONTENT"
-
-  # ★ 呼び出し元 pane に明示的に貼り付ける ★
-  tmux paste-buffer -b claude_prompt -t "$TARGET_PANE"
-else
-  tmux display-message "claude-popup: TMPFILE is empty, skip paste"
-fi
-
-# 後片付け
-rm -f "$TMPFILE"
 
 exit 0
-
