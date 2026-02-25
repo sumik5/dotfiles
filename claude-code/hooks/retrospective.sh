@@ -30,12 +30,17 @@ mkdir -p "$SAVE_DIR"
 
 FILEPATH="${SAVE_DIR}/retrospective_${TODAY}.md"
 
-# 作業ディレクトリからgitデータを収集
-GIT_LOG=""
-GIT_DIFF_STAT=""
+# 作業ディレクトリからVCSデータを収集（jj優先、gitフォールバック）
+VCS_LOG=""
+DIFF_STAT=""
 if [ -n "$CWD" ] && [ -d "$CWD" ]; then
-    GIT_LOG=$(cd "$CWD" && git log --since="today" --oneline --no-decorate 2>/dev/null || true)
-    GIT_DIFF_STAT=$(cd "$CWD" && git diff --stat 2>/dev/null || true)
+    if command -v jj &>/dev/null && [ -d "${CWD}/.jj" ]; then
+        VCS_LOG=$(cd "$CWD" && jj log --no-pager -r 'mine() & committer_date(after:"today midnight")' --no-graph 2>/dev/null || true)
+        DIFF_STAT=$(cd "$CWD" && jj diff --stat -r @ 2>/dev/null || true)
+    else
+        VCS_LOG=$(cd "$CWD" && git log --since="today" --oneline --no-decorate 2>/dev/null || true)
+        DIFF_STAT=$(cd "$CWD" && git diff --stat 2>/dev/null || true)
+    fi
 fi
 
 # トランスクリプト（JSONL形式）から編集ファイル一覧を抽出
@@ -43,9 +48,7 @@ FILES_TOUCHED=""
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
     if command -v jq &>/dev/null; then
         FILES_TOUCHED=$(cat "$TRANSCRIPT_PATH" 2>/dev/null | \
-            jq -r 'select(.type == "tool_use") |
-            select(.name == "Edit" or .name == "Write") |
-            .input.file_path // empty' 2>/dev/null | \
+            jq -r 'select(.type == "assistant") | .message.content[]? | select(.type == "tool_use") | select(.name == "Edit" or .name == "Write") | .input.file_path // empty' 2>/dev/null | \
             sort -u | head -30 || true)
     fi
 fi
@@ -55,9 +58,14 @@ SESSION_BLOCK="
 ---
 ### セッション ${NOW} (${CWD:-unknown})
 
-**Git commits (today):**
+**VCS commits (today):**
 \`\`\`
-${GIT_LOG:-（コミットなし）}
+${VCS_LOG:-（コミットなし）}
+\`\`\`
+
+**変更統計:**
+\`\`\`
+${DIFF_STAT:-（差分なし）}
 \`\`\`
 
 **変更ファイル:**
