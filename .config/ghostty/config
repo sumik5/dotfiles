@@ -1,0 +1,29 @@
+# Ghostty config (modern, minimal)
+# Docs: https://ghostty.org/docs/config/reference
+
+# Font
+font-family = "Moralerspace Argon HW"
+font-size = 14
+
+# Theme (auto light/dark)
+# Built-in theme names from Rose Pine for Ghostty
+# https://github.com/rose-pine/ghostty
+theme = light:Rose Pine Dawn,dark:Rose Pine
+
+# Spacing and composition
+window-padding-x = 10
+window-padding-y = 8
+window-padding-balance = true
+
+# Modern translucent look
+background-opacity = 0.94
+background-blur = true
+
+# Keep titlebar aligned with current system/app style
+window-theme = auto
+
+# Practical defaults
+cursor-style = block
+shell-integration = detect
+copy-on-select = true
+confirm-close-surface = true
