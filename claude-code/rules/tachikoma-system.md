@@ -5,7 +5,7 @@
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
 | **Claude Code本体（リーダー）** | Opus | タスク分析・専門タチコマ選択・委譲・監視・jj操作のみ。**実装コードは書かない** | ❌実装コード記述 |
-| **専門タチコマ（19体）** | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） | ❌change勝手作成、❌jj書込操作 |
+| **専門タチコマ（20体）** | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） | ❌change勝手作成、❌jj書込操作 |
 | **汎用タチコマ** | Sonnet | 専門タチコマでカバーされないタスクのフォールバック | ❌change勝手作成、❌jj書込操作 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
 
@@ -15,7 +15,7 @@
 - **複数ファイル・複雑なタスク**: `orchestrating-teams` スキルロード → Claude Code本体が直接 TeamCreate → planner（`sumik:タチコマ（アーキテクチャ）`）起動 → implementer（ドメイン別専門タチコマ）並列起動
 - **コア品質スキル**: `writing-clean-code`, `enforcing-type-safety`, `testing-code`, `securing-code` は各専門タチコマにプリロード済み。本体がロードする必要はない
 
-### 専門タチコマ一覧（19体）
+### 専門タチコマ一覧（20体）
 
 | # | subagent_type | モデル | 専門領域 |
 |---|--------------|--------|---------|
@@ -38,6 +38,7 @@
 | 17 | `sumik:タチコマ（E2Eテスト）` | Sonnet | Playwright E2E |
 | 18 | `sumik:タチコマ（オブザーバビリティ）` | Sonnet | 監視・OTel・ログ |
 | 19 | `sumik:タチコマ（ドキュメント）` | Sonnet | 技術文書・記事 |
+| 20 | `sumik:タチコマ（デザイン）` | Sonnet | Figma MCP・デザイン→コード |
 
 ---
 

@@ -1,6 +1,6 @@
 # サブエージェント委譲ガイド
 
-専門タチコマ19体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
+専門タチコマ20体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
 本体の役割は「適切な専門タチコマにルーティングする」こと。
 
 ---
@@ -12,11 +12,12 @@
 | 検出条件 | 委譲先 subagent_type | 主要プリロードスキル |
 |---------|---------------------|-------------------|
 | `package.json` に `next` | `sumik:タチコマ（Next.js）` | developing-nextjs, developing-react, using-next-devtools |
+| Figma URL/Make/.figma/design-system-rules | `sumik:タチコマ（デザイン）` | implementing-design, implementing-figma, applying-design-guidelines |
 | UI/Figma/shadcn/コンポーネント | `sumik:タチコマ（フロントエンド）` | designing-frontend, applying-design-guidelines, implementing-design |
-| NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` | developing-fullstack-javascript, designing-web-apis |
+| NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` | developing-fullstack-javascript, designing-web-apis, developing-api-spec-first |
 | TypeScript型設計・高度な型 | `sumik:タチコマ（TypeScript）` | mastering-typescript |
 | Python | `sumik:タチコマ（Python）` | developing-python, building-adk-agents |
-| Go | `sumik:タチコマ（Go）` | developing-go |
+| Go | `sumik:タチコマ（Go）` | developing-go, developing-api-spec-first |
 | `.sh` / シェルスクリプト | `sumik:タチコマ（Bash）` | developing-bash |
 | Docker/CI-CD/DevOps | `sumik:タチコマ（インフラ）` | managing-docker, practicing-devops |
 | `.tf` / Terraform | `sumik:タチコマ（Terraform）` | developing-terraform |
@@ -34,6 +35,7 @@
 
 ### ルーティング判断のポイント
 
+- **タチコマ（デザイン）vs タチコマ（フロントエンド）**: Figma MCP全面活用・デザイントークン同期・Code Connect → タチコマ（デザイン）。UI実装・shadcn/ui・Storybook → タチコマ（フロントエンド）
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → タチコマ（Next.js）をメイン、タチコマ（フロントエンド）をサブ）
 - **並列実行時** → 異なる専門タチコマを同時起動可能（例: タチコマ（Next.js）+ タチコマ（E2Eテスト）
 - **同一専門タチコマの複数起動** → 可能（例: タチコマ（Next.js）を2体起動して異なるページを並列実装）
