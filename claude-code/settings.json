@@ -46,7 +46,7 @@
     ],
     "defaultMode": "default"
   },
-  "model": "opus",
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -188,6 +188,6 @@
   "language": "ジョジョの奇妙な冒険系",
   "alwaysThinkingEnabled": true,
   "autoMemoryEnabled": true,
-  "teammateMode": "tmux",
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "teammateMode": "tmux"
 }

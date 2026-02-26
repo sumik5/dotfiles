@@ -24,7 +24,7 @@
 | GCP (Cloud Run/GKE) | `sumik:タチコマ（Google Cloud）` | developing-google-cloud |
 | DB/SQL/Prisma/マイグレーション | `sumik:タチコマ（データベース）` | designing-relational-databases, avoiding-sql-antipatterns |
 | AI/RAG/MCP/LLM | `sumik:タチコマ（AI/ML）` | integrating-ai-web-apps, building-rag-systems, developing-mcp |
-| テスト（ユニット/統合） | `sumik:タチコマ（テスト）` | testing-code |
+| テストファイル（`*test*`, `*spec*`, `*_test.go`, `test_*.py` 等） | `sumik:タチコマ（テスト）` | testing-code |
 | Playwright/E2E/ブラウザテスト | `sumik:タチコマ（E2Eテスト）` | testing-e2e-with-playwright, automating-browser |
 | 監視/OTel/ログ/メトリクス | `sumik:タチコマ（オブザーバビリティ）` | designing-monitoring, implementing-opentelemetry |
 | 技術文書/記事/LaTeX | `sumik:タチコマ（ドキュメント）` | writing-effective-prose, writing-zenn-articles |
@@ -37,6 +37,7 @@
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → タチコマ（Next.js）をメイン、タチコマ（フロントエンド）をサブ）
 - **並列実行時** → 異なる専門タチコマを同時起動可能（例: タチコマ（Next.js）+ タチコマ（E2Eテスト）
 - **同一専門タチコマの複数起動** → 可能（例: タチコマ（Next.js）を2体起動して異なるページを並列実装）
+- **テストエージェント vs 言語エージェント**: テスト設計・カバレッジ改善・TDD・テストリファクタリングが主題 → タチコマ（テスト）。機能実装の一部としてテストも書く → 言語エージェント（各言語エージェントも testing-code スキルを持つ）
 
 ### tmux pane起動ルール（🔴 必須）
 
