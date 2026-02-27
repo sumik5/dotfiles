@@ -134,6 +134,7 @@ CodeGuard実行（必須）
 
 | ルール | 詳細 |
 |-------|------|
+| 🔴 ToolSearch 必須 | Agent Teams API ツール（TeamCreate, TeamDelete, TaskCreate, TaskUpdate, TaskList, SendMessage）は**遅延ツール（deferred tools）**。使用前に `ToolSearch("TeamCreate team")` 等でロード必須。**これを省略するとTeamCreateが呼び出せずtmux paneが開かない** |
 | TeamCreate 必須 | タチコマ起動前に**必ず** TeamCreate でチームを作成（軽微修正でも必須） |
 | `team_name` + `run_in_background: true` | Task tool呼び出し時に**両方**指定。`team_name` がtmux pane起動の鍵 |
 | 1メッセージ複数Task | 並列起動時は1メッセージ内で複数のTask tool呼び出しを行う |
@@ -144,6 +145,7 @@ CodeGuard実行（必須）
 ### tmux pane起動の正しいフロー
 
 ```
+0. ToolSearch("TeamCreate team") でAgent Teams APIツールをロード（遅延ツールのため必須）
 1. TeamCreate（team_name: "task-name"）
 2. Task tool（team_name: "task-name", run_in_background: true, subagent_type: "sumik:タチコマ（...）"）
    → tmux pane で起動 ✓
@@ -154,11 +156,14 @@ CodeGuard実行（必須）
 ### ❌ よくある間違い
 
 ```
-# NG: run_in_background だけ → pane なし（バックグラウンドのみ）
+# NG1: ToolSearch なしで TeamCreate を呼ぼうとする → ツールが見つからない → チーム未作成 → pane なし
+TeamCreate ← ToolSearchでロードしていない = 呼び出し不可
+
+# NG2: run_in_background だけ → pane なし（バックグラウンドのみ）
 Task tool（run_in_background: true）  ← team_name なし = pane なし
 
-# OK: TeamCreate + team_name → pane あり
-TeamCreate → Task tool（team_name + run_in_background: true） ← pane あり ✓
+# OK: ToolSearch → TeamCreate → Task tool（team_name + run_in_background）→ pane あり ✓
+ToolSearch("TeamCreate team") → TeamCreate → Task tool（team_name + run_in_background: true） ← pane あり ✓
 ```
 
 ---

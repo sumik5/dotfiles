@@ -43,6 +43,7 @@
 
 ### tmux pane起動ルール（🔴 必須）
 
+- **🔴 ToolSearch 必須（最重要）**: Agent Teams API ツール（TeamCreate, TeamDelete, TaskCreate, TaskUpdate, TaskList, SendMessage）は**遅延ツール**。`ToolSearch("TeamCreate team")` 等で**事前にロード**しないと呼び出せない。これがtmux paneが開かない最大の原因
 - **TeamCreate 必須**: タチコマ起動前に必ず TeamCreate でチームを作成（軽微修正でも必須）
 - Task tool に `team_name` + `run_in_background: true` を**両方**指定 → tmux pane起動
 - ⚠️ `run_in_background: true` のみ（`team_name` なし）→ バックグラウンド実行されるが**tmux paneには表示されない**
