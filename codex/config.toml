@@ -1,0 +1,10 @@
+[features]
+multi_agent = true
+
+[agents]
+max_threads = 6
+max_depth = 2
+
+[agents.tachikoma_nextjs]
+description = "Next.js/React specialized Tachikoma execution agent. Handles Next.js 16 App Router, Server Components, React 19 features, Turbopack, Cache Components, and next-devtools MCP integration."
+config_file = "agents/tachikoma-nextjs.toml"
