@@ -5,6 +5,94 @@ multi_agent = true
 max_threads = 6
 max_depth = 2
 
+[agents.serena_expert]
+description = "Elite app development agent that uses /serena command for token-efficient, structured problem-solving. Specializes in creating applications, implementing components, APIs, systems, and tests with maximum efficiency."
+config_file = "agents/serena-expert.toml"
+
+[agents.tachikoma]
+description = "General-purpose Tachikoma execution agent for tasks not covered by specialized Tachikomas. Handles development, testing, documentation, and other technical tasks. Uses /serena for efficient development. When a task matches a specialized domain (Next.js, Python, AWS, etc.), prefer the domain-specific Tachikoma instead. PARALLEL EXECUTION: Codex can launch multiple Tachikoma instances for independent tasks."
+config_file = "agents/tachikoma.toml"
+
+[agents.tachikoma_ai_ml]
+description = "AI/ML development specialized Tachikoma execution agent. Handles Vercel AI SDK integration, LangChain.js, RAG system building, MCP server/client development, LLMOps operations, and AI-assisted development patterns. Use proactively when building AI-powered web features, RAG pipelines, MCP integrations, or LLM application deployment. Detects: ai/@vercel/ai/@langchain in package.json, google-adk in Python deps, or @modelcontextprotocol/sdk."
+config_file = "agents/tachikoma-ai-ml.toml"
+
+[agents.tachikoma_architecture]
+description = "Architecture design specialized Tachikoma (READ-ONLY). Analyzes systems using DDD strategic/tactical patterns, microservices architecture (CQRS, Saga, Event Sourcing), trade-off analysis methodology, and data architecture patterns. Use proactively for architecture reviews, system design, domain boundary analysis, modernization planning, or multi-tenant SaaS design. Does NOT write implementation code - produces design documents and recommendations only."
+config_file = "agents/tachikoma-architecture.toml"
+
+[agents.tachikoma_aws]
+description = "AWS cloud specialized Tachikoma execution agent. Handles Lambda, API Gateway, DynamoDB, CDK, EKS, S3, Bedrock, and all AWS services including security (IAM, KMS, GuardDuty), cost optimization, and SRE operations. Use proactively when working with AWS services, CDK infrastructure, serverless applications, or AWS-related code. Detects: cdk.json, samconfig.toml, serverless.yml, @aws-sdk in package.json, or boto3 in Python deps."
+config_file = "agents/tachikoma-aws.toml"
+
+[agents.tachikoma_bash]
+description = "Bash shell scripting specialized Tachikoma execution agent. Handles shell script automation, I/O pipelines, process control, system administration, and script testing/debugging. Use proactively when writing or maintaining shell scripts, automating system tasks, or building CLI tools. Detects: .sh files."
+config_file = "agents/tachikoma-bash.toml"
+
+[agents.tachikoma_database]
+description = "Database specialized Tachikoma execution agent. Handles relational database design, normalization, SQL optimization, schema migrations, and database internals understanding. Use proactively when designing database schemas, writing complex SQL, optimizing queries, planning migrations, or troubleshooting database performance. Detects: .sql files, schema.prisma, or DB-related packages."
+config_file = "agents/tachikoma-database.toml"
+
+[agents.tachikoma_design]
+description = "Design-to-code specialized Tachikoma execution agent. Handles Figma MCP integration (all 13 tools), Figma Make context, Code Connect mappings, Design System Rules generation, design token synchronization, and visual validation. Use proactively when converting Figma designs to code, managing design systems, or synchronizing design tokens. Detects: Figma URLs in user prompts, .figma/ directory, or design-system-rules files."
+config_file = "agents/tachikoma-design.toml"
+
+[agents.tachikoma_document]
+description = "Documentation and technical writing specialized Tachikoma execution agent. Handles technical documentation (7Cs principle), LaTeX academic reports, Zenn tech articles, and AI-assisted copywriting. Use proactively when creating documentation, writing tech blog posts, preparing academic reports, or crafting marketing copy. Does NOT write application code."
+config_file = "agents/tachikoma-document.toml"
+
+[agents.tachikoma_e2e_test]
+description = "E2E testing and browser automation specialized Tachikoma execution agent. Handles Playwright test design, browser automation via agent-browser CLI, visual testing, accessibility testing, and CI/CD integration. Use proactively when writing E2E tests with Playwright, automating browser interactions, or setting up browser-based test infrastructure. Detects: playwright.config.* files."
+config_file = "agents/tachikoma-e2e-test.toml"
+
+[agents.tachikoma_frontend]
+description = "Frontend UI/UX specialized Tachikoma execution agent. Handles component implementation with shadcn/ui and Storybook, Figma-to-code conversion via Figma MCP, data visualization, and design system implementation. Use proactively when creating UI components, implementing designs from Figma, building interactive interfaces, or creating data charts/dashboards. Detects: components.json, .stories.tsx/.ts files, or tailwind.config.*."
+config_file = "agents/tachikoma-frontend.toml"
+
+[agents.tachikoma_fullstack_js]
+description = "Full-stack JavaScript specialized Tachikoma execution agent. Handles NestJS/Express backend development, RESTful API design, structured logging, and full-stack integration. Use proactively when building backend APIs with NestJS or Express, implementing API endpoints, designing request/response patterns, or configuring application logging. Detects: package.json with express, nestjs, fastify, koa, or hapi dependency."
+config_file = "agents/tachikoma-fullstack-js.toml"
+
+[agents.tachikoma_go]
+description = "Go specialized Tachikoma execution agent. Handles Go development including clean code practices, GoF/concurrency/DDD design patterns, and Go internals (type system, memory, reflection). Use proactively when working on Go projects or writing Go code. Detects: go.mod."
+config_file = "agents/tachikoma-go.toml"
+
+[agents.tachikoma_google_cloud]
+description = "Google Cloud specialized Tachikoma execution agent. Handles Cloud Run, BigQuery, VPC networking, Memorystore, GCP security, and data engineering. Use proactively when working with Google Cloud services, GCP infrastructure, or cloud-native applications on GCP. Detects: cloudbuild.yaml, .gcloudignore, or @google-cloud packages."
+config_file = "agents/tachikoma-google-cloud.toml"
+
+[agents.tachikoma_infra]
+description = "Infrastructure/DevOps specialized Tachikoma execution agent. Handles Docker containers, Compose orchestration, CI/CD pipeline configuration, and DevOps methodology. Use proactively when working with Dockerfiles, docker-compose.yml, CI/CD configs, or implementing DevOps practices. Detects: Dockerfile or docker-compose.* files."
+config_file = "agents/tachikoma-infra.toml"
+
 [agents.tachikoma_nextjs]
-description = "Next.js/React specialized Tachikoma execution agent. Handles Next.js 16 App Router, Server Components, React 19 features, Turbopack, Cache Components, and next-devtools MCP integration."
+description = "Next.js/React specialized Tachikoma execution agent. Handles Next.js 16 App Router, Server Components, React 19 features, Turbopack, Cache Components, and next-devtools MCP integration. Use proactively when implementing Next.js pages, components, API routes, middleware, or React features in Next.js projects. Detects: package.json with 'next' dependency."
 config_file = "agents/tachikoma-nextjs.toml"
+
+[agents.tachikoma_observability]
+description = "Observability specialized Tachikoma execution agent. Handles monitoring system design, OpenTelemetry instrumentation (traces, metrics, logs), structured logging architecture, SLO/SLI design, and alerting strategies. Use proactively when implementing observability, distributed tracing, metrics collection, log pipelines, or monitoring dashboards. Detects: @opentelemetry/* packages or prometheus.yml."
+config_file = "agents/tachikoma-observability.toml"
+
+[agents.tachikoma_python]
+description = "Python specialized Tachikoma execution agent. Handles modern Python development with uv/ruff/mypy tooling, FastAPI, Google ADK agent building, and Pythonic patterns. Use proactively when working on Python projects, building FastAPI services, or creating Google ADK AI agents. Detects: pyproject.toml or requirements.txt."
+config_file = "agents/tachikoma-python.toml"
+
+[agents.tachikoma_security]
+description = "Security review specialized Tachikoma (READ-ONLY). Reviews code for OWASP Top 10 vulnerabilities, serverless security threats, IAM patterns, dynamic authorization (ABAC/ReBAC/Cedar), Keycloak IAM, and AI development security. Use proactively after code implementation for security audits, penetration test planning, or access control design. Does NOT modify code - produces security reports and recommendations only."
+config_file = "agents/tachikoma-security.toml"
+
+[agents.tachikoma_terraform]
+description = "Terraform IaC specialized Tachikoma execution agent. Handles HCL configuration, module design, state management, Terragrunt wrapper patterns, and cloud provider resources. Use proactively when working with .tf files, terragrunt.hcl, or infrastructure as code definitions. Detects: .tf files or terragrunt.hcl."
+config_file = "agents/tachikoma-terraform.toml"
+
+[agents.tachikoma_test]
+description = "Unit/Integration testing specialized Tachikoma execution agent. Handles TDD methodology, test design across all languages (Vitest/Jest, Go testing, pytest, etc.), React Testing Library, mock strategies, coverage optimization, and test refactoring. Use proactively when writing unit tests, integration tests, improving test coverage, or setting up test infrastructure. Detects: files containing 'test' or 'spec' in name (*test*, *spec*, *_test.go, test_*.py), vitest.config.*, jest.config.*, or pytest.ini."
+config_file = "agents/tachikoma-test.toml"
+
+[agents.tachikoma_training_presenter]
+description = "Training program design and presentation improvement specialized agent. Handles training needs analysis (KSA, ADDIE, participant analysis), curriculum design (90/20/8 rule, EAT framework), behavior change design (CREATE Action Funnel, cheat/habit/conscious strategies), presentation content improvement (storytelling, 3-act structure, AIDMA, PUNCH principle, delivery techniques), and effective prose writing (7Cs, AI smell detection). Self-improving: updates own definition based on user feedback. Use proactively when designing training programs, reviewing presentation materials, improving workshop content, or creating training curricula."
+config_file = "agents/tachikoma-training-presenter.toml"
+
+[agents.tachikoma_typescript]
+description = "TypeScript specialized Tachikoma execution agent. Handles advanced type system patterns, generics, conditional types, GoF design patterns in TypeScript, and type-safe architecture. Use proactively when deep TypeScript expertise is needed: complex type definitions, type refactoring, generic utility creation, or migrating JavaScript to TypeScript. Detects: tsconfig.json."
+config_file = "agents/tachikoma-typescript.toml"

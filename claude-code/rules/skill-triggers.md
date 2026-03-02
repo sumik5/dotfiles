@@ -1,6 +1,6 @@
 # サブエージェント委譲ガイド
 
-専門タチコマ20体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
+専門タチコマ21体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
 本体の役割は「適切な専門タチコマにルーティングする」こと。
 
 ---
@@ -31,6 +31,7 @@
 | 技術文書/記事/LaTeX | `sumik:タチコマ（ドキュメント）` | writing-effective-prose, writing-zenn-articles |
 | 設計/DDD/アーキテクチャ判断 | `sumik:タチコマ（アーキテクチャ）` | applying-domain-driven-design, architecting-microservices（読取専用） |
 | セキュリティ監査/脆弱性分析 | `sumik:タチコマ（セキュリティ）` | securing-code, securing-serverless（読取専用） |
+| 研修設計/プレゼン改善/ワークショップ | `sumik:タチコマ（研修・プレゼン）` | improving-presentations, writing-effective-prose, designing-training, applying-behavior-design |
 | 上記以外 | `sumik:タチコマ` | 汎用フォールバック（スキルプリロードなし） |
 
 ### ルーティング判断のポイント
@@ -60,7 +61,7 @@
 ### メタ・運用
 | スキル | トリガー | 概要 |
 |--------|---------|------|
-| `orchestrating-teams` | 複数ファイル・複数関心事の並列開発 | Agent Team編成・専門タチコマ並列起動・進捗管理 |
+| `orchestrating-teams` | 軽微修正以外のすべての開発タスク（デフォルト） | planner-first パターン: チーム編成 → planner計画策定 → 専門タチコマ実装 |
 | `managing-claude-md` | CLAUDE.md改善・罠追記時 | 設定ファイル管理（8原則） |
 | `researching-libraries` | 新機能実装前 | 既存ライブラリ調査（車輪の再発明禁止） |
 | `using-serena` | `/serena` コマンド使用時 | トークン効率的構造化開発 |

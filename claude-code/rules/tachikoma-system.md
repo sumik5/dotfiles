@@ -5,17 +5,17 @@
 | Agent | モデル | 役割 | 禁止事項 |
 |-------|--------|------|----------|
 | **Claude Code本体（リーダー）** | Opus | タスク分析・専門タチコマ選択・委譲・監視・jj操作のみ。**実装コードは書かない** | ❌実装コード記述 |
-| **専門タチコマ（20体）** | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） | ❌change勝手作成、❌jj書込操作 |
+| **専門タチコマ（21体）** | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） | ❌change勝手作成、❌jj書込操作 |
 | **汎用タチコマ** | Sonnet | 専門タチコマでカバーされないタスクのフォールバック | ❌change勝手作成、❌jj書込操作 |
 | **Serena Expert** | Sonnet | トークン効率化した開発（`/serena`活用） | - |
 
 **補足:**
-- **Claude Code本体の役割**: タスク分析 → `rules/skill-triggers.md` のルーティング表で専門タチコマ選択 → 委譲 → 監視 → jj操作
-- **軽微な修正（1ファイル・単一関心事）**: TeamCreate → 適切な専門タチコマ1体を `team_name` + `run_in_background: true` で起動（tmux pane表示）→ 完了後TeamDelete
-- **複数ファイル・複雑なタスク**: `orchestrating-teams` スキルロード → Claude Code本体が直接 TeamCreate → planner（`sumik:タチコマ（アーキテクチャ）`）起動 → implementer（ドメイン別専門タチコマ）並列起動
+- **Claude Code本体の役割**: 純粋なオーケストレーター。タスク分析 → ルーティング判断 → チーム編成 → 進捗監視 → jj操作。**コード記述・ドキュメント作成は一切行わない**
+- **軽微な修正（typo・1行変更等）**: TeamCreate → 適切な専門タチコマ1体を `team_name` + `run_in_background: true` で起動（tmux pane表示）→ 完了後TeamDelete
+- **上記以外すべて（デフォルトパス）**: `orchestrating-teams` スキルロード → TeamCreate → **planner**（`sumik:タチコマ（アーキテクチャ）`）が計画策定・docs/作成 → ユーザー確認 → **implementer**（ドメイン別専門タチコマ）が実装 → TeamDelete
 - **コア品質スキル**: `writing-clean-code`, `enforcing-type-safety`, `testing-code`, `securing-code` は各専門タチコマにプリロード済み。本体がロードする必要はない
 
-### 専門タチコマ一覧（20体）
+### 専門タチコマ一覧（21体）
 
 | # | subagent_type | モデル | 専門領域 |
 |---|--------------|--------|---------|
@@ -39,6 +39,7 @@
 | 18 | `sumik:タチコマ（オブザーバビリティ）` | Sonnet | 監視・OTel・ログ |
 | 19 | `sumik:タチコマ（ドキュメント）` | Sonnet | 技術文書・記事 |
 | 20 | `sumik:タチコマ（デザイン）` | Sonnet | Figma MCP・デザイン→コード |
+| 21 | `sumik:タチコマ（研修・プレゼン）` | Sonnet | 研修設計・プレゼン改善（自己進化型） |
 
 ---
 
@@ -64,66 +65,79 @@
 
 ## 必須使用ケース
 
-コード修正の委譲先:
-- **マルチファイル・マルチ関心事**: `orchestrating-teams` スキルロード → Claude Code本体が直接チーム編成 → **ドメイン別専門タチコマ**複数並列処理
-- **単一ファイル・単一関心事の軽微修正**: TeamCreate → **適切な専門タチコマ**1体を `team_name` + `run_in_background: true` で起動（tmux pane）→ 完了後TeamDelete
-- **トークン効率重視**: `/serena`コマンドを積極活用
+### デフォルトパス（ほぼすべての開発タスク）
 
-### 例外（Claude Code本体で実行可能）
+`orchestrating-teams` スキルロード → TeamCreate → **planner** が計画策定・docs作成 → ユーザー確認 → **専門タチコマ**が実装
 
-ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示、計画・設計ドキュメント作成、`researching-libraries` によるライブラリ調査
+**「迷ったらplanner-first」が原則。** 単純に見えるタスクでも、影響範囲の分析やテスト戦略の検討が必要な場合はplannerを経由する。
+
+### 例外1: 軽微な修正のみ直接委譲
+
+typo・1行変更・明白な単一ファイル修正のみ: TeamCreate → 専門タチコマ1体 → TeamDelete
+
+### 例外2: Claude Code本体で実行可能
+
+CLAUDE.md/ルールファイル管理、ファイル読み込み（1-2ファイル）、質問回答、ファイル一覧表示、`researching-libraries` によるライブラリ調査
 
 ---
 
-## 並列実行の判断基準（🔴 必須チェック）
+## チーム編成の判断基準（🔴 必須チェック）
 
-**以下のいずれかに該当 → `orchestrating-teams` スキルロード → Claude Code本体が直接Agent Team APIで実行:**
-1. **2つ以上のファイルを変更** かつ変更が相互に独立
-2. **異なる関心事** が含まれる（例: UI + API + テスト）
-3. **2つ以上の独立したサブタスク** に分解可能
-4. **フロントエンドとバックエンド** の両方を変更
-5. **同一ドメインの独立タスクが3つ以上** ある（scale-out: 同一専門タチコマを複数起動して高速化。例: 3ページ同時実装、複数テストスイート同時作成）
+### デフォルト: planner-first パターン
 
-**以下の場合のみタチコマ直接起動:**
-- 1ファイルのみの変更
-- 密結合した変更（前のタスクの出力が次の入力に必要）
+**軽微修正（typo・1行変更）以外のすべてのタスクで以下を実行:**
+1. `orchestrating-teams` スキルロード
+2. TeamCreate → planner（タチコマ（アーキテクチャ））起動
+3. planner が現状分析・計画策定・docs/作成・推奨タチコマ選定
+4. ユーザー確認
+5. 専門タチコマを起動して実装（並列可能なら並列）
 
-### Claude Code本体によるチーム編成と並列実行
-- Claude Code本体が `orchestrating-teams` スキルをロードし、Agent Team APIを直接操作
-- Claude Code本体がタスク分解・ファイル所有権設計・モデル戦略選択を実施
-- Claude Code本体がTeamCreate/TaskCreate/Task tool/SendMessageで各メンバー（タチコマ）を起動・調整・進捗管理
+### 並列化の追加判断（planner の計画に基づく）
+
+planner が作成した計画に基づき、以下に該当すれば並列起動:
+- **2つ以上の独立サブタスク** に分解可能
+- **異なるドメイン** が含まれる（例: UI + API + テスト）
+- **同一ドメインの独立タスクが3つ以上**（scale-out: 同一専門タチコマ複数起動）
+
+### Claude Code本体の役割（オーケストレーションのみ）
+- `orchestrating-teams` スキルをロードし、Agent Team APIを操作
+- TeamCreate/TaskCreate/SendMessageでチーム管理・進捗監視
+- **タスク分解・ファイル所有権設計・モデル戦略選択もplannerが実施**（本体は計画をレビューしてユーザーに確認するのみ）
 - 詳細仕様: plugin の `skills/orchestrating-teams/` 参照
 
 ---
 
-## 実装フロー（並列化対応）
+## 実装フロー
 
 ```
 ユーザー要求
     ↓
-Claude Code本体（実装コードを書かない）
+Claude Code本体（オーケストレーターに徹する）
     ↓
-【並列実行が必要そう？】（要求内容から即座に判断）
-    ├─ Yes → **`orchestrating-teams` スキルロード → 即座にTeamCreate**
-    │         Phase 1（現状把握・計画策定 → planner に全委譲）:
-    │         1. TeamCreate でチーム作成
-    │         2. planner タチコマ起動（subagent_type: `sumik:タチコマ（アーキテクチャ）`, model: opus）
-    │            → 現状把握・コードベース分析・docs/plan作成・各タスクの推奨専門タチコマ明記
-    │         3. 計画レビュー・ユーザー確認
-    │         Phase 2（実装 → ドメイン別専門タチコマ並列起動）:
-    │         4. TaskCreate + **ドメイン別専門タチコマ**を `team_name` + `run_in_background: true` で並列起動（tmux pane）
-    │            ※ scale-out: 同一subagent_typeを複数起動可（例: タチコマ（Next.js）×3で3ページ同時実装）
-    │         5. SendMessage で進捗管理・調整
-    │         6. 全メンバー完了後に統合・TeamDelete
+【タスク分類】
     │
-    ├─ No（軽微修正） → `rules/skill-triggers.md` ルーティング表で専門タチコマ選択
-    │                    → TeamCreate → Task tool（`team_name` + `run_in_background: true`）
-    │                    → tmux pane起動 → 完了後TeamDelete
+    ├─ 読み込み・質問・調査 → 本体が直接実行
     │
-    └─ No（読み込み・質問等） → 直接実行
-    ↓
-CodeGuard実行（必須）
-    ↓ 完了報告
+    ├─ 軽微修正（typo・1行変更等）
+    │    → TeamCreate → 専門タチコマ1体 → TeamDelete
+    │
+    └─ 上記以外すべて（デフォルト）→ planner-first パターン
+          │
+          Phase 1: 計画（planner に全委譲）
+          │  1. `orchestrating-teams` スキルロード → TeamCreate
+          │  2. planner 起動（sumik:タチコマ（アーキテクチャ）, model: opus）
+          │     → 現状把握・コードベース分析・docs/plan作成
+          │     → 各タスクの推奨専門タチコマ・並列可否を明記
+          │  3. 本体がplannerの計画をユーザーに提示 → ユーザー確認
+          │
+          Phase 2: 実装（専門タチコマに委譲）
+          │  4. 専門タチコマを `team_name` + `run_in_background: true` で起動
+          │     ※ 並列可能なタスクは同時起動（tmux pane）
+          │     ※ scale-out: 同一subagent_type複数起動可
+          │  5. SendMessage で進捗管理・調整
+          │  6. 全メンバー完了 → CodeGuard実行 → TeamDelete
+          ↓
+    完了報告
 ```
 
 ---
@@ -170,7 +184,7 @@ ToolSearch("TeamCreate team") → TeamCreate → Task tool（team_name + run_in_
 
 ## ドキュメント先行開発（Documentation-First Development）
 
-- **作業開始前に必ず`docs/`フォルダにMarkdown形式で計画をまとめる**
+- **planner（タチコマ（アーキテクチャ））が`docs/`フォルダにMarkdown形式で計画を作成**（Claude Code本体ではなくplannerが作成する）
 - 以下の内容を含める:
   - 変更の目的・背景
   - 変更対象ファイル・コンポーネント一覧
