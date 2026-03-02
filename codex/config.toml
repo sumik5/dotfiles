@@ -1,6 +1,9 @@
 [features]
 multi_agent = true
 
+[shell_environment_policy]
+inherit = "all"
+
 [agents]
 max_threads = 6
 max_depth = 2
