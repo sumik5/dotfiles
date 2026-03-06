@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -148,8 +148,8 @@ AIコピーライティングに関する以下の知識を持ちます:
 
 | Skill 名 | 説明 |
 |----------|------|
-| writing-effective-prose | Unified writing craft guide: prose fundamentals, AI smell detection, technical docs (7Cs), academic writing, and revision |
-| writing-latex | LaTeX document creation for Japanese academic reports |
-| writing-zenn-articles | Zenn技術記事の作成・投稿ワークフローガイド |
-| crafting-ai-copywriting | AI-assisted copywriting with 15 prompt techniques leveraging psychological triggers |
+| writing-effective-prose | Unified writing craft guide: prose fundamentals, AI smell detection (always active), technical docs (7Cs), engineering design docs (requirements spec, functional design, operation design), academic writing (Harvard, dissertation), university report/thesis writing, tech blog writing, Japanese prose craft, clarity/explanation techniques, web/digital writing, FAQ writing, and revision |
+| writing-latex | LaTeX document creation for Japanese academic reports. Covers upLaTeX + dvipdfmx setup, minted code highlighting with Japanese font support, equations, figures, tables, and cover pages |
+| writing-zenn-articles | Zenn技術記事の作成・投稿ワークフローガイド（フロントマター仕様・命名規則・品質チェック・Lint設定） |
+| crafting-ai-copywriting | AI-assisted copywriting with 15 prompt techniques leveraging psychological triggers. Use when creating marketing copy, blog titles, ad headlines, or social media posts |
 """

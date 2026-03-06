@@ -1,6 +1,6 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
-sandbox_mode = "read-only"
+sandbox_mode = "workspace-write"
 developer_instructions = """
 # 言語設定（最優先・絶対遵守）
 
@@ -197,10 +197,10 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| applying-domain-driven-design | DDD methodology covering strategic design, tactical patterns, practical adoption, and operational data decomposition |
-| architecting-microservices | Microservices patterns covering CQRS, Event Sourcing, 8 Saga variants, distributed transactions, service granularity, and contract design |
-| modernizing-architecture | Socio-technical architecture modernization covering strategy, domain design, team organization, and trade-off analysis |
-| analyzing-software-tradeoffs | Comprehensive software design trade-off analysis covering code-level, API design, distributed systems, and meta-decisions |
-| architecting-data | Data architecture patterns covering read-side optimization, domain-based decomposition, polyglot persistence, and caching strategies |
-| building-multi-tenant-saas | Multi-tenant SaaS architecture covering deployment models, tenant isolation, and data partitioning |
+| applying-domain-driven-design | Domain-Driven Design methodology covering strategic design (Bounded Context, Ubiquitous Language, Context Mapping), tactical patterns (Domain Model, Event Sourcing, CQRS), practical adoption (heuristics, EventStorming), and operational data decomposition with polyglot database selection. |
+| architecting-microservices | Microservices architectural patterns covering CQRS, Event Sourcing, 8 Saga pattern variants, distributed transactions, service granularity decisions, data ownership, workflow orchestration, and contract design. |
+| modernizing-architecture | Socio-technical architecture modernization covering strategy, domain design, team organization, and trade-off analysis methodology. |
+| analyzing-software-tradeoffs | Comprehensive software design trade-off analysis covering code-level decisions (duplication, error handling, flexibility, optimization), API design (usability, versioning), distributed systems (consistency, delivery semantics), and meta-decisions (library selection, trend evaluation, date-time handling). |
+| architecting-data | Data architecture patterns covering read-side optimization (replicas, materialized views, CQRS, CDC, event sourcing), domain-based decomposition, polyglot persistence, and caching strategies (cache-aside, read-through, write-through, write-around). |
+| building-multi-tenant-saas | Multi-tenant SaaS architecture covering deployment models, tenant isolation, and data partitioning. Use when designing SaaS platforms or evaluating silo vs pool strategies. Covers identity, onboarding, tiering, and operations. |
 """

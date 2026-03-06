@@ -12,8 +12,8 @@
 | 検出条件 | 委譲先 subagent_type | 主要プリロードスキル |
 |---------|---------------------|-------------------|
 | `package.json` に `next` | `sumik:タチコマ（Next.js）` | developing-nextjs, developing-react, using-next-devtools |
-| Figma URL/Make/.figma/design-system-rules | `sumik:タチコマ（デザイン）` | implementing-design, implementing-figma, applying-design-guidelines |
-| UI/Figma/shadcn/コンポーネント | `sumik:タチコマ（フロントエンド）` | designing-frontend, applying-design-guidelines, implementing-design |
+| Figma URL/Make/.figma/design-system-rules/デザインシステム構築/Tailwind設計 | `sumik:タチコマ（デザイン）` | implementing-design, implementing-figma, applying-design-guidelines, building-design-systems, styling-with-tailwind |
+| shadcn/ui/コンポーネント実装/Storybook/データチャート | `sumik:タチコマ（フロントエンド）` | designing-frontend, developing-storybook, designing-data-visualizations |
 | NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` | developing-fullstack-javascript, designing-web-apis, developing-api-spec-first |
 | TypeScript型設計・高度な型 | `sumik:タチコマ（TypeScript）` | mastering-typescript |
 | Python | `sumik:タチコマ（Python）` | developing-python, building-adk-agents |
@@ -36,7 +36,7 @@
 
 ### ルーティング判断のポイント
 
-- **タチコマ（デザイン）vs タチコマ（フロントエンド）**: Figma MCP全面活用・デザイントークン同期・Code Connect → タチコマ（デザイン）。UI実装・shadcn/ui・Storybook → タチコマ（フロントエンド）
+- **タチコマ（デザイン）vs タチコマ（フロントエンド）**: Figma MCP全面活用・デザイントークン同期・Code Connect・デザインシステム構築・Tailwind CSS設計・UI/UX原則 → タチコマ（デザイン）。shadcn/uiコンポーネント実装・Storybook・データビジュアライゼーション → タチコマ（フロントエンド）
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → タチコマ（Next.js）をメイン、タチコマ（フロントエンド）をサブ）
 - **並列実行時** → 異なる専門タチコマを同時起動可能（例: タチコマ（Next.js）+ タチコマ（E2Eテスト）
 - **同一専門タチコマの複数起動** → 可能（例: タチコマ（Next.js）を2体起動して異なるページを並列実装）

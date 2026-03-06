@@ -7,7 +7,11 @@ command -v jq &>/dev/null || { echo "Missing: jq"; exit 1; }
 # ─── Config ───
 
 OAUTH_CACHE="/tmp/oauth-usage-cache.json"
+OAUTH_LOCK="/tmp/oauth-usage-fetch.lock"
 OAUTH_TTL=60  # 60 seconds
+OAUTH_FAIL_TTL=300  # 5 minutes backoff on API failure
+OAUTH_LOCK_STALE_SEC=30
+OAUTH_FAIL_MARKER="/tmp/oauth-usage-fail.marker"
 CCUSAGE_CACHE="/tmp/ccusage-cache.json"
 CCUSAGE_TTL=300  # 5 minutes (fallback)
 TOKEN_LIMIT=43000000
@@ -61,15 +65,59 @@ _fetch_oauth_usage() {
     "https://api.anthropic.com/api/oauth/usage" 2>/dev/null
 }
 
+# Get file mtime in epoch seconds (GNU coreutils first, then macOS fallback)
+_file_mtime() {
+  stat -c "%Y" "$1" 2>/dev/null || /usr/bin/stat -f "%m" "$1" 2>/dev/null || echo 0
+}
+
 # Check if cache is fresh
 _oauth_cache_fresh() {
   [ -f "$OAUTH_CACHE" ] || return 1
   local now mtime
   now=$(date +%s)
-  mtime=$(stat -f "%m" "$OAUTH_CACHE" 2>/dev/null) \
-    || mtime=$(stat -c "%Y" "$OAUTH_CACHE" 2>/dev/null) \
-    || return 1
+  mtime=$(_file_mtime "$OAUTH_CACHE")
   [ $((now - mtime)) -lt "$OAUTH_TTL" ]
+}
+
+# Check if OAuth refresh should be attempted now.
+# - Fresh cache: skip refresh
+# - Stale/missing cache + recent failure marker: back off
+_oauth_should_refresh() {
+  local now
+  now=$(date +%s)
+
+  if _oauth_cache_fresh; then
+    return 1
+  fi
+
+  if [ -f "$OAUTH_FAIL_MARKER" ]; then
+    local fail_mtime
+    fail_mtime=$(_file_mtime "$OAUTH_FAIL_MARKER")
+    if [ $((now - fail_mtime)) -lt "$OAUTH_FAIL_TTL" ]; then
+      return 1
+    fi
+  fi
+
+  return 0
+}
+
+# Acquire refresh lock atomically using a directory lock.
+_oauth_try_lock() {
+  if mkdir "$OAUTH_LOCK" 2>/dev/null; then
+    return 0
+  fi
+
+  # If lock is stale (e.g. crashed background job), reclaim it.
+  local now lock_mtime
+  now=$(date +%s)
+  lock_mtime=$(_file_mtime "$OAUTH_LOCK")
+  if [ $((now - lock_mtime)) -gt "$OAUTH_LOCK_STALE_SEC" ]; then
+    rm -rf "$OAUTH_LOCK" 2>/dev/null || true
+    mkdir "$OAUTH_LOCK" 2>/dev/null
+    return $?
+  fi
+
+  return 1
 }
 
 # Parse ISO8601 timestamp to epoch seconds (macOS + Linux compatible)
@@ -151,16 +199,31 @@ if [ "${CLAUDE_CODE_USE_BEDROCK:-0}" = "0" ]; then
   else
     # Cache is stale or missing: use existing cache for display, refresh in background
     if [ -f "$OAUTH_CACHE" ]; then
-      session_str_rate=$(_build_oauth_rate_str 2>/dev/null || echo "")
+      # During failure backoff, prefer ccusage fallback over stale OAuth numbers.
+      if [ ! -f "$OAUTH_FAIL_MARKER" ]; then
+        session_str_rate=$(_build_oauth_rate_str 2>/dev/null || echo "")
+      fi
     fi
-    # Background refresh (non-blocking)
-    (
-      result=$(_fetch_oauth_usage 2>/dev/null) || exit 0
-      # Validate it looks like a usage response
-      echo "$result" | jq -e '.five_hour' &>/dev/null || exit 0
-      echo "$result" > "${OAUTH_CACHE}.tmp" \
-        && mv "${OAUTH_CACHE}.tmp" "$OAUTH_CACHE"
-    ) & disown 2>/dev/null
+    # Background refresh (non-blocking, with lock + backoff)
+    if _oauth_should_refresh && _oauth_try_lock; then
+      (
+        result=$(_fetch_oauth_usage 2>/dev/null) || {
+          touch "$OAUTH_FAIL_MARKER"
+          rm -rf "$OAUTH_LOCK"
+          exit 0
+        }
+        # Validate it looks like a usage response
+        if echo "$result" | jq -e '.five_hour' &>/dev/null; then
+          echo "$result" > "${OAUTH_CACHE}.tmp" \
+            && mv "${OAUTH_CACHE}.tmp" "$OAUTH_CACHE"
+          rm -f "$OAUTH_FAIL_MARKER"
+        else
+          # API error (rate limit etc): mark failure and rely on fail backoff
+          touch "$OAUTH_FAIL_MARKER"
+        fi
+        rm -rf "$OAUTH_LOCK"
+      ) & disown 2>/dev/null
+    fi
   fi
 
   # Fallback to ccusage if OAuth produced no output
@@ -168,9 +231,7 @@ if [ "${CLAUDE_CODE_USE_BEDROCK:-0}" = "0" ]; then
     cache_age_ok=false
     if [ -f "$CCUSAGE_CACHE" ]; then
       now=$(date +%s)
-      mtime=$(stat -f "%m" "$CCUSAGE_CACHE" 2>/dev/null) \
-        || mtime=$(stat -c "%Y" "$CCUSAGE_CACHE" 2>/dev/null) \
-        || mtime=0
+      mtime=$(_file_mtime "$CCUSAGE_CACHE")
       has_data=$(jq -r '.blocks | length > 0' "$CCUSAGE_CACHE" 2>/dev/null || echo "false")
       local_ttl=$CCUSAGE_TTL
       [ "$has_data" = "true" ] || local_ttl=30

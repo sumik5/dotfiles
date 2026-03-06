@@ -20,7 +20,7 @@
 | # | subagent_type | モデル | 専門領域 |
 |---|--------------|--------|---------|
 | 1 | `sumik:タチコマ（Next.js）` | Sonnet | Next.js/React開発 |
-| 2 | `sumik:タチコマ（フロントエンド）` | Sonnet | UI/UX・shadcn・Figma |
+| 2 | `sumik:タチコマ（フロントエンド）` | Sonnet | UI実装・shadcn・Storybook・データ可視化 |
 | 3 | `sumik:タチコマ（フルスタックJS）` | Sonnet | NestJS/Express |
 | 4 | `sumik:タチコマ（TypeScript）` | Sonnet | TypeScript型設計 |
 | 5 | `sumik:タチコマ（Python）` | Sonnet | Python・ADK |
@@ -38,7 +38,7 @@
 | 17 | `sumik:タチコマ（E2Eテスト）` | Sonnet | Playwright E2E |
 | 18 | `sumik:タチコマ（オブザーバビリティ）` | Sonnet | 監視・OTel・ログ |
 | 19 | `sumik:タチコマ（ドキュメント）` | Sonnet | 技術文書・記事 |
-| 20 | `sumik:タチコマ（デザイン）` | Sonnet | Figma MCP・デザイン→コード |
+| 20 | `sumik:タチコマ（デザイン）` | Sonnet | デザインシステム・Figma MCP・Tailwind・UI/UX原則 |
 | 21 | `sumik:タチコマ（研修・プレゼン）` | Sonnet | 研修設計・プレゼン改善（自己進化型） |
 
 ---

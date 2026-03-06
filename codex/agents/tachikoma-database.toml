@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -146,9 +146,9 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| designing-relational-databases | Guides relational database design from requirements to implementation covering entity modeling, ER diagrams, normalization, and PostgreSQL implementation |
-| avoiding-sql-antipatterns | Identifies and prevents common SQL database design mistakes across logical design, physical design, query construction, and application development |
-| understanding-database-internals | Comprehensive database internals reference covering storage engines and distributed systems |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| designing-relational-databases | Guides relational database design from requirements to implementation covering entity modeling, ER diagrams, normalization (1NF-BCNF), optimization, and PostgreSQL-specific implementation (microservices data architecture, ACID transactions, functions/stored procedures, AAA security). |
+| avoiding-sql-antipatterns | Identifies and prevents common SQL database design mistakes across logical design, physical design, query construction, and application development. Covers 25 named antipatterns with detection signals, solutions, and exception cases. |
+| understanding-database-internals | Comprehensive database internals reference covering storage engines (B-trees, LSM-trees, file formats, transactions, recovery) and distributed systems (failure detection, leader election, replication, consistency models, consensus algorithms). |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). |
 """

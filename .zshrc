@@ -416,3 +416,5 @@ source <(jj util completion zsh)
 # coderabbit
 # =================================================
 alias code-review="coderabbit review --prompt-only"
+alias claude='claude --teammate-mode tmux --dangerously-skip-permissions"
+alias codex='codex --dangerously-bypass-approvals-and-sandbox'

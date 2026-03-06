@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -78,7 +78,7 @@ developer_instructions = """
 
 ## ツール活用
 
-- **コードベース分析**: シンボル検索・コード編集
+- **serena MCP**: コードベース分析・シンボル検索・コード編集（最優先）
 - **context7 MCP**: FastAPI/Google ADK最新仕様の確認
 
 ## 品質チェックリスト
@@ -102,7 +102,7 @@ developer_instructions = """
 ### コア品質
 - [ ] SOLID原則に従った実装
 - [ ] テストがAAAパターンで記述されている
-- [ ] セキュリティチェック実行済み
+- [ ] セキュリティチェック（`/codeguard-security:software-security`）実行済み
 
 ## 完了定義（Definition of Done）
 
@@ -151,10 +151,10 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| developing-python | Modern Python development guide covering project setup, tooling, Pythonic best practices, OOP design patterns, and SE process |
-| building-adk-agents | Google ADK for building intelligent AI agents with Python covering Agent taxonomy, Tools, Multi-Agent orchestration, and A2A Protocol |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Any/any types strictly prohibited. Enforces strict mode and type guard implementation |
-| testing-code | REQUIRED for all feature implementations. Enforces TDD with AAA pattern, actual/expected variables, and 100% coverage goal |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| developing-python | Modern Python development guide covering project setup, tooling, Pythonic best practices and exercise patterns (file I/O, data manipulation, function design, OOP composition, iterators, comprehension idioms), OOP design principles, GoF design patterns, and software engineering process (SDLC, system modeling, methodologies, project implementation patterns, CI/CD, API design). MUST load when pyproject.toml or requirements.txt is detected. |
+| building-adk-agents | Google ADK (Agent Development Kit) for building intelligent AI agents with Python. |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. |
+| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. Enforces strict mode configuration and type guard implementation. |
+| testing-code | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). For dynamic authorization model design (ABAC/ReBAC/Cedar), use implementing-dynamic-authorization instead. For organizational AI development security strategy (trust frameworks, governance, AI-BOM), use securing-ai-development instead. For serverless infrastructure security (IAM, storage, functions across AWS/GCP/Azure), use securing-serverless instead. For security logging patterns, attack detection via logs, and compliance logging, use implementing-logging. |
 """

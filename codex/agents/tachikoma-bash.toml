@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -31,13 +31,13 @@ developer_instructions = """
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-IFS=$'\\n\\t'
+IFS=$'\n\t'
 ```
 
 - `set -e`: コマンド失敗時に即座にスクリプト終了
 - `set -u`: 未定義変数参照時にエラー（デフォルト値は `${VAR:-default}` で指定）
 - `set -o pipefail`: パイプライン内の任意コマンド失敗を検知
-- `IFS=$'\\n\\t'`: フィールド区切りをスペースなしに制限（意図しない単語分割を防ぐ）
+- `IFS=$'\n\t'`: フィールド区切りをスペースなしに制限（意図しない単語分割を防ぐ）
 
 ### 変数と引数処理
 - **変数展開**: `${var:-default}` / `${var:?error}` / `${var##pattern}` 等を活用
@@ -105,7 +105,7 @@ IFS=$'\\n\\t'
 
 ### Bash固有
 - [ ] `#!/usr/bin/env bash` でシバン設定
-- [ ] `set -euo pipefail` + `IFS=$'\\n\\t'` のstrict mode設定
+- [ ] `set -euo pipefail` + `IFS=$'\n\t'` のstrict mode設定
 - [ ] すべての変数が `"${var}"` とダブルクォートで保護されている
 - [ ] 関数内では `local` 変数を使用している
 - [ ] 外部入力のバリデーション（ホワイトリスト検証）を実装している
@@ -165,7 +165,7 @@ IFS=$'\\n\\t'
 
 | Skill 名 | 説明 |
 |----------|------|
-| developing-bash | Comprehensive Bash shell scripting guide covering fundamentals, control flow, I/O pipelines, process control, testing/debugging, security, and design patterns |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| developing-bash | Comprehensive Bash shell scripting and automation guide covering fundamentals, control flow, I/O pipelines, process control, system administration automation, testing/debugging, security, design patterns, and penetration testing automation (Nmap, web scanning, exploitation, Wi-Fi assessment, reporting). MUST load when .sh files are detected or shell scripts are being written. |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). |
 """

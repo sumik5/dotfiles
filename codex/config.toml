@@ -37,7 +37,7 @@ description = "Database specialized Tachikoma execution agent. Handles relationa
 config_file = "agents/tachikoma-database.toml"
 
 [agents.tachikoma_design]
-description = "Design-to-code specialized Tachikoma execution agent. Handles Figma MCP integration (all 13 tools), Figma Make context, Code Connect mappings, Design System Rules generation, design token synchronization, and visual validation. Use proactively when converting Figma designs to code, managing design systems, or synchronizing design tokens. Detects: Figma URLs in user prompts, .figma/ directory, or design-system-rules files."
+description = "Design specialized Tachikoma execution agent. Handles Figma MCP integration (all 13 tools), Figma Make context, Code Connect mappings, Design System Rules generation, design token synchronization, visual validation, design system construction/governance, Tailwind CSS styling methodology, and UI/UX design principles. Use proactively when converting Figma designs to code, managing design systems, building/evolving design systems, implementing design tokens with Tailwind CSS, or making UI/UX design decisions. Detects: Figma URLs in user prompts, .figma/ directory, design-system-rules files, or design system architecture tasks."
 config_file = "agents/tachikoma-design.toml"
 
 [agents.tachikoma_document]
@@ -49,7 +49,7 @@ description = "E2E testing and browser automation specialized Tachikoma executio
 config_file = "agents/tachikoma-e2e-test.toml"
 
 [agents.tachikoma_frontend]
-description = "Frontend UI/UX specialized Tachikoma execution agent. Handles component implementation with shadcn/ui and Storybook, Figma-to-code conversion via Figma MCP, data visualization, and design system implementation. Use proactively when creating UI components, implementing designs from Figma, building interactive interfaces, or creating data charts/dashboards. Detects: components.json, .stories.tsx/.ts files, or tailwind.config.*."
+description = "Frontend component implementation specialized Tachikoma execution agent. Handles component implementation with shadcn/ui, Storybook story creation and interaction testing, and data visualization (charts/dashboards). Use proactively when creating UI components with shadcn/ui, writing Storybook stories, building interactive interfaces, or creating data charts/dashboards. For design principles, Figma integration, design systems, or Tailwind CSS architecture, use タチコマ（デザイン） instead. Detects: components.json, .stories.tsx/.ts files."
 config_file = "agents/tachikoma-frontend.toml"
 
 [agents.tachikoma_fullstack_js]

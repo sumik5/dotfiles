@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -142,9 +142,9 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| mastering-typescript | Comprehensive TypeScript guide covering type system, advanced patterns, design patterns, and 83 best practice criteria |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Any/any types strictly prohibited. Enforces strict mode and type guard implementation |
-| testing-code | REQUIRED for all feature implementations. Enforces TDD with AAA pattern, actual/expected variables, and 100% coverage goal |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| mastering-typescript | Comprehensive TypeScript guide covering type system, advanced patterns, design patterns (GoF Creational/Structural/Behavioral), functional/reactive programming, framework integration, and 83 best practice decision criteria. MUST load when working in TypeScript projects detected by tsconfig.json. Covers Generics, Conditional Types, type inference, type design, SOLID/DDD in TypeScript, anti-patterns, and practical migration tips. For strict type safety rules, use enforcing-type-safety instead. |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. |
+| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. Enforces strict mode configuration and type guard implementation. |
+| testing-code | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). For dynamic authorization model design (ABAC/ReBAC/Cedar), use implementing-dynamic-authorization instead. For organizational AI development security strategy (trust frameworks, governance, AI-BOM), use securing-ai-development instead. For serverless infrastructure security (IAM, storage, functions across AWS/GCP/Azure), use securing-serverless instead. For security logging patterns, attack detection via logs, and compliance logging, use implementing-logging. |
 """

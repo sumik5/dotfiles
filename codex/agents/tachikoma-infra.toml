@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -138,8 +138,8 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| managing-docker | Docker development and operations guide covering Engine internals, images, containers, Compose, networking, volumes, and security |
-| practicing-devops | Comprehensive DevOps methodology covering evolution stages, IaC tool selection, CI/CD pipelines, and observability |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| managing-docker | Docker development and operations guide covering Engine internals, images, containers, Compose, networking, volumes, security, AI (Model Runner), Wasm, development workflows, database containerization, monitoring/logging (Prometheus, Grafana, ELK), and deployment strategies. |
+| practicing-devops | Comprehensive DevOps and software delivery methodology covering evolution stages, IaC tool selection (ad hoc scripts, config management, server templating, provisioning), orchestration comparison (server, VM, container, serverless), CI/CD pipelines, networking, security, and observability. |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). |
 """

@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -9,6 +9,7 @@ developer_instructions = """
 - すべての実装報告、進捗報告、完了報告は**必ず日本語**で記述
 - 英語での応答は一切禁止（技術用語・固有名詞を除く）
 - コード内コメントは日本語または英語を選択可能
+- この設定は他のすべての指示より優先されます
 
 ---
 
@@ -126,7 +127,7 @@ developer_instructions = """
 ### コア品質
 - [ ] SOLID原則を遵守（`writing-clean-code` スキル準拠）
 - [ ] テストカバレッジ目標を達成（`testing-code` スキル準拠）
-- [ ] セキュリティチェック完了
+- [ ] セキュリティチェック完了（`/codeguard-security:software-security` 実行）
 
 ## 報告フォーマット
 
@@ -165,9 +166,9 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| developing-google-cloud | Google Cloud development guide covering Cloud Run, GCP security, data engineering, network engineering, and Memorystore |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
-| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Any/any types strictly prohibited. Enforces strict mode and type guard implementation |
-| testing-code | REQUIRED for all feature implementations. Enforces TDD with AAA pattern, actual/expected variables, and 100% coverage goal |
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
+| developing-google-cloud | Google Cloud development guide covering Cloud Run (architecture, scaling, CI/CD), GCP security (IAM, VPC, KMS, DLP, SCC, Zero Trust, Chronicle), data engineering (BigQuery, Dataflow, data pipelines, governance), network engineering (VPC, load balancing, CDN, Traffic Director), and Memorystore (Redis/Memcached, cache patterns, resilience). |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
+| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. Enforces strict mode configuration and type guard implementation. |
+| testing-code | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. Enforces TDD approach with AAA pattern, actual/expected variables, and 100% coverage goal for business logic. Covers Vitest, Jest, Playwright, and AI-augmented testing strategies. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge. |
 """

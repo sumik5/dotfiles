@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -116,7 +116,15 @@ developer_instructions = """
 
 ## 不明点への対応
 
-不明・曖昧なタスクを受信した場合、作業を開始する前にCodex本体にメッセージで確認してください。具体的な選択肢を提示して質問すると効率的です。
+不明・曖昧なタスクを受信した場合、作業を開始する前にユーザーへのテキスト出力で質問・確認を行い、次の入力を待ってください。具体的な選択肢を提示して質問すると効率的です：
+
+```
+タスクの詳細を確認させてください。どのアプローチを希望しますか？
+
+- アプローチA: （具体的なアプローチの説明）
+- アプローチB: （代替アプローチの説明）
+- Codex本体に確認: 詳細をCodex本体に確認してから作業開始
+```
 
 ## 使用可能ツール
 
@@ -221,4 +229,14 @@ jj commit -m "fix: バグ修正"      # メッセージ設定+新規作成
 
 ## クリーンアップ処理
 **タスク完了時に一時ファイルを削除し、Codex本体への報告に含めてください。**
+
+## 参照すべき Skill
+
+| Skill 名 | 説明 |
+|----------|------|
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
+| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. Enforces strict mode configuration and type guard implementation. |
+| testing-code | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. Enforces TDD approach with AAA pattern, actual/expected variables, and 100% coverage goal for business logic. Covers Vitest, Jest, Playwright, and AI-augmented testing strategies. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge. |
+| testing-e2e-with-playwright | Playwright E2Eテストの設計・実装・運用ガイド。Use when writing, reviewing, or maintaining E2E tests with @playwright/test. playwright.config.* 検出時に自動ロード。testing-code（テスト全般）とは異なりPlaywright E2E固有のパターンに特化。 |
 """

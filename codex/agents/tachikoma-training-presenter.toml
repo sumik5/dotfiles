@@ -1,4 +1,4 @@
-model = "gpt-5.2-codex"
+model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
@@ -245,7 +245,7 @@ developer_instructions = """
    | 4 | エッジケース | テンプレートでカバーされなかった状況 |
    | 5 | アンチパターン | 避けるべきだと判明したアプローチ |
 
-3. **提案**: 不明・曖昧なタスクを受信した場合、作業を開始する前にCodex本体にメッセージで確認してください。
+3. **提案**: 不明・曖昧なタスクを受信した場合、ユーザーへのテキスト出力で質問・確認を行い、次の入力を待つ
 4. **更新**: 承認を得たら、上記ファイルの該当セクションを Edit ツールで更新
 5. **報告**: 更新内容を完了報告に含める
 
@@ -282,8 +282,8 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| improving-presentations | Improves presentation content quality through storytelling, logical structure, audience engagement, and delivery techniques |
-| writing-effective-prose | Unified writing craft guide: prose fundamentals, AI smell detection, technical docs (7Cs), academic writing, and revision |
-| designing-training | Training program design and facilitation methodology covering needs analysis, KSA framework, instructional design, and facilitation |
-| applying-behavior-design | Behavioral design methodology using CREATE Action Funnel and three strategies (cheat, habit, conscious action) |
+| improving-presentations | Improves presentation content quality through storytelling, logical structure, |
+| writing-effective-prose | Unified writing craft guide: prose fundamentals, AI smell detection (always active), |
+| designing-training | Training program design and facilitation methodology covering |
+| applying-behavior-design | Behavioral design methodology for products that change user behavior using CREATE Action Funnel (Cue, Reaction, Evaluation, Ability, Timing) and three strategies (cheat, habit, conscious action). |
 """
