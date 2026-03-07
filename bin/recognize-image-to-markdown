@@ -1,0 +1,561 @@
+#!/usr/bin/env python3
+"""画像ベース EPUB / 画像ディレクトリ → Markdown 変換ツール
+
+LM Studio のローカル VLM (OCR) を使い、画像ベースの EPUB または画像
+ディレクトリを日本語テキスト (Markdown) に変換する。
+
+使用例:
+  recognize-image-to-markdown book.epub
+  recognize-image-to-markdown book.epub -o ~/Desktop/book.md
+  recognize-image-to-markdown ./epub-folder/          # フォルダ内の全EPUBを処理
+  recognize-image-to-markdown ./scanned-pages/        # 画像のみのフォルダ
+  recognize-image-to-markdown book.epub --no-resume   # 最初からやり直し
+
+前提:
+  - LM Studio が起動し VLM モデルがロードされていること
+  - pandoc がインストールされていること (EPUB 入力時)
+  - Python 3.10+
+"""
+
+import argparse
+import os
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import zipfile
+from pathlib import Path
+
+SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
+DEFAULT_BLANK_THRESHOLD = 15360  # 15KB
+DEFAULT_MODEL = "qwen/qwen3.5-9b"
+
+RECOGNITION_PROMPT = (
+    "添付の画像を文字に変換し、markdown形式で返信してください。"
+    "前後の不要なシステムメッセージは不要であり、画像の内容のみ返信してください"
+)
+
+
+# ---------------------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------------------
+
+def log(msg: str) -> None:
+    print(msg, file=sys.stderr)
+
+
+def ensure_lmstudio() -> None:
+    try:
+        import lmstudio  # noqa: F401
+    except ImportError:
+        log("lmstudio パッケージをインストールしています...")
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "lmstudio", "-q"]
+        )
+
+
+def check_lmstudio_connection(model_name: str) -> None:
+    """LM Studio に接続できるか事前チェックする。"""
+    try:
+        import lmstudio as lms
+        lms.llm(model_name)
+    except Exception as exc:
+        log(
+            f"エラー: LM Studio に接続できません。\n"
+            f"LM Studio が起動しモデル '{model_name}' がロードされていることを確認してください。\n"
+            f"詳細: {exc}"
+        )
+        sys.exit(1)
+
+
+def check_pandoc() -> None:
+    if shutil.which("pandoc") is None:
+        log("エラー: pandoc が見つかりません。brew install pandoc でインストールしてください。")
+        sys.exit(1)
+
+
+def strip_think_tags(text: str) -> str:
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+    if "</think>" in text:
+        text = text.split("</think>", 1)[1]
+    return text.strip()
+
+
+def is_blank_image(path: Path, threshold: int = DEFAULT_BLANK_THRESHOLD) -> bool:
+    return path.stat().st_size <= threshold
+
+
+# ---------------------------------------------------------------------------
+# EPUB handling
+# ---------------------------------------------------------------------------
+
+def extract_epub_images(epub_path: Path, work_dir: Path) -> Path:
+    """EPUB から画像を抽出し、画像ディレクトリのパスを返す。"""
+    img_dir = work_dir / "images"
+    img_dir.mkdir(parents=True, exist_ok=True)
+
+    with zipfile.ZipFile(epub_path, "r") as zf:
+        for member in zf.namelist():
+            suffix = Path(member).suffix.lower()
+            if suffix in SUPPORTED_EXTENSIONS:
+                data = zf.read(member)
+                dest = img_dir / Path(member).name
+                dest.write_bytes(data)
+
+    count = sum(1 for f in img_dir.iterdir() if f.suffix.lower() in SUPPORTED_EXTENSIONS)
+    if count == 0:
+        log(f"エラー: EPUB 内に画像ファイルが見つかりません。")
+        sys.exit(1)
+    log(f"画像抽出完了: {count} 枚")
+    return img_dir
+
+
+def is_image_based_epub(epub_path: Path, work_dir: Path) -> tuple[bool, Path, list[str]]:
+    """pandoc で EPUB → Markdown 変換し、画像ベースかどうか判定する。
+
+    Returns:
+        (is_image_based, md_path, page_order)
+        - is_image_based: 画像ベースなら True
+        - md_path: pandoc 変換済み Markdown のパス
+        - page_order: 画像参照順のファイル名リスト
+    """
+    md_path = work_dir / "pandoc-output.md"
+    subprocess.run(
+        ["pandoc", "-t", "markdown", "-o", str(md_path), str(epub_path)],
+        check=True,
+        capture_output=True,
+    )
+
+    md_text = md_path.read_text(errors="replace")
+    lines = md_text.splitlines()
+    total_lines = len(lines)
+
+    # 画像参照行と非空テキスト行をカウント
+    img_line_count = sum(1 for l in lines if "![" in l)
+    # 空行・HTMLタグ行・divブロック(:::)を除いた実質テキスト行数
+    text_lines = [
+        l for l in lines
+        if l.strip()
+        and "![" not in l
+        and not l.strip().startswith(":::")
+        and not l.strip().startswith("{")
+        and not re.match(r'^\[?\]\{', l.strip())
+    ]
+    text_line_count = len(text_lines)
+
+    # 画像ファイル名を参照順に抽出（重複除去、順序維持）
+    pattern = re.compile(r'([\w./-]+\.(?:jpg|jpeg|png|webp))', re.IGNORECASE)
+    seen: set[str] = set()
+    order: list[str] = []
+    for m in pattern.finditer(md_text):
+        name = Path(m.group(1)).name
+        if name not in seen:
+            seen.add(name)
+            order.append(name)
+
+    # 判定: テキスト行が少なく画像参照が多ければ画像ベース
+    # 閾値: テキスト行が全体の20%未満、または実質テキスト50行未満かつ画像10枚以上
+    is_image = (
+        (total_lines > 0 and text_line_count / max(total_lines, 1) < 0.2)
+        or (text_line_count < 50 and len(order) >= 10)
+    )
+
+    log(f"EPUB分析: 総行数={total_lines}, テキスト行={text_line_count}, "
+        f"画像参照={img_line_count}, 画像数={len(order)} "
+        f"→ {'画像ベース' if is_image else 'テキストベース'}")
+
+    return is_image, md_path, order
+
+
+def collect_ordered_images(
+    img_dir: Path,
+    page_order: list[str] | None,
+) -> list[Path]:
+    """ページ順リストに基づいて画像ファイルを収集する。
+
+    page_order が None の場合（ディレクトリ直接入力）はファイル名ソート。
+    """
+    if page_order:
+        files = []
+        for name in page_order:
+            candidate = img_dir / name
+            if candidate.is_file():
+                files.append(candidate)
+        if files:
+            return files
+
+    # フォールバック: ファイル名ソート
+    return sorted(
+        f for f in img_dir.iterdir()
+        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+    )
+
+
+# ---------------------------------------------------------------------------
+# OCR
+# ---------------------------------------------------------------------------
+
+def recognize_single_image(model_name: str, image_path: Path) -> str:
+    import lmstudio as lms
+
+    image_handle = lms.prepare_image(str(image_path))
+    model = lms.llm(model_name)
+    chat = lms.Chat()
+    chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
+    result = model.respond(chat)
+    return strip_think_tags(result.content)
+
+
+# ---------------------------------------------------------------------------
+# Resume support
+# ---------------------------------------------------------------------------
+
+def load_progress(progress_file: Path) -> set[str]:
+    """処理済みファイル名のセットを返す。"""
+    if not progress_file.exists():
+        return set()
+    return set(progress_file.read_text().strip().splitlines())
+
+
+def save_progress(progress_file: Path, filename: str) -> None:
+    with open(progress_file, "a") as f:
+        f.write(filename + "\n")
+
+
+# ---------------------------------------------------------------------------
+# Progress bar
+# ---------------------------------------------------------------------------
+
+def format_time(seconds: float) -> str:
+    if seconds < 60:
+        return f"{seconds:.0f}s"
+    m, s = divmod(int(seconds), 60)
+    if m < 60:
+        return f"{m}m{s:02d}s"
+    h, m = divmod(m, 60)
+    return f"{h}h{m:02d}m"
+
+
+def render_progress(
+    current: int,
+    total: int,
+    filename: str,
+    elapsed: float,
+    status: str = "",
+    bar_width: int = 30,
+) -> None:
+    """ターミナル幅に収まるプログレスバーを stderr に描画する。"""
+    pct = current / max(total, 1)
+    filled = int(bar_width * pct)
+    bar = "█" * filled + "░" * (bar_width - filled)
+
+    # ETA 計算
+    if current > 0 and pct < 1.0:
+        eta = elapsed / current * (total - current)
+        eta_str = f"ETA {format_time(eta)}"
+    elif pct >= 1.0:
+        eta_str = f"done {format_time(elapsed)}"
+    else:
+        eta_str = "..."
+
+    # ステータス（空白スキップ等）があれば短く表示
+    info = f" {status}" if status else ""
+
+    line = f"  {bar} {current}/{total} ({pct:.0%}) {eta_str}{info}"
+
+    # ターミナル幅を取得して切り詰め
+    try:
+        cols = os.get_terminal_size().columns
+        line = line[:cols]
+    except OSError:
+        pass
+
+    # 行クリア + 行頭復帰で同じ行を上書き
+    print(f"\033[2K\r{line}", end="", file=sys.stderr, flush=True)
+
+
+# ---------------------------------------------------------------------------
+# Main conversion
+# ---------------------------------------------------------------------------
+
+def convert(
+    image_files: list[Path],
+    output_path: Path,
+    model_name: str,
+    skip_blank: bool,
+    resume: bool,
+    blank_threshold: int = DEFAULT_BLANK_THRESHOLD,
+) -> None:
+    total = len(image_files)
+    if total == 0:
+        log("エラー: 処理対象の画像がありません。")
+        sys.exit(1)
+
+    progress_file = output_path.with_suffix(".progress")
+    processed = load_progress(progress_file) if resume else set()
+
+    # resume 時は既存ファイルに追記、それ以外は新規作成
+    mode = "a" if resume and output_path.exists() else "w"
+
+    skipped_blank = 0
+    skipped_done = 0
+    written = 0
+    start_time = time.time()
+
+    with open(output_path, mode) as out:
+        for i, image_file in enumerate(image_files, 1):
+            elapsed = time.time() - start_time
+
+            # Resume: 処理済みスキップ
+            if image_file.name in processed:
+                skipped_done += 1
+                render_progress(i, total, image_file.name, elapsed, "skip:resume")
+                continue
+
+            # 空白ページスキップ
+            if skip_blank and is_blank_image(image_file, threshold=blank_threshold):
+                skipped_blank += 1
+                save_progress(progress_file, image_file.name)
+                render_progress(i, total, image_file.name, elapsed, "skip:blank")
+                continue
+
+            render_progress(i, total, image_file.name, elapsed, image_file.name)
+
+            try:
+                text = recognize_single_image(model_name, image_file)
+            except Exception as exc:
+                print(file=sys.stderr)  # プログレスバー行を確定
+                log(f"エラー [{i}/{total}] {image_file.name}: {exc}")
+                log("中断します。再実行で続きから自動再開します（--no-resume で最初から）。")
+                sys.exit(1)
+
+            if written > 0:
+                out.write("\n\n---\n\n")
+            out.write(text)
+            out.flush()
+            written += 1
+            save_progress(progress_file, image_file.name)
+
+    # プログレスバーを完了表示で確定
+    elapsed = time.time() - start_time
+    render_progress(total, total, "", elapsed)
+    print(file=sys.stderr)  # 改行
+
+    # 完了時にプログレスファイルを削除
+    if progress_file.exists():
+        progress_file.unlink()
+
+    log(f"完了: {output_path}")
+    log(f"  処理: {written}, 空白スキップ: {skipped_blank}, "
+        f"resume スキップ: {skipped_done}, "
+        f"所要時間: {format_time(elapsed)} "
+        f"({elapsed / max(written, 1):.1f}s/page)")
+
+
+# ---------------------------------------------------------------------------
+# Single EPUB processing
+# ---------------------------------------------------------------------------
+
+def process_single_epub(
+    epub_path: Path,
+    output_path: Path,
+    model_name: str,
+    skip_blank: bool,
+    resume: bool,
+    blank_threshold: int,
+) -> bool:
+    """1つのEPUBファイルを画像抽出→ページ順解析→OCR→Markdown保存する。
+
+    Returns:
+        True: 処理した, False: テキストベースのためスキップした
+    """
+    work_dir = Path(tempfile.mkdtemp(prefix="epub-ocr-"))
+    log(f"作業ディレクトリ: {work_dir}")
+
+    log("EPUB を分析中...")
+    is_image, md_path, page_order = is_image_based_epub(epub_path, work_dir)
+
+    if not is_image:
+        log(f"スキップ: {epub_path.name} はテキストベースのEPUBです（OCR不要）")
+        return False
+
+    log("EPUB から画像を抽出中...")
+    img_dir = extract_epub_images(epub_path, work_dir)
+
+    image_files = collect_ordered_images(img_dir, page_order)
+    log(f"処理対象: {len(image_files)} 枚")
+
+    convert(
+        image_files=image_files,
+        output_path=output_path,
+        model_name=model_name,
+        skip_blank=skip_blank,
+        resume=resume,
+        blank_threshold=blank_threshold,
+    )
+    return True
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def resolve_output_path(input_path: Path, output_arg: str | None) -> Path:
+    if output_arg:
+        return Path(output_arg).expanduser().resolve()
+    return input_path.with_suffix(".md")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="画像ベース EPUB / 画像ディレクトリを Markdown に変換",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "使用例:\n"
+            "  %(prog)s book.epub                      # 単一EPUB\n"
+            "  %(prog)s book.epub -o ~/Desktop/book.md  # 出力先指定\n"
+            "  %(prog)s ./epub-folder/                  # フォルダ内の全EPUB\n"
+            "  %(prog)s ./scanned-pages/                # 画像ディレクトリ\n"
+            "  %(prog)s book.epub --no-resume            # 最初からやり直し\n"
+        ),
+    )
+    parser.add_argument(
+        "input",
+        help="EPUB ファイルまたは画像を含むディレクトリ",
+    )
+    parser.add_argument(
+        "-o", "--output",
+        default=None,
+        help="出力 Markdown ファイルパス (デフォルト: 入力と同じ場所に .md)",
+    )
+    parser.add_argument(
+        "--model",
+        default=DEFAULT_MODEL,
+        help=f"LM Studio モデル名 (デフォルト: {DEFAULT_MODEL})",
+    )
+    parser.add_argument(
+        "--no-skip-blank",
+        action="store_true",
+        default=False,
+        help="空白ページスキップを無効化",
+    )
+    parser.add_argument(
+        "--blank-threshold",
+        type=int,
+        default=DEFAULT_BLANK_THRESHOLD,
+        help=f"空白ページ判定の閾値バイト数 (デフォルト: {DEFAULT_BLANK_THRESHOLD})",
+    )
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        default=False,
+        help="中断再開を無効化し最初から処理する (デフォルト: resume ON)",
+    )
+    args = parser.parse_args()
+
+    input_path = Path(args.input).expanduser().resolve()
+    if not input_path.exists():
+        log(f"エラー: '{input_path}' が見つかりません。")
+        sys.exit(1)
+
+    resume = not args.no_resume
+    skip_blank = not args.no_skip_blank
+
+    # lmstudio パッケージ確認
+    ensure_lmstudio()
+
+    is_epub = input_path.is_file() and input_path.suffix.lower() == ".epub"
+    is_dir = input_path.is_dir()
+
+    if not is_epub and not is_dir:
+        # 単一画像ファイルの場合
+        if input_path.suffix.lower() in SUPPORTED_EXTENSIONS:
+            output_path = resolve_output_path(input_path, args.output)
+            check_lmstudio_connection(args.model)
+            text = recognize_single_image(args.model, input_path)
+            output_path.write_text(text)
+            log(f"完了: {output_path}")
+            return
+        log(f"エラー: '{input_path}' は対応していない形式です。EPUB / 画像ディレクトリ / 画像ファイルを指定してください。")
+        sys.exit(1)
+
+    # ディレクトリ指定時: EPUB が含まれていれば各EPUBを個別処理
+    if is_dir:
+        epub_files = sorted(input_path.glob("*.epub"))
+        has_images = any(
+            f.suffix.lower() in SUPPORTED_EXTENSIONS
+            for f in input_path.iterdir() if f.is_file()
+        )
+
+        if epub_files:
+            # EPUB が1つ以上ある → 各EPUBを個別処理
+            check_pandoc()
+            log(f"LM Studio 接続チェック (モデル: {args.model})...")
+            check_lmstudio_connection(args.model)
+
+            log(f"フォルダ内に {len(epub_files)} 件の EPUB を検出")
+            processed_count = 0
+            skipped_text = 0
+            for idx, epub in enumerate(epub_files, 1):
+                log(f"\n{'='*60}")
+                log(f"[{idx}/{len(epub_files)}] {epub.name}")
+                log(f"{'='*60}")
+                # -o 指定がある場合は無視（各EPUBの出力先は自動決定）
+                out = epub.with_suffix(".md")
+                if args.output and len(epub_files) == 1:
+                    out = Path(args.output).expanduser().resolve()
+                did_process = process_single_epub(
+                    epub_path=epub,
+                    output_path=out,
+                    model_name=args.model,
+                    skip_blank=skip_blank,
+                    resume=resume,
+                    blank_threshold=args.blank_threshold,
+                )
+                if did_process:
+                    processed_count += 1
+                else:
+                    skipped_text += 1
+            log(f"\n全 {len(epub_files)} 件完了 "
+                f"(OCR処理: {processed_count}, テキストベーススキップ: {skipped_text})")
+            return
+
+        if has_images:
+            # 画像のみのディレクトリ → 従来通りOCR
+            output_path = resolve_output_path(input_path, args.output)
+            log(f"LM Studio 接続チェック (モデル: {args.model})...")
+            check_lmstudio_connection(args.model)
+            image_files = collect_ordered_images(input_path, None)
+            log(f"処理対象: {len(image_files)} 枚")
+            convert(
+                image_files=image_files,
+                output_path=output_path,
+                model_name=args.model,
+                skip_blank=skip_blank,
+                resume=resume,
+                blank_threshold=args.blank_threshold,
+            )
+            return
+
+        log(f"エラー: '{input_path}' に EPUB も画像も見つかりません。")
+        sys.exit(1)
+
+    # 単一 EPUB ファイル
+    output_path = resolve_output_path(input_path, args.output)
+    check_pandoc()
+    log(f"LM Studio 接続チェック (モデル: {args.model})...")
+    check_lmstudio_connection(args.model)
+    process_single_epub(
+        epub_path=input_path,
+        output_path=output_path,
+        model_name=args.model,
+        skip_blank=skip_blank,
+        resume=resume,
+        blank_threshold=args.blank_threshold,
+    )
+
+
+if __name__ == "__main__":
+    main()

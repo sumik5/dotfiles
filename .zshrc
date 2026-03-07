@@ -418,3 +418,5 @@ source <(jj util completion zsh)
 alias code-review="coderabbit review --prompt-only"
 alias claude='claude --teammate-mode tmux --dangerously-skip-permissions"
 alias codex='codex --dangerously-bypass-approvals-and-sandbox'
+alias docker='podman'
+alias docker-comopse='podman-compose'
