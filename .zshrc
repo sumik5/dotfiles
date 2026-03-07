@@ -51,23 +51,6 @@ zstyle ':filter-select' case-insensitive yes
 zstyle ':filter-select' extended-search yes
 
 # -------------------------------------------------
-# aliases
-
-alias htop='sudo htop'
-
-if (( ${+commands[vim]} )); then
-  alias vi='vim'
-fi
-
-alias ll='ls -vl'
-alias greps='rg --hidden -p'
-alias claude='claude --teammate-mode tmux --dangerously-skip-permissions'
-alias brew="arch -arm64 brew"
-alias gcautog="gcauto -m gemini"
-alias vi="nvim"
-alias vim="nvim"
-
-# -------------------------------------------------
 # user environment
 
 # brew api token
@@ -352,7 +335,6 @@ rm () {
 peco-cd () {
   cd "$( ghq list --full-path | peco)"
 }
-alias repo='peco-cd'
 
 # =================================================
 # 環境別設定ファイルの読み込み（最後に読み込んで最優先）
@@ -400,7 +382,6 @@ export PATH="$PATH:/Users/sumik/.lmstudio/bin"
 export ENABLE_LSP_TOOL=1
 
 
-alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 
 export OBSIDIAN='~/Dropbox/obsidian/'
 
@@ -411,12 +392,21 @@ autoload -U compinit
 compinit
 source <(jj util completion zsh)
 
-
 # =================================================
-# coderabbit
+# alias
 # =================================================
+alias ll='ls -vl'
+alias greps='rg --hidden -p'
+alias claude='claude --teammate-mode tmux --dangerously-skip-permissions'
+alias brew="arch -arm64 brew"
+alias gcautog="gcauto -m gemini"
+alias vi="nvim"
+alias vim="nvim"
+alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
 alias code-review="coderabbit review --prompt-only"
-alias claude='claude --teammate-mode tmux --dangerously-skip-permissions"
-alias codex='codex --dangerously-bypass-approvals-and-sandbox'
-alias docker='podman'
-alias docker-comopse='podman-compose'
+alias claude="claude --teammate-mode tmux --dangerously-skip-permissions"
+alias codex="codex --dangerously-bypass-approvals-and-sandbox"
+alias docker="podman"
+alias docker-comopse="podman-compose"
+alias htop='sudo htop'
+alias repo='peco-cd'
