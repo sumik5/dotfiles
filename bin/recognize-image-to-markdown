@@ -62,12 +62,18 @@ def check_lmstudio_connection(model_name: str) -> None:
         import lmstudio as lms
         lms.llm(model_name)
     except Exception as exc:
-        log(
-            f"エラー: LM Studio に接続できません。\n"
-            f"LM Studio が起動しモデル '{model_name}' がロードされていることを確認してください。\n"
-            f"詳細: {exc}"
-        )
-        sys.exit(1)
+        log(f"接続チェック失敗: {exc}")
+        log(f"モデル '{model_name}' のリロードを試みます...")
+        try:
+            reload_model(model_name)
+            log("リロード成功。処理を続行します。")
+        except Exception as reload_exc:
+            log(
+                f"エラー: LM Studio に接続できません。\n"
+                f"LM Studio が起動しモデル '{model_name}' がロードされていることを確認してください。\n"
+                f"詳細: {reload_exc}"
+            )
+            sys.exit(1)
 
 
 def check_pandoc() -> None:
@@ -197,15 +203,74 @@ def collect_ordered_images(
 # OCR
 # ---------------------------------------------------------------------------
 
-def recognize_single_image(model_name: str, image_path: Path) -> str:
+MAX_RETRIES = 5
+
+
+def reload_model(model_name: str) -> None:
+    """LM Studio のモデルをアンロードして再ロードする。"""
     import lmstudio as lms
 
-    image_handle = lms.prepare_image(str(image_path))
-    model = lms.llm(model_name)
-    chat = lms.Chat()
-    chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
-    result = model.respond(chat)
-    return strip_think_tags(result.content)
+    log(f"\nモデル '{model_name}' をリロードします...")
+
+    # Step 1: アンロード
+    try:
+        model = lms.llm(model_name)
+        model.unload()
+        log("  モデルをアンロードしました。")
+    except Exception as exc:
+        log(f"  アンロード中にエラー（続行）: {exc}")
+
+    # Step 2: 少し待つ
+    time.sleep(10)
+
+    # Step 3: ダウンロード済みモデルから探して再ロード
+    downloaded_models = lms.list_downloaded_models()
+    target = next(
+        (m for m in downloaded_models if m.model_key == model_name),
+        None,
+    )
+    if target is None:
+        raise RuntimeError(
+            f"ダウンロード済みモデルに '{model_name}' が見つかりません。"
+        )
+    log(f"  モデルをロード中: {model_name}")
+    target.load_new_instance(ttl=3600)
+
+    # Step 4: 接続確認
+    lms.llm(model_name)
+    log(f"  モデル '{model_name}' のリロード完了。")
+
+
+def recognize_single_image(
+    model_name: str,
+    image_path: Path,
+    max_retries: int = MAX_RETRIES,
+) -> str:
+    import lmstudio as lms
+
+    retryable = (
+        lms.LMStudioPredictionError,
+        lms.LMStudioChannelClosedError,
+        lms.LMStudioServerError,
+    )
+
+    for attempt in range(max_retries + 1):
+        try:
+            image_handle = lms.prepare_image(str(image_path))
+            model = lms.llm(model_name)
+            chat = lms.Chat()
+            chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
+            result = model.respond(chat)
+            return strip_think_tags(result.content)
+        except retryable as exc:
+            if attempt >= max_retries:
+                raise
+            log(f"\n  予測エラー発生 (試行 {attempt + 1}/{max_retries + 1}): {exc}")
+            reload_model(model_name)
+            log(f"  リトライします... (試行 {attempt + 2}/{max_retries + 1})")
+
+    # ここには到達しないが型チェッカーのために
+    raise RuntimeError("予期しない状態: リトライループを抜けました")
 
 
 # ---------------------------------------------------------------------------
@@ -327,7 +392,7 @@ def convert(
                 text = recognize_single_image(model_name, image_file)
             except Exception as exc:
                 print(file=sys.stderr)  # プログレスバー行を確定
-                log(f"エラー [{i}/{total}] {image_file.name}: {exc}")
+                log(f"エラー [{i}/{total}] {image_file.name}: リトライ後も失敗しました。{exc}")
                 log("中断します。再実行で続きから自動再開します（--no-resume で最初から）。")
                 sys.exit(1)
 
