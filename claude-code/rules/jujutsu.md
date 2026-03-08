@@ -156,7 +156,7 @@ jj git fetch && jj rebase -o <bookmark>@origin
 
 ```bash
 # 方法1: 混在したままコミット（変更が論理的にまとまっている場合）
-gcauto -y
+gcauto
 
 # 方法2: ファイル単位で分離してから個別コミット
 jj split          # 対話的にファイルを選択して分離
@@ -252,7 +252,7 @@ jj log
 jj bookmark list
 
 # 3. 必要であればリモートに push（`@` もしくは `@` が empty の場合は `@-` に、track 中の bookmark がローカルとリモートで一致して設定されている場合は不要）
-jj push -b <bookmark-name>
+jj git push -b <bookmark-name>
 
 # 4. GitHub CLI で PR 作成
 gh pr create --base main --head <bookmark-name>
