@@ -21,7 +21,7 @@ description = "AI/ML development specialized Tachikoma execution agent. Handles 
 config_file = "agents/tachikoma-ai-ml.toml"
 
 [agents.tachikoma_architecture]
-description = "Architecture design specialized Tachikoma (READ-ONLY). Analyzes systems using DDD strategic/tactical patterns, microservices architecture (CQRS, Saga, Event Sourcing), trade-off analysis methodology, and data architecture patterns. Use proactively for architecture reviews, system design, domain boundary analysis, modernization planning, or multi-tenant SaaS design. Does NOT write implementation code - produces design documents and recommendations only."
+description = "Architecture design specialized Tachikoma (READ-ONLY). Analyzes systems using DDD strategic/tactical patterns, microservices architecture (CQRS, Saga, Event Sourcing), trade-off analysis methodology, data architecture patterns, and Clean Architecture (dependency rules, concentric layer model, component principles). Use proactively for architecture reviews, system design, domain boundary analysis, modernization planning, or multi-tenant SaaS design. Does NOT write implementation code - produces design documents and recommendations only."
 config_file = "agents/tachikoma-architecture.toml"
 
 [agents.tachikoma_aws]

@@ -30,7 +30,7 @@
 | Playwright/E2E/ブラウザテスト | `sumik:タチコマ（E2Eテスト）` | testing-e2e-with-playwright, automating-browser |
 | 監視/OTel/ログ/メトリクス | `sumik:タチコマ（オブザーバビリティ）` | designing-monitoring, implementing-opentelemetry |
 | 技術文書/記事/LaTeX | `sumik:タチコマ（ドキュメント）` | writing-effective-prose, writing-zenn-articles |
-| 設計/DDD/アーキテクチャ判断 | `sumik:タチコマ（アーキテクチャ）` | applying-domain-driven-design, architecting-microservices（読取専用） |
+| 設計/DDD/アーキテクチャ判断 | `sumik:タチコマ（アーキテクチャ）` | applying-domain-driven-design, architecting-microservices, applying-clean-architecture（読取専用） |
 | セキュリティ監査/脆弱性分析 | `sumik:タチコマ（セキュリティ）` | securing-code, securing-serverless（読取専用） |
 | 研修設計/プレゼン改善/ワークショップ | `sumik:タチコマ（研修・プレゼン）` | improving-presentations, writing-effective-prose, designing-training, applying-behavior-design |
 | 上記以外 | `sumik:タチコマ` | 汎用フォールバック（スキルプリロードなし） |
