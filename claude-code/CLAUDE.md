@@ -14,7 +14,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | コードファイル変更時（軽微: typo・1行変更等の明白な修正） | TeamCreate → **適切な専門タチコマ**1体に委譲（`team_name` + `run_in_background: true`）→ 完了後TeamDelete |
 | コードファイル変更時（上記以外すべて＝デフォルト） | `orchestrating-teams` スキルロード → TeamCreate → **planner**（タチコマ（アーキテクチャ））が現状分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → TeamDelete |
 | Claude Code本体の役割（🔴最重要） | **オーケストレーターに徹する**: タスク分析・ルーティング判断・チーム編成・進捗監視・jj操作・ユーザー対話のみ。コード記述も計画ドキュメント作成もチームメイトに委譲。例外: CLAUDE.md/ルールファイル管理・ファイル読み込み（1-2ファイル）・質問回答・ライブラリ調査 |
-| jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto -y` を使用） |
+| jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj git push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto` を使用。対話的ツールのためClaude Codeからは `jj commit -m` を直接使用） |
 | 新規作業開始時 | ユーザー確認してchangeとbookmark作成を提案（勝手な作成・削除禁止） |
 | 要件・仕様が曖昧な場合 | AskUserQuestionツールで質問（推測での作業進行禁止） |
 
@@ -45,7 +45,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | `jj diff` | 現在の変更差分確認 | コミット前、変更内容確認時 |
 | `jj log` | 変更履歴表示 | 履歴確認時 |
 | `jj bookmark list` | bookmark一覧確認 | 作業ブランチ確認時 |
-| `gcauto -y` | AI生成メッセージでコミット（非対話式） | コミット作成時 |
+| `gcauto` | AI生成メッセージでコミット（対話式。Claude Codeからは `jj commit -m` を使用） | コミット作成時 |
 | `/reload` | CLAUDE.md再読み込み | compaction後のコンテキスト復元時 |
 | `/serena "問題"` | トークン効率的な構造化開発 | コンポーネント開発・API実装・バグ修正時 |
 | `/resume [名前]` | Named Sessionの再開 | 中断したセッションの再開時 |

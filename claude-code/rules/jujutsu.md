@@ -105,15 +105,16 @@ jj diff --from @- --to @  # 前の変更セットとの比較
 ### 3. 変更の記録
 
 ```bash
-# gcauto を使用してAI生成メッセージでコミット（推奨・非対話式）
-gcauto -y
+# gcauto を使用してAI生成メッセージでコミット（対話式・ターミナルで手動実行向け）
+gcauto
 
-# gcauto -y が自動検出して以下を実行:
+# gcauto が自動検出して以下を実行:
 #   1. jj diff で差分取得
 #   2. AI（Claude/Gemini）でConventional Commits形式のメッセージ生成
-#   3. 確認なしで jj commit -m "<message>" を自動実行
+#   3. ユーザー確認後に jj commit -m "<message>" を実行
+# ⚠️ gcauto は対話式ツールのため、Claude Code からは直接使用できない
 
-# 手動でメッセージを設定する場合（gcautoが使えない場合のみ）
+# Claude Code から使用する場合（gcauto の代替）
 jj describe -m "feat: 新機能を追加"
 jj new
 
@@ -137,8 +138,8 @@ jj bookmark set <name> -r <revision>
 ### 5. リモート操作
 
 ```bash
-# 特定のブックマークをプッシュ（本来ならコマンドは `jj git push` だが、一連の pre-push タスクを事前に実行するよう定義したエイリアスコマンド `jj push` を使う）
-jj push -b <name>
+# 特定のブックマークをプッシュ
+jj git push -b <name>
 
 # フェッチ
 jj git fetch

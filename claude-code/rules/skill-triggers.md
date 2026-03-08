@@ -20,6 +20,7 @@
 | Go | `sumik:タチコマ（Go）` | developing-go, developing-api-spec-first |
 | `.sh` / シェルスクリプト | `sumik:タチコマ（Bash）` | developing-bash |
 | Docker/CI-CD/DevOps | `sumik:タチコマ（インフラ）` | managing-docker, practicing-devops |
+| Containerfile/podman/buildah/skopeo | `sumik:タチコマ（インフラ）` | managing-podman |
 | `.tf` / Terraform | `sumik:タチコマ（Terraform）` | developing-terraform |
 | AWS (CDK/SAM/SDK/Bedrock) | `sumik:タチコマ（AWS）` | developing-aws |
 | GCP (Cloud Run/GKE) | `sumik:タチコマ（Google Cloud）` | developing-google-cloud |
