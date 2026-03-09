@@ -71,8 +71,8 @@ fi
 
 export ZPLUG_HOME=$HOME/.zplug
 export CLICOLOR=1
-export EDITOR='vim'
-export VISUAL='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
 export PAGER='less'
 export GITHUB_URL=https://github.com/
 source $ZPLUG_HOME/init.zsh
@@ -393,20 +393,31 @@ compinit
 source <(jj util completion zsh)
 
 # =================================================
-# alias
+# abbr
 # =================================================
-alias ll='ls -vl'
-alias greps='rg --hidden -p'
-alias claude='claude --teammate-mode tmux --dangerously-skip-permissions'
-alias brew="arch -arm64 brew"
-alias gcautog="gcauto -m gemini"
-alias vi="nvim"
-alias vim="nvim"
-alias claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
-alias code-review="coderabbit review --prompt-only"
-alias claude="claude --teammate-mode tmux --dangerously-skip-permissions"
-alias codex="codex --dangerously-bypass-approvals-and-sandbox"
-alias docker="podman"
-alias docker-comopse="podman-compose"
-alias htop='sudo htop'
-alias repo='peco-cd'
+ABBR_QUIET=1
+source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
+
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+
+  autoload -Uz compinit
+  compinit
+fi
+
+{
+  abbr -S -f ll='ls -vl'
+  abbr -S -f greps='rg --hidden -p'
+  abbr -S -f brew="arch -arm64 brew"
+  abbr -S -f gcautog="gcauto -m gemini"
+  abbr -S -f vi="nvim"
+  abbr -S -f vim="nvim"
+  abbr -S -f claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
+  abbr -S -f code-review="coderabbit review --prompt-only"
+  abbr -S -f claude="claude --teammate-mode tmux --dangerously-skip-permissions"
+  abbr -S -f codex="codex --dangerously-bypass-approvals-and-sandbox"
+  abbr -S -f docker="podman"
+  abbr -S -f docker-comopse="podman-compose"
+  abbr -S -f htop='sudo htop'
+  abbr -S -f repo='peco-cd'
+} &>/dev/null
