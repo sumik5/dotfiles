@@ -1,3 +1,4 @@
+agent_key = "tachikoma_e2e_test"
 model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
@@ -174,7 +175,9 @@ developer_instructions = """
 
 | Skill 名 | 説明 |
 |----------|------|
-| testing-e2e-with-playwright | Playwright E2Eテストの設計・実装・運用ガイド |
-| automating-browser | Browser Agent CLIによるブラウザ操作自動化 |
-| writing-clean-code | REQUIRED for all code implementations. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws |
+| testing-e2e-with-playwright | Playwright E2Eテストの設計・実装・運用ガイド。 |
+| automating-browser | Browser Agent CLIによるブラウザ操作自動化（セマンティックロケーター、状態永続化、ネットワーク傍受）。 |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles, 25 code smell categories, refactoring recipes, and software design laws. |
+| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. |
+| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. |
 """

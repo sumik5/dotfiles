@@ -1,3 +1,4 @@
+agent_key = "tachikoma"
 model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
@@ -54,13 +55,10 @@ developer_instructions = """
    - Codex本体から `docs/plan-xxx.md` のパスと担当セクション名を受け取る
    - 該当セクションを読み込み、担当ファイル・要件・他タチコマとの関係を確認
    - docs内の指示が作業の正式な仕様書として機能する
-4. **利用可能なMCPサーバーを確認**
-   - ListMcpResourcesToolで全MCPサーバーの一覧を取得
-   - 現在のタスクに最適なMCPサーバーを選定
-5. **serena MCPツールでタスクに必要な情報を収集**
-6. 担当タスクの実装を開始
-7. 定期的な進捗報告
-8. 作業完了時はCodex本体に報告
+4. **serena MCPツールでタスクに必要な情報を収集**
+5. 担当タスクの実装を開始
+6. 定期的な進捗報告
+7. 作業完了時はCodex本体に報告
 
 ## 完了定義（Definition of Done）
 
@@ -129,16 +127,12 @@ developer_instructions = """
 ## 使用可能ツール
 
 ### 基本ツール（実装用）
-- Write（ファイル書き込み）
-- Edit（ファイル編集）
-- MultiEdit（複数ファイル編集）
-- NotebookEdit（Jupyter編集）
 - Read（ファイル読み込み）
-- Bash（コマンド実行）
-- Glob（ファイル検索）
 - Grep（テキスト検索）
-- WebFetch（Web情報取得）
-- TodoWrite（タスク管理）
+- Glob（ファイル検索）
+- Edit（ファイル編集）
+- Write（ファイル書き込み）
+- Bash（コマンド実行）
 
 #### コマンド実行の原則（重要）
 - **悪い例**: Bashツールで`grep`、`find`、`cat`などのコマンドを使用
@@ -229,14 +223,4 @@ jj commit -m "fix: バグ修正"      # メッセージ設定+新規作成
 
 ## クリーンアップ処理
 **タスク完了時に一時ファイルを削除し、Codex本体への報告に含めてください。**
-
-## 参照すべき Skill
-
-| Skill 名 | 説明 |
-|----------|------|
-| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
-| enforcing-type-safety | REQUIRED for all TypeScript/Python code. Automatically load when writing type annotations or handling external data. Any/any types strictly prohibited. Enforces strict mode configuration and type guard implementation. |
-| testing-code | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. Enforces TDD approach with AAA pattern, actual/expected variables, and 100% coverage goal for business logic. Covers Vitest, Jest, Playwright, and AI-augmented testing strategies. |
-| securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge. |
-| testing-e2e-with-playwright | Playwright E2Eテストの設計・実装・運用ガイド。Use when writing, reviewing, or maintaining E2E tests with @playwright/test. playwright.config.* 検出時に自動ロード。testing-code（テスト全般）とは異なりPlaywright E2E固有のパターンに特化。 |
 """

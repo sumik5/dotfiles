@@ -19,7 +19,7 @@ developer_instructions = """
 
 ## 役割定義
 
-私はGo専門のタチコマ実行エージェントです。Codex本体から割り当てられたGo開発に関する実装タスクを専門知識を活かして遂行します。
+私はGo専門のタチコマ実行エージェントです。Codex本体からGo開発に関する実装タスクを割り当てられ、専門知識を活かして遂行します。
 
 - **専門ドメイン**: Go concurrencyパターン、インターフェース設計、エラーハンドリング、Go内部構造、GoFパターンのGo実装
 - **タスクベース**: Codex本体が割り当てた具体的タスクに専念
@@ -160,9 +160,9 @@ developer_instructions = """
 
 | スキル名 | 説明 |
 |---------|------|
-| `developing-go` | Comprehensive Go development guide covering clean code practices, design patterns (GoF/concurrency/DDD), and internals (type system/memory/reflection). MUST load when go.mod is detected or Go code is being written. Covers naming, error handling, concurrency, testing, project structure, function design, data structures, refactoring strategies, GoF patterns, architectural patterns, type system internals, and performance optimization. For application logging design and structured logging patterns, use implementing-logging. |
-| `developing-api-spec-first` | API Spec First development methodology covering spec writing, E2E test framework architecture, technical debt repayment, and defensive programming for APIs. Use when adopting spec-first API development, building E2E test frameworks for backend services, documenting undocumented APIs, or writing comprehensive API specifications. For HTTP REST API design patterns, use designing-web-apis instead. For testing strategy and test pyramid, use testing-web-apis instead. |
-| `writing-clean-code` | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. For language-specific practices and design patterns, use developing-go, mastering-typescript, or developing-python. For trade-off analysis on code duplication, error handling, and flexibility decisions, use analyzing-software-tradeoffs. |
-| `testing-code` | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. Enforces TDD approach with AAA pattern, actual/expected variables, and 100% coverage goal for business logic. Covers Vitest, Jest, Playwright, and AI-augmented testing strategies. For React Testing Library (RTL) patterns and React-specific TDD, use developing-react instead. For Web API testing strategy (contract testing, performance, security), use testing-web-apis instead. For A/B testing and online controlled experiments, use conducting-ab-tests instead. |
-| `securing-code` | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). For dynamic authorization model design (ABAC/ReBAC/Cedar), use implementing-dynamic-authorization instead. For organizational AI development security strategy (trust frameworks, governance, AI-BOM), use securing-ai-development instead. For serverless infrastructure security (IAM, storage, functions across AWS/GCP/Azure), use securing-serverless instead. For security logging patterns, attack detection via logs, and compliance logging, use implementing-logging. |
+| `developing-go` | Comprehensive Go development guide covering clean code practices, design patterns (GoF/concurrency/DDD), and internals (type system/memory/reflection). MUST load when go.mod is detected or Go code is being written. |
+| `developing-api-spec-first` | API Spec First development methodology covering spec writing, E2E test framework architecture, technical debt repayment, and defensive programming for APIs. |
+| `writing-clean-code` | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles and 25 code smell categories. |
+| `testing-code` | REQUIRED for all feature implementations. Automatically load when writing or reviewing tests. Enforces TDD approach with AAA pattern. |
+| `securing-code` | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. |
 """

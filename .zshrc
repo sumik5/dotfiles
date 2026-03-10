@@ -408,7 +408,6 @@ fi
 {
   abbr -S -f ll='ls -vl'
   abbr -S -f greps='rg --hidden -p'
-  abbr -S -f brew="arch -arm64 brew"
   abbr -S -f gcautog="gcauto -m gemini"
   abbr -S -f vi="nvim"
   abbr -S -f vim="nvim"

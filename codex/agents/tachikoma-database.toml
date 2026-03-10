@@ -88,7 +88,7 @@ developer_instructions = """
 
 - **Bash**: `psql`コマンド・`EXPLAIN ANALYZE`実行・`pg_dump`
 - **Read/Glob/Grep**: 既存スキーマ・クエリの分析
-- **コードベース分析**: DB関連コード分析
+- **serena MCP**: コードベースのDB関連コード分析
 
 ## 品質チェックリスト
 
@@ -108,7 +108,7 @@ developer_instructions = """
 
 ### コア品質
 - [ ] SOLID原則に従った実装（`writing-clean-code` スキル準拠）
-- [ ] セキュリティチェック完了
+- [ ] セキュリティチェック完了（`/codeguard-security:software-security` 実行）
 
 ## 報告フォーマット
 
@@ -149,6 +149,6 @@ developer_instructions = """
 | designing-relational-databases | Guides relational database design from requirements to implementation covering entity modeling, ER diagrams, normalization (1NF-BCNF), optimization, and PostgreSQL-specific implementation (microservices data architecture, ACID transactions, functions/stored procedures, AAA security). |
 | avoiding-sql-antipatterns | Identifies and prevents common SQL database design mistakes across logical design, physical design, query construction, and application development. Covers 25 named antipatterns with detection signals, solutions, and exception cases. |
 | understanding-database-internals | Comprehensive database internals reference covering storage engines (B-trees, LSM-trees, file formats, transactions, recovery) and distributed systems (failure detection, leader election, replication, consistency models, consensus algorithms). |
-| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). |
+| writing-clean-code | REQUIRED for all code implementations. Automatically load when writing or reviewing any code. Covers SOLID principles (SRP, OCP, LSP, ISP, DIP), 25 code smell categories with MAPPER principles, practical refactoring recipes, and software design laws (simplicity, change, defect probability, testing). Language-agnostic clean code guide. |
 | securing-code | REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check. Covers input validation, secrets management, OWASP top 10 countermeasures, authentication/authorization patterns, and web penetration testing knowledge (reconnaissance, attack techniques, bypass methods). |
 """

@@ -1,6 +1,38 @@
+agent_key = "tachikoma_security"
+name = "タチコマ（セキュリティ）"
+description = "Security review specialized Tachikoma (READ-ONLY). Reviews code for OWASP Top 10 vulnerabilities, serverless security threats, IAM patterns, dynamic authorization (ABAC/ReBAC/Cedar), Keycloak IAM, and AI development security. Use proactively after code implementation for security audits, penetration test planning, or access control design. Does NOT modify code - produces security reports and recommendations only."
+
 model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
+
+tools = [
+  "Read",
+  "Glob",
+  "Grep",
+  "Bash"
+]
+
+[[skills]]
+name = "securing-code"
+description = "REQUIRED after all code implementations. Automatically load when implementation is complete to run CodeGuard security check."
+
+[[skills]]
+name = "securing-serverless"
+description = "Comprehensive serverless security guide covering threat models, attack techniques, and defense patterns across AWS, Azure, and Google Cloud."
+
+[[skills]]
+name = "securing-ai-development"
+description = "Organizational security strategy for AI-powered software development covering trust frameworks, adaptive guardrails, AI-BOM, AI-SPM, governance models, and cross-functional ownership."
+
+[[skills]]
+name = "implementing-dynamic-authorization"
+description = "Dynamic authorization design covering ABAC, ReBAC, PBAC models and Cedar policy language."
+
+[[skills]]
+name = "managing-keycloak"
+description = "Comprehensive Keycloak identity and access management guide covering OIDC/SAML protocols, SSO, Realms, Clients, Users, Roles, authentication flows, MFA, authorization policies, JWT token management, application integration (Java/Node.js/Spring Boot), Docker/Kubernetes deployment, clustering, and SPI extensions."
+
 developer_instructions = """
 # 言語設定（最優先・絶対遵守）
 
@@ -153,14 +185,4 @@ developer_instructions = """
 - Conventional Commits形式必須
 - 読み取り専用操作は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
-
-## 参照すべき Skill
-
-| Skill 名 | 説明 |
-|----------|------|
-| securing-code | REQUIRED after all code implementations. Covers input validation, secrets management, OWASP top 10, authentication/authorization, and web penetration testing |
-| securing-serverless | Comprehensive serverless security guide covering threat models, attack techniques, and defense patterns across AWS, Azure, and Google Cloud |
-| securing-ai-development | Organizational security strategy for AI-powered software development covering trust frameworks, adaptive guardrails, and governance |
-| implementing-dynamic-authorization | Dynamic authorization design covering ABAC, ReBAC, PBAC models and Cedar policy language |
-| managing-keycloak | Comprehensive Keycloak IAM guide covering OIDC/SAML, SSO, authentication flows, JWT, and deployment |
 """
