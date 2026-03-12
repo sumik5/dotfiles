@@ -419,4 +419,5 @@ fi
   abbr -S -f docker-comopse="podman-compose"
   abbr -S -f htop='sudo htop'
   abbr -S -f repo='peco-cd'
+  abbr -S -f jjbm="jj bookmark set main -r @-"
 } &>/dev/null
