@@ -352,7 +352,7 @@ def convert(
     skip_blank: bool,
     resume: bool,
     blank_threshold: int = DEFAULT_BLANK_THRESHOLD,
-) -> None:
+) -> int:
     total = len(image_files)
     if total == 0:
         log("エラー: 処理対象の画像がありません。")
@@ -418,6 +418,9 @@ def convert(
         f"所要時間: {format_time(elapsed)} "
         f"({elapsed / max(written, 1):.1f}s/page)")
 
+    char_count = len(output_path.read_text(errors="replace"))
+    return char_count
+
 
 # ---------------------------------------------------------------------------
 # Single EPUB processing
@@ -430,11 +433,12 @@ def process_single_epub(
     skip_blank: bool,
     resume: bool,
     blank_threshold: int,
-) -> bool:
+) -> int | None:
     """1つのEPUBファイルを画像抽出→ページ順解析→OCR→Markdown保存する。
 
     Returns:
-        True: 処理した, False: テキストベースのためスキップした
+        int: 処理した場合の出力Markdownの文字数
+        None: テキストベースのためスキップした場合
     """
     work_dir = Path(tempfile.mkdtemp(prefix="epub-ocr-"))
     log(f"作業ディレクトリ: {work_dir}")
@@ -444,7 +448,7 @@ def process_single_epub(
 
     if not is_image:
         log(f"スキップ: {epub_path.name} はテキストベースのEPUBです（OCR不要）")
-        return False
+        return None
 
     log("EPUB から画像を抽出中...")
     img_dir = extract_epub_images(epub_path, work_dir)
@@ -452,7 +456,7 @@ def process_single_epub(
     image_files = collect_ordered_images(img_dir, page_order)
     log(f"処理対象: {len(image_files)} 枚")
 
-    convert(
+    char_count = convert(
         image_files=image_files,
         output_path=output_path,
         model_name=model_name,
@@ -460,7 +464,7 @@ def process_single_epub(
         resume=resume,
         blank_threshold=blank_threshold,
     )
-    return True
+    return char_count
 
 
 # ---------------------------------------------------------------------------
@@ -542,6 +546,9 @@ def main() -> None:
             text = recognize_single_image(args.model, input_path)
             output_path.write_text(text)
             log(f"完了: {output_path}")
+            char_count = len(output_path.read_text(errors="replace"))
+            log("\n変換結果:")
+            log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
             return
         log(f"エラー: '{input_path}' は対応していない形式です。EPUB / 画像ディレクトリ / 画像ファイルを指定してください。")
         sys.exit(1)
@@ -563,6 +570,7 @@ def main() -> None:
             log(f"フォルダ内に {len(epub_files)} 件の EPUB を検出")
             processed_count = 0
             skipped_text = 0
+            results: list[tuple[str, str, int]] = []  # (epub名, md名, 文字数)
             for idx, epub in enumerate(epub_files, 1):
                 log(f"\n{'='*60}")
                 log(f"[{idx}/{len(epub_files)}] {epub.name}")
@@ -571,7 +579,7 @@ def main() -> None:
                 out = epub.with_suffix(".md")
                 if args.output and len(epub_files) == 1:
                     out = Path(args.output).expanduser().resolve()
-                did_process = process_single_epub(
+                char_count = process_single_epub(
                     epub_path=epub,
                     output_path=out,
                     model_name=args.model,
@@ -579,12 +587,17 @@ def main() -> None:
                     resume=resume,
                     blank_threshold=args.blank_threshold,
                 )
-                if did_process:
+                if char_count is not None:
                     processed_count += 1
+                    results.append((epub.name, out.name, char_count))
                 else:
                     skipped_text += 1
             log(f"\n全 {len(epub_files)} 件完了 "
                 f"(OCR処理: {processed_count}, テキストベーススキップ: {skipped_text})")
+            if results:
+                log("\n変換結果:")
+                for epub_name, md_name, chars in results:
+                    log(f"  {epub_name} → {md_name} ({chars:,} 文字)")
             return
 
         if has_images:
@@ -594,7 +607,7 @@ def main() -> None:
             check_lmstudio_connection(args.model)
             image_files = collect_ordered_images(input_path, None)
             log(f"処理対象: {len(image_files)} 枚")
-            convert(
+            char_count = convert(
                 image_files=image_files,
                 output_path=output_path,
                 model_name=args.model,
@@ -602,6 +615,8 @@ def main() -> None:
                 resume=resume,
                 blank_threshold=args.blank_threshold,
             )
+            log("\n変換結果:")
+            log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
             return
 
         log(f"エラー: '{input_path}' に EPUB も画像も見つかりません。")
@@ -612,7 +627,7 @@ def main() -> None:
     check_pandoc()
     log(f"LM Studio 接続チェック (モデル: {args.model})...")
     check_lmstudio_connection(args.model)
-    process_single_epub(
+    char_count = process_single_epub(
         epub_path=input_path,
         output_path=output_path,
         model_name=args.model,
@@ -620,6 +635,9 @@ def main() -> None:
         resume=resume,
         blank_threshold=args.blank_threshold,
     )
+    if char_count is not None:
+        log("\n変換結果:")
+        log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
 
 
 if __name__ == "__main__":
