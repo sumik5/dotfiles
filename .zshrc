@@ -418,6 +418,7 @@ fi
   abbr -S -f docker="podman"
   abbr -S -f docker-comopse="podman-compose"
   abbr -S -f htop='sudo htop'
-  abbr -S -f repo='peco-cd'
+  abbr -S -f ghq='peco-cd'
   abbr -S -f jjbm="jj bookmark set main -r @-"
+  abbr -S -f gcauto='gcauto -m codex'
 } &>/dev/null
