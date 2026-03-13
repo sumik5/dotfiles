@@ -20,6 +20,7 @@ LM Studio のローカル VLM (OCR) を使い、画像ベースの EPUB また�
 import argparse
 import os
 import re
+import signal
 import shutil
 import subprocess
 import sys
@@ -30,7 +31,17 @@ from pathlib import Path
 
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 DEFAULT_BLANK_THRESHOLD = 15360  # 15KB
-DEFAULT_MODEL = "qwen/qwen3.5-9b"
+DEFAULT_RECOGNITION_TIMEOUT = 120  # 2分
+
+
+class RecognitionTimeoutError(Exception):
+    """1ページの認識処理がタイムアウトした場合の例外。"""
+
+
+def _timeout_handler(signum: int, frame: object) -> None:
+    raise RecognitionTimeoutError("認識処理が2分を超えたため中断しました")
+# DEFAULT_MODEL = "qwen/qwen3.5-9b"
+DEFAULT_MODEL = "qwen/qwen3-vl-8b"
 
 RECOGNITION_PROMPT = (
     "添付の画像を文字に変換し、markdown形式で返信してください。"
@@ -56,23 +67,28 @@ def ensure_lmstudio() -> None:
         )
 
 
-def check_lmstudio_connection(model_name: str) -> None:
+def ensure_pillow() -> None:
+    try:
+        import PIL  # noqa: F401
+    except ImportError:
+        log("Pillow パッケージをインストールしています...")
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "Pillow", "-q"]
+        )
+
+
+def check_lmstudio_connection(model_name: str, context_length: int = 0) -> None:
     """LM Studio に接続できるか事前チェックする。"""
     try:
         import lmstudio as lms
         lms.llm(model_name)
     except Exception as exc:
-        log(f"接続チェック失敗: {exc}")
-        log(f"モデル '{model_name}' のリロードを試みます...")
+        log(f"接続失敗 ({exc}), リロード中...")
         try:
-            reload_model(model_name)
-            log("リロード成功。処理を続行します。")
+            reload_model(model_name, context_length=context_length)
+            log("リロード成功。")
         except Exception as reload_exc:
-            log(
-                f"エラー: LM Studio に接続できません。\n"
-                f"LM Studio が起動しモデル '{model_name}' がロードされていることを確認してください。\n"
-                f"詳細: {reload_exc}"
-            )
+            log(f"エラー: LM Studio に接続できません ({reload_exc})")
             sys.exit(1)
 
 
@@ -91,6 +107,48 @@ def strip_think_tags(text: str) -> str:
 
 def is_blank_image(path: Path, threshold: int = DEFAULT_BLANK_THRESHOLD) -> bool:
     return path.stat().st_size <= threshold
+
+
+def resize_image_if_needed(image_path: Path, max_size: int) -> tuple[Path, bool]:
+    """画像の長辺が max_size を超える場合にリサイズする。
+
+    Args:
+        image_path: 元の画像パス
+        max_size: 長辺の最大ピクセル数（0 の場合はリサイズ無効）
+
+    Returns:
+        (処理後の画像パス, リサイズされたか否か)
+        リサイズした場合は tempfile に保存したパスを返す。
+        呼び出し側は is_resized が True の場合にファイルを削除する責任を持つ。
+    """
+    if max_size <= 0:
+        return image_path, False
+
+    from PIL import Image
+
+    with Image.open(image_path) as img:
+        w, h = img.size
+        long_side = max(w, h)
+
+        if long_side <= max_size:
+            return image_path, False
+
+        # アスペクト比を維持してリサイズ
+        ratio = max_size / long_side
+        new_w = int(w * ratio)
+        new_h = int(h * ratio)
+        resized = img.resize((new_w, new_h), Image.LANCZOS)
+
+        # 拡張子を保持したまま tempfile に保存
+        suffix = image_path.suffix or ".jpg"
+        tmp = tempfile.NamedTemporaryFile(
+            suffix=suffix, delete=False, prefix="recognize-resize-"
+        )
+        tmp.close()
+        resized_path = Path(tmp.name)
+        resized.save(resized_path)
+
+    return resized_path, True
 
 
 # ---------------------------------------------------------------------------
@@ -114,7 +172,6 @@ def extract_epub_images(epub_path: Path, work_dir: Path) -> Path:
     if count == 0:
         log(f"エラー: EPUB 内に画像ファイルが見つかりません。")
         sys.exit(1)
-    log(f"画像抽出完了: {count} 枚")
     return img_dir
 
 
@@ -128,11 +185,16 @@ def is_image_based_epub(epub_path: Path, work_dir: Path) -> tuple[bool, Path, li
         - page_order: 画像参照順のファイル名リスト
     """
     md_path = work_dir / "pandoc-output.md"
-    subprocess.run(
+    result = subprocess.run(
         ["pandoc", "-t", "markdown", "-o", str(md_path), str(epub_path)],
-        check=True,
         capture_output=True,
+        text=True,
     )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"pandoc 変換失敗 (exit {result.returncode}): "
+            f"{result.stderr.strip() or '(詳細なし)'}"
+        )
 
     md_text = md_path.read_text(errors="replace")
     lines = md_text.splitlines()
@@ -206,19 +268,21 @@ def collect_ordered_images(
 MAX_RETRIES = 5
 
 
-def reload_model(model_name: str) -> None:
-    """LM Studio のモデルをアンロードして再ロードする。"""
-    import lmstudio as lms
+def reload_model(model_name: str, context_length: int = 0) -> None:
+    """LM Studio のモデルをアンロードして再ロードする。
 
-    log(f"\nモデル '{model_name}' をリロードします...")
+    Args:
+        model_name: モデル名
+        context_length: コンテキスト長（0 の場合はデフォルトを使用）
+    """
+    import lmstudio as lms
 
     # Step 1: アンロード
     try:
         model = lms.llm(model_name)
         model.unload()
-        log("  モデルをアンロードしました。")
-    except Exception as exc:
-        log(f"  アンロード中にエラー（続行）: {exc}")
+    except Exception:
+        pass
 
     # Step 2: 少し待つ
     time.sleep(10)
@@ -233,44 +297,72 @@ def reload_model(model_name: str) -> None:
         raise RuntimeError(
             f"ダウンロード済みモデルに '{model_name}' が見つかりません。"
         )
-    log(f"  モデルをロード中: {model_name}")
-    target.load_new_instance(ttl=3600)
+
+    load_config: dict | None = None
+    if context_length > 0:
+        load_config = {"contextLength": context_length}
+
+    target.load_new_instance(ttl=3600, config=load_config)
 
     # Step 4: 接続確認
     lms.llm(model_name)
-    log(f"  モデル '{model_name}' のリロード完了。")
 
 
 def recognize_single_image(
     model_name: str,
     image_path: Path,
     max_retries: int = MAX_RETRIES,
+    max_image_size: int = 1280,
+    context_length: int = 0,
+    timeout: int = DEFAULT_RECOGNITION_TIMEOUT,
 ) -> str:
     import lmstudio as lms
 
-    retryable = (
-        lms.LMStudioPredictionError,
-        lms.LMStudioChannelClosedError,
-        lms.LMStudioServerError,
-    )
+    # リサイズが必要な場合は tempfile に保存し、処理後に削除
+    actual_path, is_resized = resize_image_if_needed(image_path, max_image_size)
+    try:
+        retryable = (
+            lms.LMStudioPredictionError,
+            lms.LMStudioChannelClosedError,
+            lms.LMStudioServerError,
+            RecognitionTimeoutError,
+        )
 
-    for attempt in range(max_retries + 1):
-        try:
-            image_handle = lms.prepare_image(str(image_path))
-            model = lms.llm(model_name)
-            chat = lms.Chat()
-            chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
-            result = model.respond(chat)
-            return strip_think_tags(result.content)
-        except retryable as exc:
-            if attempt >= max_retries:
-                raise
-            log(f"\n  予測エラー発生 (試行 {attempt + 1}/{max_retries + 1}): {exc}")
-            reload_model(model_name)
-            log(f"  リトライします... (試行 {attempt + 2}/{max_retries + 1})")
+        for attempt in range(max_retries + 1):
+            try:
+                # タイムアウト設定: 1ページの認識が制限時間を超えたら異常とみなす
+                old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+                signal.alarm(timeout)
+                try:
+                    image_handle = lms.prepare_image(str(actual_path))
+                    model = lms.llm(model_name)
+                    chat = lms.Chat()
+                    chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
+                    result = model.respond(chat)
+                    return strip_think_tags(result.content)
+                finally:
+                    signal.alarm(0)
+                    signal.signal(signal.SIGALRM, old_handler)
+            except retryable as exc:
+                if attempt >= max_retries:
+                    raise
+                is_timeout = isinstance(exc, RecognitionTimeoutError)
+                label = "timeout" if is_timeout else "error"
+                reason = str(exc).split("\n", 1)[0][:60]
+                # プログレスバー行を上書きしてリロード状況を表示
+                print(
+                    f"\033[2K\r  reload {attempt + 1}/{max_retries} "
+                    f"({label}: {reason})",
+                    end="", file=sys.stderr, flush=True,
+                )
+                reload_model(model_name, context_length=context_length)
 
-    # ここには到達しないが型チェッカーのために
-    raise RuntimeError("予期しない状態: リトライループを抜けました")
+        # ここには到達しないが型チェッカーのために
+        raise RuntimeError("予期しない状態: リトライループを抜けました")
+    finally:
+        # リサイズした一時ファイルを削除
+        if is_resized and actual_path.exists():
+            actual_path.unlink()
 
 
 # ---------------------------------------------------------------------------
@@ -352,6 +444,8 @@ def convert(
     skip_blank: bool,
     resume: bool,
     blank_threshold: int = DEFAULT_BLANK_THRESHOLD,
+    max_image_size: int = 1280,
+    context_length: int = 0,
 ) -> int:
     total = len(image_files)
     if total == 0:
@@ -389,7 +483,11 @@ def convert(
             render_progress(i, total, image_file.name, elapsed, image_file.name)
 
             try:
-                text = recognize_single_image(model_name, image_file)
+                text = recognize_single_image(
+                    model_name, image_file,
+                    max_image_size=max_image_size,
+                    context_length=context_length,
+                )
             except Exception as exc:
                 print(file=sys.stderr)  # プログレスバー行を確定
                 log(f"エラー [{i}/{total}] {image_file.name}: リトライ後も失敗しました。{exc}")
@@ -433,6 +531,8 @@ def process_single_epub(
     skip_blank: bool,
     resume: bool,
     blank_threshold: int,
+    max_image_size: int = 1280,
+    context_length: int = 0,
 ) -> int | None:
     """1つのEPUBファイルを画像抽出→ページ順解析→OCR→Markdown保存する。
 
@@ -441,20 +541,14 @@ def process_single_epub(
         None: テキストベースのためスキップした場合
     """
     work_dir = Path(tempfile.mkdtemp(prefix="epub-ocr-"))
-    log(f"作業ディレクトリ: {work_dir}")
-
-    log("EPUB を分析中...")
     is_image, md_path, page_order = is_image_based_epub(epub_path, work_dir)
 
     if not is_image:
         log(f"スキップ: {epub_path.name} はテキストベースのEPUBです（OCR不要）")
         return None
 
-    log("EPUB から画像を抽出中...")
     img_dir = extract_epub_images(epub_path, work_dir)
-
     image_files = collect_ordered_images(img_dir, page_order)
-    log(f"処理対象: {len(image_files)} 枚")
 
     char_count = convert(
         image_files=image_files,
@@ -463,6 +557,8 @@ def process_single_epub(
         skip_blank=skip_blank,
         resume=resume,
         blank_threshold=blank_threshold,
+        max_image_size=max_image_size,
+        context_length=context_length,
     )
     return char_count
 
@@ -522,6 +618,18 @@ def main() -> None:
         default=False,
         help="中断再開を無効化し最初から処理する (デフォルト: resume ON)",
     )
+    parser.add_argument(
+        "--max-image-size",
+        type=int,
+        default=1280,
+        help="VLMに送る前に画像の長辺をこのピクセル数にリサイズする (デフォルト: 1280, 0で無効)",
+    )
+    parser.add_argument(
+        "--context-length",
+        type=int,
+        default=4096,
+        help="モデルリロード時のコンテキスト長を指定する (デフォルト: 4096, 0で指定なし)",
+    )
     args = parser.parse_args()
 
     input_path = Path(args.input).expanduser().resolve()
@@ -532,8 +640,10 @@ def main() -> None:
     resume = not args.no_resume
     skip_blank = not args.no_skip_blank
 
-    # lmstudio パッケージ確認
+    # lmstudio / Pillow パッケージ確認
     ensure_lmstudio()
+    if args.max_image_size > 0:
+        ensure_pillow()
 
     is_epub = input_path.is_file() and input_path.suffix.lower() == ".epub"
     is_dir = input_path.is_dir()
@@ -542,7 +652,7 @@ def main() -> None:
         # 単一画像ファイルの場合
         if input_path.suffix.lower() in SUPPORTED_EXTENSIONS:
             output_path = resolve_output_path(input_path, args.output)
-            check_lmstudio_connection(args.model)
+            check_lmstudio_connection(args.model, context_length=args.context_length)
             text = recognize_single_image(args.model, input_path)
             output_path.write_text(text)
             log(f"完了: {output_path}")
@@ -565,35 +675,57 @@ def main() -> None:
             # EPUB が1つ以上ある → 各EPUBを個別処理
             check_pandoc()
             log(f"LM Studio 接続チェック (モデル: {args.model})...")
-            check_lmstudio_connection(args.model)
+            check_lmstudio_connection(args.model, context_length=args.context_length)
 
             log(f"フォルダ内に {len(epub_files)} 件の EPUB を検出")
             processed_count = 0
             skipped_text = 0
+            skipped_done = 0
+            skipped_error = 0
             results: list[tuple[str, str, int]] = []  # (epub名, md名, 文字数)
             for idx, epub in enumerate(epub_files, 1):
                 log(f"\n{'='*60}")
                 log(f"[{idx}/{len(epub_files)}] {epub.name}")
-                log(f"{'='*60}")
                 # -o 指定がある場合は無視（各EPUBの出力先は自動決定）
                 out = epub.with_suffix(".md")
                 if args.output and len(epub_files) == 1:
                     out = Path(args.output).expanduser().resolve()
-                char_count = process_single_epub(
-                    epub_path=epub,
-                    output_path=out,
-                    model_name=args.model,
-                    skip_blank=skip_blank,
-                    resume=resume,
-                    blank_threshold=args.blank_threshold,
-                )
+
+                # 変換済みスキップ: .progress が無く .md がある → 完了済み
+                progress_file = out.with_suffix(".progress")
+                if not progress_file.exists() and out.exists() and resume:
+                    char_count = len(out.read_text(errors="replace"))
+                    log(f"スキップ: 変換済み ({out.name}, {char_count:,} 文字)")
+                    log(f"{'='*60}")
+                    skipped_done += 1
+                    results.append((epub.name, out.name, char_count))
+                    continue
+
+                try:
+                    char_count = process_single_epub(
+                        epub_path=epub,
+                        output_path=out,
+                        model_name=args.model,
+                        skip_blank=skip_blank,
+                        resume=resume,
+                        blank_threshold=args.blank_threshold,
+                        max_image_size=args.max_image_size,
+                        context_length=args.context_length,
+                    )
+                except Exception as exc:
+                    log(f"エラー: {exc}")
+                    log(f"{'='*60}")
+                    skipped_error += 1
+                    continue
+                log(f"{'='*60}")
                 if char_count is not None:
                     processed_count += 1
                     results.append((epub.name, out.name, char_count))
                 else:
                     skipped_text += 1
             log(f"\n全 {len(epub_files)} 件完了 "
-                f"(OCR処理: {processed_count}, テキストベーススキップ: {skipped_text})")
+                f"(OCR処理: {processed_count}, 変換済みスキップ: {skipped_done}, "
+                f"テキストベーススキップ: {skipped_text}, エラースキップ: {skipped_error})")
             if results:
                 log("\n変換結果:")
                 for epub_name, md_name, chars in results:
@@ -604,9 +736,8 @@ def main() -> None:
             # 画像のみのディレクトリ → 従来通りOCR
             output_path = resolve_output_path(input_path, args.output)
             log(f"LM Studio 接続チェック (モデル: {args.model})...")
-            check_lmstudio_connection(args.model)
+            check_lmstudio_connection(args.model, context_length=args.context_length)
             image_files = collect_ordered_images(input_path, None)
-            log(f"処理対象: {len(image_files)} 枚")
             char_count = convert(
                 image_files=image_files,
                 output_path=output_path,
@@ -614,6 +745,8 @@ def main() -> None:
                 skip_blank=skip_blank,
                 resume=resume,
                 blank_threshold=args.blank_threshold,
+                max_image_size=args.max_image_size,
+                context_length=args.context_length,
             )
             log("\n変換結果:")
             log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
@@ -624,9 +757,17 @@ def main() -> None:
 
     # 単一 EPUB ファイル
     output_path = resolve_output_path(input_path, args.output)
+
+    # 変換済みスキップ: .progress が無く .md がある → 完了済み
+    progress_file = output_path.with_suffix(".progress")
+    if not progress_file.exists() and output_path.exists() and resume:
+        char_count = len(output_path.read_text(errors="replace"))
+        log(f"スキップ: {input_path.name} は変換済みです ({output_path.name}, {char_count:,} 文字)")
+        return
+
     check_pandoc()
     log(f"LM Studio 接続チェック (モデル: {args.model})...")
-    check_lmstudio_connection(args.model)
+    check_lmstudio_connection(args.model, context_length=args.context_length)
     char_count = process_single_epub(
         epub_path=input_path,
         output_path=output_path,
@@ -634,6 +775,8 @@ def main() -> None:
         skip_blank=skip_blank,
         resume=resume,
         blank_threshold=args.blank_threshold,
+        max_image_size=args.max_image_size,
+        context_length=args.context_length,
     )
     if char_count is not None:
         log("\n変換結果:")

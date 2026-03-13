@@ -25,7 +25,7 @@
 | AWS (CDK/SAM/SDK/Bedrock) | `sumik:タチコマ（AWS）` | developing-aws |
 | GCP (Cloud Run/GKE) | `sumik:タチコマ（Google Cloud）` | developing-google-cloud |
 | DB/SQL/Prisma/マイグレーション | `sumik:タチコマ（データベース）` | designing-relational-databases, avoiding-sql-antipatterns |
-| AI/RAG/MCP/LLM | `sumik:タチコマ（AI/ML）` | integrating-ai-web-apps, building-rag-systems, developing-mcp |
+| AI/RAG/MCP/LLM | `sumik:タチコマ（AI/ML）` | integrating-ai-web-apps, building-rag-systems, developing-mcp, building-langchain-agents |
 | テストファイル（`*test*`, `*spec*`, `*_test.go`, `test_*.py` 等） | `sumik:タチコマ（テスト）` | testing-code |
 | Playwright/E2E/ブラウザテスト | `sumik:タチコマ（E2Eテスト）` | testing-e2e-with-playwright, automating-browser |
 | 監視/OTel/ログ/メトリクス | `sumik:タチコマ（オブザーバビリティ）` | designing-monitoring, implementing-opentelemetry |
