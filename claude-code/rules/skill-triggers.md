@@ -1,6 +1,6 @@
 # サブエージェント委譲ガイド
 
-専門タチコマ21体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
+専門タチコマ23体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
 本体の役割は「適切な専門タチコマにルーティングする」こと。
 
 ---
@@ -12,7 +12,9 @@
 | 検出条件 | 委譲先 subagent_type | 主要プリロードスキル |
 |---------|---------------------|-------------------|
 | `package.json` に `next` | `sumik:タチコマ（Next.js）` | developing-nextjs, developing-react, using-next-devtools |
-| Figma URL/Make/.figma/design-system-rules/デザインシステム構築/Tailwind設計 | `sumik:タチコマ（デザイン）` | implementing-design, implementing-figma, applying-design-guidelines, building-design-systems, styling-with-tailwind |
+| Figma URL/Make/.figma/Code Connect/デザイントークン同期/Tailwind実装 | `sumik:タチコマ（Figma実装）` | implementing-figma, implementing-design, styling-with-tailwind |
+| デザインシステム構築/DS運用/パターンライブラリ/Figma変数管理/design-system-rules | `sumik:タチコマ（デザインシステム）` | building-design-systems, constructing-figma-design-systems |
+| UX戦略/デザイン思考/グラフィックデザイン/AIエクスペリエンス設計/クリエイティブ生成 | `sumik:タチコマ（UXデザイン）` | understanding-ui-philosophy, practicing-design-thinking, designing-graphics, designing-ai-experiences, creating-ai-design-creatives, applying-design-guidelines |
 | shadcn/ui/コンポーネント実装/Storybook/データチャート | `sumik:タチコマ（フロントエンド）` | designing-frontend, developing-storybook, designing-data-visualizations |
 | NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` | developing-fullstack-javascript, designing-web-apis, developing-api-spec-first |
 | TypeScript型設計・高度な型 | `sumik:タチコマ（TypeScript）` | mastering-typescript |
@@ -33,11 +35,12 @@
 | 設計/DDD/アーキテクチャ判断 | `sumik:タチコマ（アーキテクチャ）` | applying-domain-driven-design, architecting-microservices, applying-clean-architecture（読取専用） |
 | セキュリティ監査/脆弱性分析 | `sumik:タチコマ（セキュリティ）` | securing-code, securing-serverless（読取専用） |
 | 研修設計/プレゼン改善/ワークショップ | `sumik:タチコマ（研修・プレゼン）` | improving-presentations, writing-effective-prose, designing-training, applying-behavior-design |
-| 上記以外 | `sumik:タチコマ` | 汎用フォールバック（スキルプリロードなし） |
+| 上記以外 | `sumik:タチコマ` | 汎用フォールバック（コア品質スキルプリロード済み） |
 
 ### ルーティング判断のポイント
 
-- **タチコマ（デザイン）vs タチコマ（フロントエンド）**: Figma MCP全面活用・デザイントークン同期・Code Connect・デザインシステム構築・Tailwind CSS設計・UI/UX原則 → タチコマ（デザイン）。shadcn/uiコンポーネント実装・Storybook・データビジュアライゼーション → タチコマ（フロントエンド）
+- **デザイン3体の使い分け**: Figma→コード変換・Code Connect・トークン同期・Tailwind実装 → タチコマ（Figma実装）。DS構築・ガバナンス・パターンライブラリ・Figma変数管理 → タチコマ（デザインシステム）。UX戦略・デザイン思考・グラフィック基礎・AIエクスペリエンス → タチコマ（UXデザイン）（コード記述なし）
+- **タチコマ（Figma実装/デザインシステム）vs タチコマ（フロントエンド）**: Figma MCP活用・トークン同期・DS構築 → Figma実装/デザインシステム。shadcn/uiコンポーネント実装・Storybook・データビジュアライゼーション → タチコマ（フロントエンド）
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → タチコマ（Next.js）をメイン、タチコマ（フロントエンド）をサブ）
 - **並列実行時** → 異なる専門タチコマを同時起動可能（例: タチコマ（Next.js）+ タチコマ（E2Eテスト）
 - **同一専門タチコマの複数起動** → 可能（例: タチコマ（Next.js）を2体起動して異なるページを並列実装）
