@@ -36,9 +36,9 @@ config_file = "agents/tachikoma-bash.toml"
 description = "Database specialized Tachikoma execution agent. Handles relational database design, normalization, SQL optimization, schema migrations, and database internals understanding. Use proactively when designing database schemas, writing complex SQL, optimizing queries, planning migrations, or troubleshooting database performance. Detects: .sql files, schema.prisma, or DB-related packages."
 config_file = "agents/tachikoma-database.toml"
 
-[agents.tachikoma_design]
-description = "Design specialized Tachikoma execution agent. Handles Figma MCP integration (all 13 tools), Figma Make context, Code Connect mappings, Design System Rules generation, design token synchronization, visual validation, design system construction/governance, Tailwind CSS styling methodology, and UI/UX design principles. Use proactively when converting Figma designs to code, managing design systems, building/evolving design systems, implementing design tokens with Tailwind CSS, or making UI/UX design decisions. Detects: Figma URLs in user prompts, .figma/ directory, design-system-rules files, or design system architecture tasks."
-config_file = "agents/tachikoma-design.toml"
+[agents.tachikoma_design_system]
+description = "Design system construction and governance specialized Tachikoma execution agent. Handles design system architecture, component pattern libraries, Figma variable/token management, design system governance, and organizational adoption strategy. Use proactively when building or evolving design systems, establishing component governance, defining design tokens at architecture level, or planning design system rollout across teams. Detects: design system architecture tasks, design-tokens directories, or component library governance needs."
+config_file = "agents/tachikoma-design-system.toml"
 
 [agents.tachikoma_document]
 description = "Documentation and technical writing specialized Tachikoma execution agent. Handles technical documentation (7Cs principle), LaTeX academic reports, Zenn tech articles, and AI-assisted copywriting. Use proactively when creating documentation, writing tech blog posts, preparing academic reports, or crafting marketing copy. Does NOT write application code."
@@ -47,6 +47,10 @@ config_file = "agents/tachikoma-document.toml"
 [agents.tachikoma_e2e_test]
 description = "E2E testing and browser automation specialized Tachikoma execution agent. Handles Playwright test design, browser automation via agent-browser CLI, visual testing, accessibility testing, and CI/CD integration. Use proactively when writing E2E tests with Playwright, automating browser interactions, or setting up browser-based test infrastructure. Detects: playwright.config.* files."
 config_file = "agents/tachikoma-e2e-test.toml"
+
+[agents.tachikoma_figma_impl]
+description = "Figma-to-code implementation specialized Tachikoma execution agent. Handles Figma MCP integration (all 13 tools), Code Connect mappings, design token synchronization, visual validation, and Tailwind CSS styling methodology. Use proactively when converting Figma designs to code, syncing design tokens, managing Code Connect mappings, or implementing pixel-perfect UI from Figma mockups. Detects: Figma URLs in user prompts, .figma/ directory, or design-system-rules files."
+config_file = "agents/tachikoma-figma-impl.toml"
 
 [agents.tachikoma_frontend]
 description = "Frontend component implementation specialized Tachikoma execution agent. Handles component implementation with shadcn/ui, Storybook story creation and interaction testing, and data visualization (charts/dashboards). Use proactively when creating UI components with shadcn/ui, writing Storybook stories, building interactive interfaces, or creating data charts/dashboards. For design principles, Figma integration, design systems, or Tailwind CSS architecture, use タチコマ（デザイン） instead. Detects: components.json, .stories.tsx/.ts files."
@@ -99,3 +103,7 @@ config_file = "agents/tachikoma-training-presenter.toml"
 [agents.tachikoma_typescript]
 description = "TypeScript specialized Tachikoma execution agent. Handles advanced type system patterns, generics, conditional types, GoF design patterns in TypeScript, and type-safe architecture. Use proactively when deep TypeScript expertise is needed: complex type definitions, type refactoring, generic utility creation, or migrating JavaScript to TypeScript. Detects: tsconfig.json."
 config_file = "agents/tachikoma-typescript.toml"
+
+[agents.tachikoma_ux_design]
+description = "UX strategy, visual design, and creative specialized Tachikoma execution agent. Handles UI/UX philosophy (Fluid Interfaces, motion theory, constraint design), design thinking process (empathize, define, ideate, prototype, test), graphic design fundamentals (form, color, typography, layout), AI experience design (mental models, maturity frameworks), and AI-assisted creative generation. Use proactively when conducting UX research, making visual design decisions, running design thinking workshops, designing AI user experiences, or creating design creatives. Does NOT handle Figma-to-code conversion or design system code implementation."
+config_file = "agents/tachikoma-ux-design.toml"

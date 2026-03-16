@@ -199,27 +199,13 @@ developer_instructions = """
 - 指示が来たら即座に「承知しました」と返答してから作業開始
 - 不明点があれば作業前にCodex本体に確認
 
-## バージョン管理（Jujutsu）
+## バージョン管理（Git）
 
-### jj操作の原則
-- **このプロジェクトはJujutsu (jj) を使用** - gitコマンドは原則使用禁止（`jj git`サブコマンドを除く）
-- **jj操作は許可されています**: `jj new`, `jj commit`, `jj describe`, `jj status`, `jj diff`, `jj log` 等すべて実行可能
-- **Conventional Commits形式必須**: `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:` 等のプレフィックスを使用
-- **詳細は `rules/jujutsu.md` 参照**
-
-### jj基本コマンド
-```bash
-jj status          # 作業状態確認
-jj diff            # 差分表示
-jj describe -m "feat: 新機能追加"  # メッセージ設定
-jj new             # 新しいchangeを開始
-jj commit -m "fix: バグ修正"      # メッセージ設定+新規作成
-```
-
-### 注意事項
-- 読み取り専用操作（`jj status`, `jj diff`, `jj log`）は常に安全に実行可能
-- 書き込み操作（`jj new`, `jj commit`, `jj describe`）もタスク内で必要なら実行可能
-- changeやbookmarkを勝手に作成・削除しない（Codex本体が指示した場合のみ）
+- `git`コマンドを使用
+- Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`）
+- 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
+- 書き込み操作はタスク内で必要な場合のみ実行可能
+- ブランチを勝手に作成・削除しない（Codex本体が指示した場合のみ）
 
 ## クリーンアップ処理
 **タスク完了時に一時ファイルを削除し、Codex本体への報告に含めてください。**
