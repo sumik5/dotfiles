@@ -1,100 +1,53 @@
-# サブエージェント委譲ガイド
+# サブエージェントルーティング
 
-専門タチコマ23体の導入により、Claude Code本体がスキルをロードして自ら実装する必要はなくなった。
-本体の役割は「適切な専門タチコマにルーティングする」こと。
+本体の役割 =「適切な専門タチコマにルーティングする」こと。
 
----
+## ルーティング表
 
-## 🔴 サブエージェントルーティング表
+| 検出条件 | 委譲先 subagent_type |
+|---------|---------------------|
+| `package.json` に `next` | `sumik:タチコマ（Next.js）` |
+| Figma URL/.figma/Code Connect/トークン同期/Tailwind実装 | `sumik:タチコマ（Figma実装）` |
+| DS構築/ガバナンス/パターンライブラリ/Figma変数管理 | `sumik:タチコマ（デザインシステム）` |
+| UX戦略/デザイン思考/グラフィック/AIエクスペリエンス | `sumik:タチコマ（UXデザイン）`（コード記述なし） |
+| shadcn/ui/Storybook/データチャート | `sumik:タチコマ（フロントエンド）` |
+| NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` |
+| TypeScript型設計・高度な型 | `sumik:タチコマ（TypeScript）` |
+| Python | `sumik:タチコマ（Python）` |
+| Go | `sumik:タチコマ（Go）` |
+| `.sh` / シェルスクリプト | `sumik:タチコマ（Bash）` |
+| Docker/CI-CD/DevOps/Podman | `sumik:タチコマ（インフラ）` |
+| `.tf` / Terraform | `sumik:タチコマ（Terraform）` |
+| AWS (CDK/SAM/SDK/Bedrock) | `sumik:タチコマ（AWS）` |
+| GCP (Cloud Run/GKE) | `sumik:タチコマ（Google Cloud）` |
+| DB/SQL/Prisma/マイグレーション | `sumik:タチコマ（データベース）` |
+| AI/RAG/MCP/LLM | `sumik:タチコマ（AI/ML）` |
+| テストファイル（`*test*`, `*spec*`等） | `sumik:タチコマ（テスト）` |
+| Playwright/E2E | `sumik:タチコマ（E2Eテスト）` |
+| 監視/OTel/ログ | `sumik:タチコマ（オブザーバビリティ）` |
+| 技術文書/記事/LaTeX | `sumik:タチコマ（ドキュメント）` |
+| 設計/DDD/アーキテクチャ | `sumik:タチコマ（アーキテクチャ）`（読取専用） |
+| セキュリティ監査 | `sumik:タチコマ（セキュリティ）`（読取専用） |
+| 研修/プレゼン | `sumik:タチコマ（研修・プレゼン）` |
+| 上記以外 | `sumik:タチコマ` |
 
-コード実装・変更タスクを受けた場合、以下の検出条件から適切な専門タチコマを選択し委譲する:
+### 判断ポイント
 
-| 検出条件 | 委譲先 subagent_type | 主要プリロードスキル |
-|---------|---------------------|-------------------|
-| `package.json` に `next` | `sumik:タチコマ（Next.js）` | developing-nextjs, developing-react, using-next-devtools |
-| Figma URL/Make/.figma/Code Connect/デザイントークン同期/Tailwind実装 | `sumik:タチコマ（Figma実装）` | implementing-figma, implementing-design, styling-with-tailwind |
-| デザインシステム構築/DS運用/パターンライブラリ/Figma変数管理/design-system-rules | `sumik:タチコマ（デザインシステム）` | building-design-systems, constructing-figma-design-systems |
-| UX戦略/デザイン思考/グラフィックデザイン/AIエクスペリエンス設計/クリエイティブ生成 | `sumik:タチコマ（UXデザイン）` | understanding-ui-philosophy, practicing-design-thinking, designing-graphics, designing-ai-experiences, creating-ai-design-creatives, applying-design-guidelines |
-| shadcn/ui/コンポーネント実装/Storybook/データチャート | `sumik:タチコマ（フロントエンド）` | designing-frontend, developing-storybook, designing-data-visualizations |
-| NestJS/Express/Fastify | `sumik:タチコマ（フルスタックJS）` | developing-fullstack-javascript, designing-web-apis, developing-api-spec-first |
-| TypeScript型設計・高度な型 | `sumik:タチコマ（TypeScript）` | mastering-typescript |
-| Python | `sumik:タチコマ（Python）` | developing-python, building-adk-agents |
-| Go | `sumik:タチコマ（Go）` | developing-go, developing-api-spec-first |
-| `.sh` / シェルスクリプト | `sumik:タチコマ（Bash）` | developing-bash |
-| Docker/CI-CD/DevOps | `sumik:タチコマ（インフラ）` | managing-docker, practicing-devops |
-| Containerfile/podman/buildah/skopeo | `sumik:タチコマ（インフラ）` | managing-podman |
-| `.tf` / Terraform | `sumik:タチコマ（Terraform）` | developing-terraform |
-| AWS (CDK/SAM/SDK/Bedrock) | `sumik:タチコマ（AWS）` | developing-aws |
-| GCP (Cloud Run/GKE) | `sumik:タチコマ（Google Cloud）` | developing-google-cloud |
-| DB/SQL/Prisma/マイグレーション | `sumik:タチコマ（データベース）` | designing-relational-databases, avoiding-sql-antipatterns |
-| AI/RAG/MCP/LLM | `sumik:タチコマ（AI/ML）` | integrating-ai-web-apps, building-rag-systems, developing-mcp, building-langchain-agents |
-| テストファイル（`*test*`, `*spec*`, `*_test.go`, `test_*.py` 等） | `sumik:タチコマ（テスト）` | testing-code |
-| Playwright/E2E/ブラウザテスト | `sumik:タチコマ（E2Eテスト）` | testing-e2e-with-playwright, automating-browser |
-| 監視/OTel/ログ/メトリクス | `sumik:タチコマ（オブザーバビリティ）` | designing-monitoring, implementing-opentelemetry |
-| 技術文書/記事/LaTeX | `sumik:タチコマ（ドキュメント）` | writing-effective-prose, writing-zenn-articles |
-| 設計/DDD/アーキテクチャ判断 | `sumik:タチコマ（アーキテクチャ）` | applying-domain-driven-design, architecting-microservices, applying-clean-architecture（読取専用） |
-| セキュリティ監査/脆弱性分析 | `sumik:タチコマ（セキュリティ）` | securing-code, securing-serverless（読取専用） |
-| 研修設計/プレゼン改善/ワークショップ | `sumik:タチコマ（研修・プレゼン）` | improving-presentations, writing-effective-prose, designing-training, applying-behavior-design |
-| 上記以外 | `sumik:タチコマ` | 汎用フォールバック（コア品質スキルプリロード済み） |
+- **複数条件該当** → より専門的な方を優先（例: Next.js+UI → Next.jsメイン）
+- **テスト主題（TDD・カバレッジ改善）** → タチコマ（テスト）。機能実装の一部 → 言語タチコマ
+- **デザイン3体**: Figma→コード → Figma実装。DS運用 → デザインシステム。UX戦略 → UXデザイン
 
-### ルーティング判断のポイント
+## 本体が直接使用するスキル
 
-- **デザイン3体の使い分け**: Figma→コード変換・Code Connect・トークン同期・Tailwind実装 → タチコマ（Figma実装）。DS構築・ガバナンス・パターンライブラリ・Figma変数管理 → タチコマ（デザインシステム）。UX戦略・デザイン思考・グラフィック基礎・AIエクスペリエンス → タチコマ（UXデザイン）（コード記述なし）
-- **タチコマ（Figma実装/デザインシステム）vs タチコマ（フロントエンド）**: Figma MCP活用・トークン同期・DS構築 → Figma実装/デザインシステム。shadcn/uiコンポーネント実装・Storybook・データビジュアライゼーション → タチコマ（フロントエンド）
-- **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → タチコマ（Next.js）をメイン、タチコマ（フロントエンド）をサブ）
-- **並列実行時** → 異なる専門タチコマを同時起動可能（例: タチコマ（Next.js）+ タチコマ（E2Eテスト）
-- **同一専門タチコマの複数起動** → 可能（例: タチコマ（Next.js）を2体起動して異なるページを並列実装）
-- **テストエージェント vs 言語エージェント**: テスト設計・カバレッジ改善・TDD・テストリファクタリングが主題 → タチコマ（テスト）。機能実装の一部としてテストも書く → 言語エージェント（各言語エージェントも testing-code スキルを持つ）
+| スキル | トリガー |
+|--------|---------|
+| `orchestrating-teams` | 軽微修正以外の開発タスク（デフォルト） |
+| `managing-claude-md` | CLAUDE.md改善時 |
+| `researching-libraries` | 新機能実装前 |
+| `applying-semantic-versioning` | バージョン判断時 |
+| `writing-conventional-commits` | コミットメッセージ作成時 |
+| `searching-with-exa` | Web検索（第一優先。fallback: `searching-web`） |
 
-### tmux pane起動ルール（🔴 必須）
+## オンデマンドスキル（明示的要求時のみ）
 
-- **🔴 ToolSearch 必須（最重要）**: Agent Teams API ツール（TeamCreate, TeamDelete, TaskCreate, TaskUpdate, TaskList, SendMessage）は**遅延ツール**。`ToolSearch("TeamCreate team")` 等で**事前にロード**しないと呼び出せない。これがtmux paneが開かない最大の原因
-- **TeamCreate 必須**: タチコマ起動前に必ず TeamCreate でチームを作成（軽微修正でも必須）
-- Task tool に `team_name` + `run_in_background: true` を**両方**指定 → tmux pane起動
-- ⚠️ `run_in_background: true` のみ（`team_name` なし）→ バックグラウンド実行されるが**tmux paneには表示されない**
-- 1メッセージ内で複数のTask tool呼び出しを行い、tmux paneで並列起動
-- Bash toolでのタチコマ起動は禁止
-- 単体タスク完了後は TeamDelete でチームを解放（1セッション1チーム制約）
-
----
-
-## 🟡 本体が直接使用するスキル
-
-以下のスキルは専門タチコマに委譲せず、Claude Code本体が直接Skillツールでロードして使用する:
-
-### メタ・運用
-| スキル | トリガー | 概要 |
-|--------|---------|------|
-| `orchestrating-teams` | 軽微修正以外のすべての開発タスク（デフォルト） | planner-first パターン: チーム編成 → planner計画策定 → 専門タチコマ実装 |
-| `managing-claude-md` | CLAUDE.md改善・罠追記時 | 設定ファイル管理（8原則） |
-| `researching-libraries` | 新機能実装前 | 既存ライブラリ調査（車輪の再発明禁止） |
-| `using-serena` | `/serena` コマンド使用時 | トークン効率的構造化開発 |
-| `authoring-skills` | 新スキル作成時 | スキル作成ガイド |
-
-### バージョン管理・品質（本体が判断するもの）
-| スキル | トリガー | 概要 |
-|--------|---------|------|
-| `applying-semantic-versioning` | バージョン判断時 | SemVer 2.0.0準拠 |
-| `writing-conventional-commits` | コミットメッセージ作成時 | Conventional Commits 1.0.0 |
-
-### 情報収集
-| スキル | トリガー | 概要 |
-|--------|---------|------|
-| `searching-with-exa` | Web検索・情報収集時 | Exa MCP第一優先 |
-| `searching-web` | Exa MCP使用不可時 | gemini CLI フォールバック |
-
----
-
-## 🟢 オンデマンドスキル（特殊用途）
-
-以下はユーザーの明示的な要求がある場合のみロードする:
-
-| トリガー | スキル | 概要 |
-|---------|--------|------|
-| フラッシュカード作成 | `creating-flashcards`, `using-anki-mcp` | Ankiフラッシュカード |
-| プレゼン作成 | `generating-google-slides`, `slidekit-create`, `slidekit-templ` | スライド生成 |
-| 翻訳 | `translating-with-lmstudio` | LMStudio翻訳 |
-| Codex相談 | `using-codex` | OpenAI Codex CLI |
-| 差分表示 | `viewing-diffs` | 差分ビューア |
-| 図表作成 | `mermaid-diagrams`, `using-drawio-mcp` | 図表生成 |
-| PM業務 | `using-claude-code-as-pm` | PM向けClaude活用 |
+フラッシュカード(`using-anki-mcp`) / プレゼン(`slidekit-create`, `generating-google-slides`) / 図表(`mermaid-diagrams`, `using-drawio-mcp`) / Codex(`using-codex`) / PM(`using-claude-code-as-pm`)
