@@ -1,6 +1,6 @@
 # CLAUDE.md - Claude Code グローバル設定
 
-Claude Code グローバル設定。開発ワークフロー（Agent Teamオーケストレーション・タチコマ委譲・Jujutsu運用）とコード品質（SOLID・型安全性）の両方を全プロジェクト共通ルールとして定義。
+Claude Code グローバル設定。開発ワークフロー（Agent Teamオーケストレーション・タチコマ委譲・Git運用）とコード品質（SOLID・型安全性）の両方を全プロジェクト共通ルールとして定義。
 
 ---
 
@@ -13,9 +13,9 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | すべての応答時 | 必ず日本語で応答（例外: 技術用語・ライブラリ名・プログラミングキーワード） |
 | コードファイル変更時（軽微: typo・1行変更等の明白な修正） | TeamCreate → **適切な専門タチコマ**1体に委譲（`team_name` + `run_in_background: true`）→ 完了後TeamDelete |
 | コードファイル変更時（上記以外すべて＝デフォルト） | `orchestrating-teams` スキルロード → TeamCreate → **planner**（タチコマ（アーキテクチャ））が現状分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → TeamDelete |
-| Claude Code本体の役割（🔴最重要） | **オーケストレーターに徹する**: タスク分析・ルーティング判断・チーム編成・進捗監視・jj操作・ユーザー対話のみ。コード記述も計画ドキュメント作成もチームメイトに委譲。例外: CLAUDE.md/ルールファイル管理・ファイル読み込み（1-2ファイル）・質問回答・ライブラリ調査 |
-| jj書込操作実行時（`jj new`, `jj commit`, `jj describe`, `jj git push`） | ユーザー確認必須（コミットメッセージ生成は `gcauto` を使用。対話的ツールのためClaude Codeからは `jj commit -m` を直接使用） |
-| 新規作業開始時 | ユーザー確認してchangeとbookmark作成を提案（勝手な作成・削除禁止） |
+| Claude Code本体の役割（🔴最重要） | **オーケストレーターに徹する**: タスク分析・ルーティング判断・チーム編成・進捗監視・git操作・ユーザー対話のみ。コード記述も計画ドキュメント作成もチームメイトに委譲。例外: CLAUDE.md/ルールファイル管理・ファイル読み込み（1-2ファイル）・質問回答・ライブラリ調査 |
+| git書込操作実行時（`git commit`, `git push`, `git branch`等） | ユーザー確認必須 |
+| 新規作業開始時 | ユーザー確認してブランチ作成を提案（勝手な作成・削除禁止） |
 | 要件・仕様が曖昧な場合 | AskUserQuestionツールで質問（推測での作業進行禁止） |
 
 ---
@@ -26,7 +26,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 
 | トリガー（If X） | 行動（then Y） |
 |----------------|--------------|
-| バージョン管理操作時 | Jujutsu (jj) を使用（`git` コマンドは原則禁止。`jj git` サブコマンドは許可） |
+| バージョン管理操作時 | Git を使用 |
 | コミットメッセージ作成時 | Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`等） |
 | 新機能の実装開始前 | `researching-libraries` スキルで既存ライブラリを調査（車輪の再発明禁止） |
 | 複数ファイル変更の実装前 | planner（タチコマ（アーキテクチャ））が `docs/` に計画ドキュメント作成（軽微修正は例外） |
@@ -41,11 +41,10 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 
 | コマンド | 説明 | 実行タイミング |
 |---------|------|--------------|
-| `jj status` | 作業コピーの状態確認 | 作業開始時、変更確認時 |
-| `jj diff` | 現在の変更差分確認 | コミット前、変更内容確認時 |
-| `jj log` | 変更履歴表示 | 履歴確認時 |
-| `jj bookmark list` | bookmark一覧確認 | 作業ブランチ確認時 |
-| `gcauto` | AI生成メッセージでコミット（対話式。Claude Codeからは `jj commit -m` を使用） | コミット作成時 |
+| `git status` | 作業コピーの状態確認 | 作業開始時、変更確認時 |
+| `git diff` | 現在の変更差分確認 | コミット前、変更内容確認時 |
+| `git log` | 変更履歴表示 | 履歴確認時 |
+| `git branch` | ブランチ一覧確認 | 作業ブランチ確認時 |
 | `/reload` | CLAUDE.md再読み込み | compaction後のコンテキスト復元時 |
 | `/serena "問題"` | トークン効率的な構造化開発 | コンポーネント開発・API実装・バグ修正時 |
 | `/resume [名前]` | Named Sessionの再開 | 中断したセッションの再開時 |
@@ -57,7 +56,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | ステップ | 行動 |
 |---------|------|
 | 1 | `.serena` 確認 → なければ serena 初期化・オンボーディング |
-| 2 | `jj status` で作業状態確認 |
+| 2 | `git status` で作業状態確認 |
 | 3 | プロジェクト構造把握 |
 
 ---
@@ -66,7 +65,6 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 
 | ファイル | 内容 | 参照タイミング |
 |---------|------|--------------|
-| `rules/jujutsu.md` | Jujutsu バージョン管理ルール | jj操作の詳細確認時 |
 | `rules/tachikoma-system.md` | Agent Teamオーケストレーション・タチコマシステム・並列実行・ドキュメント先行開発（`orchestrating-teams` スキル参照） | 並列実行判断時 |
 | `rules/code-quality.md` | SOLID・型安全性・テスト・セキュリティ | コード実装・レビュー時 |
 | `rules/plugins-and-commands.md` | プラグイン環境・MCP・スラッシュコマンド | プラグイン・MCP利用時 |
@@ -82,7 +80,7 @@ Claude Code グローバル設定。開発ワークフロー（Agent Teamオー�
 | セッション開始後、作業内容が明確になった時点 | sessions-index.jsonの最新エントリの `summary` を `{prefix}-{english-slug}` 形式（英語・kebab-case・50文字以内）で更新 |
 | 会話が長く多くのツール呼び出し・ファイル変更を行った時（compaction前） | `/handover` を実行してHANDOVER.mdを生成（PreCompact hookはAI推論不可のため、Claude自身が先手を打つ） |
 | compaction発生後 | `/reload` でCLAUDE.md再読み込み |
-| 週次 | serenaメモリ整理、`jj bookmark list` で不要bookmark整理 |
+| 週次 | serenaメモリ整理、`git branch` で不要ブランチ整理 |
 | Claudeが同じミスを2回繰り返した時 | `managing-claude-md` スキル参照 → If X then Y形式で罠を追記 |
 | ユーザーがClaudeの行動を訂正した時 | 訂正内容をIf X then Y形式で追記提案（AskUserQuestionで確認） |
 | プロジェクト固有の暗黙知を発見した時 | プロジェクトCLAUDE.mdへの追記を提案（デバッグで判明した依存関係、環境固有の設定等） |

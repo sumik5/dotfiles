@@ -30,17 +30,12 @@ mkdir -p "$SAVE_DIR"
 
 FILEPATH="${SAVE_DIR}/retrospective_${TODAY}.md"
 
-# 作業ディレクトリからVCSデータを収集（jj優先、gitフォールバック）
+# 作業ディレクトリからVCSデータを収集
 VCS_LOG=""
 DIFF_STAT=""
 if [ -n "$CWD" ] && [ -d "$CWD" ]; then
-    if command -v jj &>/dev/null && [ -d "${CWD}/.jj" ]; then
-        VCS_LOG=$(cd "$CWD" && jj log --no-pager -r 'mine() & committer_date(after:"today midnight")' --no-graph 2>/dev/null || true)
-        DIFF_STAT=$(cd "$CWD" && jj diff --stat -r @ 2>/dev/null || true)
-    else
-        VCS_LOG=$(cd "$CWD" && git log --since="today" --oneline --no-decorate 2>/dev/null || true)
-        DIFF_STAT=$(cd "$CWD" && git diff --stat 2>/dev/null || true)
-    fi
+    VCS_LOG=$(cd "$CWD" && git log --since="today" --oneline --no-decorate 2>/dev/null || true)
+    DIFF_STAT=$(cd "$CWD" && git diff --stat 2>/dev/null || true)
 fi
 
 # トランスクリプト（JSONL形式）から編集ファイル一覧を抽出
