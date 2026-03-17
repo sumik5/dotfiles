@@ -168,6 +168,12 @@ if command -v colima &> /dev/null; then
   eval "$(colima completion zsh)"
 fi
 
+# -------------------------------------------------
+# codex
+if command -v codex &> /dev/null; then
+  eval "$(codex completion zsh)"
+fi
+
 #############################################
 # git auto status
 #############################################
@@ -328,7 +334,6 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f gcautog="gcauto -m gemini"
   abbr -S -f vi="nvim"
   abbr -S -f vim="nvim"
-  abbr -S -f claude-mem='bun "$HOME/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs"'
   abbr -S -f code-review="coderabbit review --prompt-only"
   abbr -S -f claude="claude --teammate-mode tmux --dangerously-skip-permissions"
   abbr -S -f codex="codex --dangerously-bypass-approvals-and-sandbox"
@@ -338,3 +343,4 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f ghq='peco-cd'
   abbr -S -f gcauto='gcauto -m codex'
 } &>/dev/null
+
