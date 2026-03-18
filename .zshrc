@@ -331,7 +331,6 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
 {
   abbr -S -f ll='ls -vl'
   abbr -S -f greps='rg --hidden -p'
-  abbr -S -f gcautog="gcauto -m gemini"
   abbr -S -f vi="nvim"
   abbr -S -f vim="nvim"
   abbr -S -f code-review="coderabbit review --prompt-only"
@@ -341,6 +340,5 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f docker-comopse="podman-compose"
   abbr -S -f htop='sudo htop'
   abbr -S -f ghq='peco-cd'
-  abbr -S -f gcauto='gcauto -m codex'
 } &>/dev/null
 
