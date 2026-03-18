@@ -29,7 +29,6 @@
       "Bash(sudo:*)",
       "Bash(rm -rf:*)",
       "Bash(git push:*)",
-      "Bash(git commit:*)",
       "Bash(git reset:*)",
       "Bash(git rebase:*)",
       "Bash(kill:*)",
