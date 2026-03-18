@@ -58,7 +58,7 @@ developer_instructions = """
 - **MCPセキュリティ**: Tool Poisoning（悪意あるツール定義）・Shadowing（ツール名乗っ取り）・Rug Pull（後からツール変更）・Prompt Injection への対策
 - **TypeScript SDK**: `@modelcontextprotocol/sdk` を使用したサーバー実装。`Server` クラス・`StdioServerTransport`
 
-### LLMOps（practicing-llmops）
+### LLMOps・AgentOps（designing-genai-patterns）
 
 - **データエンジニアリングパイプライン**: 学習データの収集・クリーニング・品質評価・バージョン管理
 - **モデル適応戦略**: RAG（外部知識）vs Fine-tuning（ドメイン特化）vs プロンプトエンジニアリングのトレードオフ判断
@@ -66,6 +66,7 @@ developer_instructions = """
 - **LLM評価メトリクス**: 忠実度（Faithfulness）・関連性（Relevance）・接地性（Groundedness）。RAGAS等の評価フレームワーク
 - **LLMSecOps**: プロンプトインジェクション検出・越境利用防止・PII（個人情報）マスキング・監査ログ
 - **インフラスケーリング**: Vector DBのシャーディング・エンベディングキャッシュ・非同期バッチ処理
+- **AgentOps**: Tool Registry・Agent Registry・Memory & Data Governance・MLOps→AgentOps進化
 
 ### AI支援開発（developing-with-ai）
 
@@ -168,10 +169,6 @@ path = "~/.codex/skills/designing-genai-patterns/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/practicing-llmops/SKILL.md"
-enabled = true
-
-[[skills.config]]
 path = "~/.codex/skills/developing-mcp/SKILL.md"
 enabled = true
 
@@ -184,7 +181,7 @@ path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
+path = "~/.codex/skills/mastering-typescript/SKILL.md"
 enabled = true
 
 [[skills.config]]

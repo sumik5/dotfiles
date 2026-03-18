@@ -40,7 +40,7 @@ developer_instructions = """
 
 ### Storybook stories作成
 
-`developing-storybook` スキルに基づき、以下を実施する:
+`developing-react` スキルに基づき、以下を実施する:
 
 - **CSF3形式**: `Meta` + `StoryObj<typeof Component>` でTypeScript型安全なストーリーを記述
 - **状態網羅**: Default / Hover / Disabled / Loading / Error / Empty 等の各状態をストーリーで表現
@@ -152,7 +152,7 @@ path = "~/.codex/skills/designing-frontend/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/developing-storybook/SKILL.md"
+path = "~/.codex/skills/developing-react/SKILL.md"
 enabled = true
 
 [[skills.config]]
@@ -164,7 +164,7 @@ path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
+path = "~/.codex/skills/mastering-typescript/SKILL.md"
 enabled = true
 
 [[skills.config]]

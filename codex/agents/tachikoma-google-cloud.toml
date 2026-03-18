@@ -124,7 +124,7 @@ developer_instructions = """
 - [ ] トリガーが適切なブランチ・イベントに設定されている
 
 ### 型安全性（TypeScript/Python）
-- [ ] `any` 型を使用していない（`enforcing-type-safety` スキル準拠）
+- [ ] `any` 型を使用していない（`mastering-typescript` スキル準拠）
 - [ ] Google Cloud クライアントライブラリの型定義を正確に使用
 - [ ] BigQuery スキーマの型定義が完備
 
@@ -178,7 +178,7 @@ path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
+path = "~/.codex/skills/mastering-typescript/SKILL.md"
 enabled = true
 
 [[skills.config]]

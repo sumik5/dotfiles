@@ -162,7 +162,7 @@ path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
+path = "~/.codex/skills/mastering-typescript/SKILL.md"
 enabled = true
 
 [[skills.config]]

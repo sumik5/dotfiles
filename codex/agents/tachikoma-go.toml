@@ -165,6 +165,10 @@ path = "~/.codex/skills/developing-go/SKILL.md"
 enabled = true
 
 [[skills.config]]
+path = "~/.codex/skills/developing-web-apis/SKILL.md"
+enabled = true
+
+[[skills.config]]
 path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 

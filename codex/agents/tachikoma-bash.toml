@@ -36,15 +36,13 @@ developer_instructions = """
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
-IFS=$'
-	'
+IFS=$'\n\t'
 ```
 
 - `set -e`: コマンド失敗時に即座にスクリプト終了
 - `set -u`: 未定義変数参照時にエラー（デフォルト値は `${VAR:-default}` で指定）
 - `set -o pipefail`: パイプライン内の任意コマンド失敗を検知
-- `IFS=$'
-	'`: フィールド区切りをスペースなしに制限（意図しない単語分割を防ぐ）
+- `IFS=$'\n\t'`: フィールド区切りをスペースなしに制限（意図しない単語分割を防ぐ）
 
 ### 変数と引数処理
 - **変数展開**: `${var:-default}` / `${var:?error}` / `${var##pattern}` 等を活用
@@ -112,8 +110,7 @@ IFS=$'
 
 ### Bash固有
 - [ ] `#!/usr/bin/env bash` でシバン設定
-- [ ] `set -euo pipefail` + `IFS=$'
-	'` のstrict mode設定
+- [ ] `set -euo pipefail` + `IFS=$'\n\t'` のstrict mode設定
 - [ ] すべての変数が `"${var}"` とダブルクォートで保護されている
 - [ ] 関数内では `local` 変数を使用している
 - [ ] 外部入力のバリデーション（ホワイトリスト検証）を実装している

@@ -47,7 +47,7 @@ developer_instructions = """
 - **Repository**: Aggregateの永続化を抽象化。Infrastructure層への依存を逆転
 - **Domain Service**: 複数のAggregateにまたがるビジネスロジックを配置
 
-### マイクロサービスアーキテクチャ（architecting-microservices）
+### マイクロサービスアーキテクチャ（architecting-infrastructure）
 
 - **サービス粒度決定**: Single Business Capability原則。チームサイズ（2-pizza rule）・変更頻度・トランザクション境界から判断
 - **CQRS（Command Query Responsibility Segregation）**: 書き込みモデルと読み取りモデルを分離。読み取り側の独立スケーリングと最適化
@@ -55,7 +55,7 @@ developer_instructions = """
 - **8つのSagaパターン**: Choreography（イベント駆動）vs Orchestration（中央指揮）。Compensating Transaction（補償トランザクション）で分散整合性を維持
 - **メッセージングパターン**: Outbox Pattern（二重書き込み防止）、Inbox Pattern（冪等性保証）、Dead Letter Queue
 
-### アーキテクチャトレードオフ分析（modernizing-architecture）
+### アーキテクチャトレードオフ分析（architecting-infrastructure）
 
 - **トレードオフマトリクス**: 一貫性・可用性・パーティション耐性（CAP定理）のトレードオフを体系的に評価
 - **移行戦略**: Strangler Fig Pattern（段階的置き換え）、Branch by Abstraction、Feature Toggle活用
@@ -139,7 +139,7 @@ developer_instructions = """
    codex が見つからない → **スキップして完了報告へ進む**（ブロックしない）
 
 2. **初回レビュー実行**
-   `reviewing-plans-with-codex` スキルを使って `{plan_file_fullpath}` を初回レビューする。
+   `orchestrating-codex` スキルを使って `{plan_file_fullpath}` を初回レビューする。
    実行エラー → **スキップして完了報告へ進む**
 
 3. **レビュー結果の判断と対応**
@@ -151,7 +151,7 @@ developer_instructions = """
    | 指摘なし | 完了報告へ |
 
 4. **プラン修正 → 再レビュー（ループ）**
-   プランを修正した後、`reviewing-plans-with-codex` スキルの `--resume` モードで再レビューする。
+   プランを修正した後、`orchestrating-codex` スキルの `--resume` モードで再レビューする。
    **致命的な指摘がなくなるまでステップ3-4を繰り返す。**
 
 ### 判断基準
@@ -206,15 +206,11 @@ developer_instructions = """
 [skills]
 
 [[skills.config]]
-path = "~/.codex/skills/applying-domain-driven-design/SKILL.md"
+path = "~/.codex/skills/applying-clean-architecture/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/architecting-microservices/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/modernizing-architecture/SKILL.md"
+path = "~/.codex/skills/architecting-infrastructure/SKILL.md"
 enabled = true
 
 [[skills.config]]
@@ -223,8 +219,4 @@ enabled = true
 
 [[skills.config]]
 path = "~/.codex/skills/building-multi-tenant-saas/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/applying-clean-architecture/SKILL.md"
 enabled = true

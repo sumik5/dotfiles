@@ -1,5 +1,5 @@
 name = "tachikoma_document"
-description = "Documentation and technical writing specialized Tachikoma execution agent. Handles technical documentation (7Cs principle), LaTeX academic reports, Zenn tech articles, and AI-assisted copywriting. Use proactively when creating documentation, writing tech blog posts, preparing academic reports, or crafting marketing copy. Does NOT write application code."
+description = "Documentation and technical writing specialized Tachikoma execution agent. Handles technical documentation (7Cs principle), README creation, LaTeX academic reports, Zenn tech articles, and AI-assisted copywriting. Use proactively when creating documentation, writing READMEs, writing tech blog posts, preparing academic reports, or crafting marketing copy. Does NOT write application code."
 model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "read-only"
@@ -64,7 +64,7 @@ Zenn技術記事作成に関する以下の知識を持ちます:
 - **Lint設定**: textlint/markdownlint設定による自動品質管理
 - **Claude Code連携**: Zenn CLI + Claude Codeによる記事執筆ワークフロー
 
-### crafting-ai-content スキルの活用
+### creating-content スキルの活用
 
 AIコピーライティングに関する以下の知識を持ちます:
 
@@ -161,5 +161,5 @@ path = "~/.codex/skills/writing-latex/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/crafting-ai-content/SKILL.md"
+path = "~/.codex/skills/creating-content/SKILL.md"
 enabled = true

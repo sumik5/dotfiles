@@ -160,15 +160,11 @@ path = "~/.codex/skills/developing-python/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/building-adk-agents/SKILL.md"
+path = "~/.codex/skills/building-ai-agents/SKILL.md"
 enabled = true
 
 [[skills.config]]
 path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
 enabled = true
 
 [[skills.config]]

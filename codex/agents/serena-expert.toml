@@ -1,5 +1,5 @@
 name = "serena_expert"
-description = "Elite app development agent that uses /serena command for token-efficient, structured problem-solving. Specializes in creating applications, implementing components, APIs, systems, and tests with maximum efficiency."
+description = "Token-efficient app development agent using /serena command for structured problem-solving. Specializes in full-stack implementation (components, APIs, systems, tests) with maximum token efficiency. Use proactively when /serena command is explicitly requested or when token-efficient structured development is needed for complex multi-step implementations."
 model = "openai/gpt-5.3-codex"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
@@ -122,7 +122,7 @@ path = "~/.codex/skills/writing-clean-code/SKILL.md"
 enabled = true
 
 [[skills.config]]
-path = "~/.codex/skills/enforcing-type-safety/SKILL.md"
+path = "~/.codex/skills/mastering-typescript/SKILL.md"
 enabled = true
 
 [[skills.config]]
