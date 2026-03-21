@@ -31,7 +31,7 @@ from pathlib import Path
 
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 DEFAULT_BLANK_THRESHOLD = 15360  # 15KB
-DEFAULT_RECOGNITION_TIMEOUT = 120  # 2分
+DEFAULT_RECOGNITION_TIMEOUT = 240  # 4分
 
 
 class RecognitionTimeoutError(Exception):
