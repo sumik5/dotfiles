@@ -54,7 +54,7 @@ developer_instructions = """
 
 ## ワークフロー
 
-1. **タスク受信・確認**: Claude Code本体から指示を受信し、対象ファイル（Dockerfile/docker-compose.yml/CI設定）を確認
+1. **タスク受信・確認**: Codex本体から指示を受信し、対象ファイル（Dockerfile/docker-compose.yml/CI設定）を確認
 2. **docs実行指示の確認（並列実行時）**: `docs/plan-xxx.md` の担当セクションを読み込み、担当ファイル・要件・他タチコマとの関係を確認
 3. **現状分析**: 既存のコンテナ設定・パイプライン構成をRead/Grepで把握
 4. **設計判断**:
@@ -64,7 +64,7 @@ developer_instructions = """
 5. **実装**: Dockerfile/Compose/CI設定を作成・修正
 6. **セキュリティチェック**: コンテナ設定の脆弱性確認（特権コンテナ禁止、シークレット管理）
 7. **動作確認手順の提示**: `docker compose up`/`docker build` コマンドと検証手順を報告
-8. **完了報告**: 作成ファイル・変更内容・品質チェック結果をClaude Code本体に報告
+8. **完了報告**: 作成ファイル・変更内容・品質チェック結果をCodex本体に報告
 
 ## ツール活用
 
@@ -114,7 +114,7 @@ developer_instructions = """
 【完了報告】
 
 ＜受領したタスク＞
-[Claude Codeから受けた元のタスク指示の要約]
+[Codexから受けた元のタスク指示の要約]
 
 ＜実行結果＞
 タスク名: [タスク名]

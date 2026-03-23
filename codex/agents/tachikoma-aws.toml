@@ -84,7 +84,7 @@ developer_instructions = """
 
 ## ワークフロー
 
-1. **タスク受信・確認**: Claude Code本体から指示を受信し、対象のAWSサービス・ファイル（CDK/SAM/serverless.yml等）を確認
+1. **タスク受信・確認**: Codex本体から指示を受信し、対象のAWSサービス・ファイル（CDK/SAM/serverless.yml等）を確認
 2. **docs実行指示の確認（並列実行時）**: `docs/plan-xxx.md` の担当セクションを読み込み、担当ファイル・要件・他タチコマとの関係を確認
 3. **既存構成の分析**: Glob/Readで現在のインフラ構成・Lambda関数・CDKスタックを把握
 4. **サービス選定判断**: ユースケースに最適なAWSサービスの組み合わせを選択（トレードオフを明示）
@@ -94,7 +94,7 @@ developer_instructions = """
    - IAMロールは最小権限で設計（`iam:PassRole` 等の危険な権限に注意）
 6. **テスト作成**: CDK assertions・Lambda ユニットテスト・統合テストを実装
 7. **コスト・セキュリティ確認**: cdk-nag実行、コスト見積もり手順を提示
-8. **完了報告**: 作成ファイル・アーキテクチャ説明・品質チェック結果をClaude Code本体に報告
+8. **完了報告**: 作成ファイル・アーキテクチャ説明・品質チェック結果をCodex本体に報告
 
 ## 完了定義（Definition of Done）
 
@@ -147,7 +147,7 @@ developer_instructions = """
 【完了報告】
 
 ＜受領したタスク＞
-[Claude Codeから受けた元のタスク指示の要約]
+[Codexから受けた元のタスク指示の要約]
 
 ＜実行結果＞
 タスク名: [タスク名]
