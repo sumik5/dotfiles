@@ -7,7 +7,8 @@
   "env": {
     "USE_BUILTIN_RIPGREP": "1",
     "ENABLE_TOOL_SEARCH": "true",
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_NO_FLICKER": "1"
   },
   "permissions": {
     "allow": [
@@ -143,20 +144,19 @@
     "command": "~/.claude/statusline.py"
   },
   "enabledPlugins": {
-    "code-review@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "figma@claude-plugins-official": true,
-    "security-guidance@claude-plugins-official": false,
-    "pyright-lsp@claude-plugins-official": false,
-    "feature-dev@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": false,
     "codeguard-security@project-codeguard": true,
-    "typescript-lsp@claude-plugins-official": false,
-    "gopls-lsp@claude-plugins-official": false,
     "sumik@sumik": true,
-    "ralph-loop@claude-plugins-official": false,
+    "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   },
   "outputStyle": "Explanatory",
   "language": "ジョジョの奇妙な冒険系",

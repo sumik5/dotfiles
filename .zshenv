@@ -36,8 +36,9 @@ path=(
   /opt/homebrew/opt/coreutils/libexec/gnubin(N-/)
   /opt/homebrew/opt/llvm/bin(N-/)
   /opt/homebrew/opt/trash/bin(N-/)
-  /Library/TeX/texbin(N-/)
   /opt/homebrew/opt/postgresql@15/bin(N-/)
+  /opt/homebrew/share/google-cloud-sdk/bin(N-/)
+  /Library/TeX/texbin(N-/)
   $path
 )
 
