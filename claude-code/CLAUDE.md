@@ -55,3 +55,5 @@
 - Named Session接頭辞: `feature-` / `bugfix-` / `refactor-` / `docs-` / `chore-`
 - 対象: `~/.claude/projects/{project-key}/sessions-index.json` の最新 `modified` エントリ
 - `/resume` で再開可能（`P` プレビュー、`/` 検索）
+
+@RTK.md

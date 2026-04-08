@@ -55,7 +55,13 @@ if command -v terminal-notifier &>/dev/null; then
         -message "$MESSAGE_SAFE" \
         -sound "$SOUND" \
         -contentImage "$ICON" \
-        -group "$GROUP"
+        -group "$GROUP" \
+    || osascript <<EOF 2>/dev/null || true
+display notification "${MESSAGE_SAFE}" \
+    with title "${TITLE_SAFE}" \
+    subtitle "${SUBTITLE_SAFE}" \
+    sound name "${SOUND}"
+EOF
 else
     # osascriptフォールバック
     osascript <<EOF 2>/dev/null || true
