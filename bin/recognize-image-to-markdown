@@ -18,16 +18,21 @@ LM Studio のローカル VLM (OCR) を使い、画像ベースの EPUB また�
 """
 
 import argparse
+from dataclasses import dataclass
 import os
 import re
+import select
 import signal
 import shutil
 import subprocess
 import sys
+import termios
 import tempfile
 import time
+import tty
 import zipfile
 from pathlib import Path
+from typing import TextIO
 
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 DEFAULT_BLANK_THRESHOLD = 15360  # 15KB
@@ -40,13 +45,21 @@ class RecognitionTimeoutError(Exception):
 
 def _timeout_handler(signum: int, frame: object) -> None:
     raise RecognitionTimeoutError("認識処理が2分を超えたため中断しました")
-# DEFAULT_MODEL = "qwen/qwen3.5-9b"
-DEFAULT_MODEL = "qwen/qwen3-vl-8b"
 
 RECOGNITION_PROMPT = (
     "添付の画像を文字に変換し、markdown形式で返信してください。"
     "前後の不要なシステムメッセージは不要であり、画像の内容のみ返信してください"
 )
+PAGE_SEPARATOR = "\n\n---\n\n"
+
+
+@dataclass(frozen=True)
+class LmStudioModelChoice:
+    model_key: str
+    display_name: str
+    params_string: str
+    size_bytes: int | None
+    is_loaded: bool
 
 
 # ---------------------------------------------------------------------------
@@ -90,6 +103,233 @@ def check_lmstudio_connection(model_name: str, context_length: int = 0) -> None:
         except Exception as reload_exc:
             log(f"エラー: LM Studio に接続できません ({reload_exc})")
             sys.exit(1)
+
+
+def _model_info_value(model: object, attr: str) -> object | None:
+    info = getattr(model, "info", None)
+    if info is not None:
+        value = getattr(info, attr, None)
+        if value is not None:
+            return value
+    return getattr(model, attr, None)
+
+
+def _format_size(size_bytes: int | None) -> str:
+    if size_bytes is None:
+        return ""
+    gib = size_bytes / 1024 / 1024 / 1024
+    return f"{gib:.1f}GB"
+
+
+def list_lmstudio_vision_models() -> list[LmStudioModelChoice]:
+    """LM Studio からダウンロード済みの画像対応 LLM を取得する。"""
+    import lmstudio as lms
+
+    try:
+        loaded_keys = {
+            str(getattr(handle.get_info(), "model_key", "") or handle.identifier)
+            for handle in lms.list_loaded_models()
+        }
+        downloaded_models = lms.list_downloaded_models()
+    except Exception as exc:
+        log(f"エラー: LM Studio に接続できません ({exc})")
+        sys.exit(1)
+
+    choices: list[LmStudioModelChoice] = []
+    for model in downloaded_models:
+        if _model_info_value(model, "type") != "llm":
+            continue
+        if _model_info_value(model, "vision") is not True:
+            continue
+
+        model_key = str(_model_info_value(model, "model_key") or "")
+        if not model_key:
+            continue
+
+        display_name = str(_model_info_value(model, "display_name") or model_key)
+        params_string = str(_model_info_value(model, "params_string") or "")
+        size_value = _model_info_value(model, "size_bytes")
+        size_bytes = size_value if isinstance(size_value, int) else None
+        choices.append(
+            LmStudioModelChoice(
+                model_key=model_key,
+                display_name=display_name,
+                params_string=params_string,
+                size_bytes=size_bytes,
+                is_loaded=model_key in loaded_keys,
+            )
+        )
+
+    if not choices:
+        log("エラー: LM Studio に画像対応のダウンロード済み LLM が見つかりません。")
+        sys.exit(1)
+
+    return choices
+
+
+def _format_model_choice(index: int, choice: LmStudioModelChoice) -> str:
+    details = [choice.params_string, _format_size(choice.size_bytes)]
+    detail_text = ", ".join(d for d in details if d)
+    loaded = " [loaded]" if choice.is_loaded else ""
+    suffix = f" ({detail_text})" if detail_text else ""
+    return f"  {index}. {choice.display_name}{suffix}{loaded}\n     {choice.model_key}"
+
+
+def _render_model_menu(
+    choices: list[LmStudioModelChoice],
+    selected_index: int,
+) -> list[str]:
+    lines = [
+        "LM Studio の画像対応モデル (↑/↓で選択, Enterで決定, qで中止):"
+    ]
+    for idx, choice in enumerate(choices):
+        details = [choice.params_string, _format_size(choice.size_bytes)]
+        detail_text = ", ".join(d for d in details if d)
+        loaded = " [loaded]" if choice.is_loaded else ""
+        suffix = f" ({detail_text})" if detail_text else ""
+        marker = ">" if idx == selected_index else " "
+        lines.append(
+            f"{marker} {idx + 1:2}. {choice.display_name}{suffix}{loaded}"
+        )
+        lines.append(f"     {choice.model_key}")
+    return lines
+
+
+def _redraw_model_menu(lines: list[str], previous_line_count: int) -> int:
+    if previous_line_count > 0:
+        print(f"\033[{previous_line_count}A", end="", file=sys.stderr)
+    for line in lines:
+        print(f"\033[2K\r{line}", file=sys.stderr)
+    return len(lines)
+
+
+def _read_key() -> str:
+    char = sys.stdin.read(1)
+    if char == "\x1b":
+        sequence = char
+        while select.select([sys.stdin], [], [], 0.02)[0]:
+            sequence += sys.stdin.read(1)
+            if len(sequence) >= 3:
+                break
+        return sequence
+    return char
+
+
+def _choose_model_with_arrow_keys(
+    choices: list[LmStudioModelChoice],
+    default_index: int,
+) -> str:
+    selected_index = default_index
+    previous_line_count = 0
+    escape_prefix = False
+    bracket_prefix = False
+    old_settings = termios.tcgetattr(sys.stdin.fileno())
+    try:
+        tty.setcbreak(sys.stdin.fileno())
+        print("\033[?25l", end="", file=sys.stderr)  # カーソル非表示
+        while True:
+            previous_line_count = _redraw_model_menu(
+                _render_model_menu(choices, selected_index),
+                previous_line_count,
+            )
+            key = _read_key()
+            if key == "\x1b":
+                escape_prefix = True
+                bracket_prefix = False
+                continue
+            if escape_prefix and key == "[":
+                escape_prefix = False
+                bracket_prefix = True
+                continue
+            if bracket_prefix:
+                bracket_prefix = False
+                if key == "A":
+                    selected_index = (selected_index - 1) % len(choices)
+                elif key == "B":
+                    selected_index = (selected_index + 1) % len(choices)
+                continue
+            escape_prefix = False
+
+            if key in ("\r", "\n"):
+                break
+            if key in ("q", "Q", "\x03", "\x04"):
+                print(file=sys.stderr)
+                log("中止しました。")
+                sys.exit(130)
+            if key in ("\x1b[A", "k"):
+                selected_index = (selected_index - 1) % len(choices)
+            elif key in ("\x1b[B", "j"):
+                selected_index = (selected_index + 1) % len(choices)
+    finally:
+        print("\033[?25h", end="", file=sys.stderr)  # カーソル再表示
+        termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old_settings)
+
+    choice = choices[selected_index]
+    log(f"選択モデル: {choice.model_key}")
+    return choice.model_key
+
+
+def _choose_model_with_number_prompt(
+    choices: list[LmStudioModelChoice],
+    default_index: int,
+) -> str:
+    log("LM Studio の画像対応モデル:")
+    for idx, choice in enumerate(choices, 1):
+        log(_format_model_choice(idx, choice))
+
+    while True:
+        default_choice = choices[default_index]
+        print(
+            f"使用するモデル番号を選択してください "
+            f"[Enter={default_index + 1}: {default_choice.model_key}]: ",
+            end="",
+            file=sys.stderr,
+            flush=True,
+        )
+        selected = sys.stdin.readline().strip()
+        if not selected:
+            choice = default_choice
+            break
+        if selected.isdecimal():
+            selected_index = int(selected) - 1
+            if 0 <= selected_index < len(choices):
+                choice = choices[selected_index]
+                break
+        for candidate in choices:
+            if selected == candidate.model_key:
+                choice = candidate
+                break
+        else:
+            log("番号または model_key を入力してください。")
+            continue
+        break
+
+    log(f"選択モデル: {choice.model_key}")
+    return choice.model_key
+
+
+def choose_lmstudio_model() -> str:
+    """起動時に一度だけ LM Studio の画像対応モデルを選択する。"""
+    choices = list_lmstudio_vision_models()
+    default_index = next(
+        (idx for idx, choice in enumerate(choices) if choice.is_loaded),
+        0,
+    )
+
+    if not sys.stdin.isatty():
+        log("エラー: --model が未指定ですが、対話入力できません。--model でモデル名を指定してください。")
+        sys.exit(1)
+
+    try:
+        return _choose_model_with_arrow_keys(choices, default_index)
+    except (termios.error, OSError):
+        return _choose_model_with_number_prompt(choices, default_index)
+
+
+def resolve_model_name(model_arg: str | None) -> str:
+    if model_arg:
+        return model_arg
+    return choose_lmstudio_model()
 
 
 def check_pandoc() -> None:
@@ -373,12 +613,137 @@ def load_progress(progress_file: Path) -> set[str]:
     """処理済みファイル名のセットを返す。"""
     if not progress_file.exists():
         return set()
-    return set(progress_file.read_text().strip().splitlines())
+    return {line for line in progress_file.read_text().splitlines() if line}
 
 
 def save_progress(progress_file: Path, filename: str) -> None:
     with open(progress_file, "a") as f:
         f.write(filename + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+
+
+def page_cache_dir_for(output_path: Path) -> Path:
+    return output_path.with_suffix(".progress.d")
+
+
+def completion_marker_for(output_path: Path) -> Path:
+    return output_path.with_suffix(".complete")
+
+
+def is_conversion_complete(output_path: Path) -> bool:
+    return output_path.exists() and completion_marker_for(output_path).exists()
+
+
+def remove_completion_marker(output_path: Path) -> None:
+    marker = completion_marker_for(output_path)
+    if marker.exists():
+        marker.unlink()
+
+
+def mark_conversion_complete(output_path: Path, total_pages: int, char_count: int) -> None:
+    marker_text = (
+        f"output={output_path.name}\n"
+        f"pages={total_pages}\n"
+        f"chars={char_count}\n"
+        f"completed_at={time.strftime('%Y-%m-%dT%H:%M:%S%z')}\n"
+    )
+    write_text_atomic(completion_marker_for(output_path), marker_text)
+
+
+def backup_incomplete_output(output_path: Path) -> Path:
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    candidate = output_path.with_name(
+        f"{output_path.stem}.partial-{timestamp}{output_path.suffix}"
+    )
+    counter = 1
+    while candidate.exists():
+        candidate = output_path.with_name(
+            f"{output_path.stem}.partial-{timestamp}-{counter}{output_path.suffix}"
+        )
+        counter += 1
+    output_path.replace(candidate)
+    return candidate
+
+
+def cache_page_filename(index: int, image_file: Path) -> str:
+    safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", image_file.name).strip("._")
+    if not safe_name:
+        safe_name = "page"
+    return f"{index:05d}-{safe_name}.md"
+
+
+def cache_page_path(progress_dir: Path, index: int, image_file: Path) -> Path:
+    return progress_dir / cache_page_filename(index, image_file)
+
+
+def load_cached_pages(progress_dir: Path, image_files: list[Path]) -> set[str]:
+    if not progress_dir.exists():
+        return set()
+    return {
+        image_file.name
+        for index, image_file in enumerate(image_files, 1)
+        if cache_page_path(progress_dir, index, image_file).exists()
+    }
+
+
+def write_text_atomic(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(f".{path.name}.tmp")
+    with open(tmp, "w") as f:
+        f.write(text)
+        f.flush()
+        os.fsync(f.fileno())
+    tmp.replace(path)
+
+
+def append_markdown_page(out: TextIO, text: str, needs_separator: bool) -> None:
+    if needs_separator:
+        out.write(PAGE_SEPARATOR)
+    out.write(text)
+    out.flush()
+    os.fsync(out.fileno())
+
+
+def has_markdown_content(output_path: Path) -> bool:
+    return output_path.exists() and output_path.stat().st_size > 0
+
+
+def rebuild_output_from_cache(
+    image_files: list[Path],
+    output_path: Path,
+    processed: set[str],
+    progress_dir: Path,
+) -> int:
+    """途中保存されたページ断片から出力 Markdown を復元する。"""
+    if has_markdown_content(output_path) or not processed or not progress_dir.exists():
+        return 0
+
+    restored = 0
+    with open(output_path, "w") as out:
+        for index, image_file in enumerate(image_files, 1):
+            if image_file.name not in processed:
+                continue
+            page_path = cache_page_path(progress_dir, index, image_file)
+            if not page_path.exists():
+                continue
+            text = page_path.read_text(errors="replace")
+            if not text:
+                continue
+            if restored > 0:
+                out.write(PAGE_SEPARATOR)
+            out.write(text)
+            restored += 1
+
+        if restored > 0:
+            out.flush()
+            os.fsync(out.fileno())
+
+    if restored == 0 and output_path.exists() and output_path.stat().st_size == 0:
+        output_path.unlink()
+    if restored > 0:
+        log(f"resume: 途中保存された Markdown から {restored} ページを復元しました。")
+    return restored
 
 
 # ---------------------------------------------------------------------------
@@ -453,10 +818,43 @@ def convert(
         sys.exit(1)
 
     progress_file = output_path.with_suffix(".progress")
-    processed = load_progress(progress_file) if resume else set()
+    progress_dir = page_cache_dir_for(output_path)
+
+    if resume and is_conversion_complete(output_path):
+        char_count = len(output_path.read_text(errors="replace"))
+        log(f"スキップ: 変換済み ({output_path.name}, {char_count:,} 文字)")
+        return char_count
+
+    remove_completion_marker(output_path)
+
+    if resume:
+        progress_pages = load_progress(progress_file)
+        cached_pages = load_cached_pages(progress_dir, image_files)
+        processed = progress_pages | cached_pages
+        rebuild_output_from_cache(
+            image_files=image_files,
+            output_path=output_path,
+            processed=processed,
+            progress_dir=progress_dir,
+        )
+        if progress_pages and not has_markdown_content(output_path) and not cached_pages:
+            log("resume: .progress はありますが Markdown 本文がないため、最初から処理します。")
+            processed = set()
+            progress_file.unlink()
+        if output_path.exists() and not processed and not is_conversion_complete(output_path):
+            backup_path = backup_incomplete_output(output_path)
+            log(f"resume: 完了マーカーのない既存 Markdown を退避しました: {backup_path.name}")
+    else:
+        processed = set()
+        if progress_file.exists():
+            progress_file.unlink()
+        if progress_dir.exists():
+            shutil.rmtree(progress_dir)
+        remove_completion_marker(output_path)
 
     # resume 時は既存ファイルに追記、それ以外は新規作成
     mode = "a" if resume and output_path.exists() else "w"
+    has_output_content = resume and has_markdown_content(output_path)
 
     skipped_blank = 0
     skipped_done = 0
@@ -494,10 +892,9 @@ def convert(
                 log("中断します。再実行で続きから自動再開します（--no-resume で最初から）。")
                 sys.exit(1)
 
-            if written > 0:
-                out.write("\n\n---\n\n")
-            out.write(text)
-            out.flush()
+            write_text_atomic(cache_page_path(progress_dir, i, image_file), text)
+            append_markdown_page(out, text, needs_separator=has_output_content)
+            has_output_content = True
             written += 1
             save_progress(progress_file, image_file.name)
 
@@ -509,6 +906,8 @@ def convert(
     # 完了時にプログレスファイルを削除
     if progress_file.exists():
         progress_file.unlink()
+    if progress_dir.exists():
+        shutil.rmtree(progress_dir)
 
     log(f"完了: {output_path}")
     log(f"  処理: {written}, 空白スキップ: {skipped_blank}, "
@@ -517,6 +916,7 @@ def convert(
         f"({elapsed / max(written, 1):.1f}s/page)")
 
     char_count = len(output_path.read_text(errors="replace"))
+    mark_conversion_complete(output_path, total, char_count)
     return char_count
 
 
@@ -597,8 +997,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--model",
-        default=DEFAULT_MODEL,
-        help=f"LM Studio モデル名 (デフォルト: {DEFAULT_MODEL})",
+        default=None,
+        help="LM Studio モデル名 (未指定時は起動時に画像対応モデルから選択)",
     )
     parser.add_argument(
         "--no-skip-blank",
@@ -652,9 +1052,15 @@ def main() -> None:
         # 単一画像ファイルの場合
         if input_path.suffix.lower() in SUPPORTED_EXTENSIONS:
             output_path = resolve_output_path(input_path, args.output)
-            check_lmstudio_connection(args.model, context_length=args.context_length)
-            text = recognize_single_image(args.model, input_path)
-            output_path.write_text(text)
+            model_name = resolve_model_name(args.model)
+            check_lmstudio_connection(model_name, context_length=args.context_length)
+            text = recognize_single_image(
+                model_name,
+                input_path,
+                max_image_size=args.max_image_size,
+                context_length=args.context_length,
+            )
+            write_text_atomic(output_path, text)
             log(f"完了: {output_path}")
             char_count = len(output_path.read_text(errors="replace"))
             log("\n変換結果:")
@@ -674,8 +1080,9 @@ def main() -> None:
         if epub_files:
             # EPUB が1つ以上ある → 各EPUBを個別処理
             check_pandoc()
-            log(f"LM Studio 接続チェック (モデル: {args.model})...")
-            check_lmstudio_connection(args.model, context_length=args.context_length)
+            model_name = resolve_model_name(args.model)
+            log(f"LM Studio 接続チェック (モデル: {model_name})...")
+            check_lmstudio_connection(model_name, context_length=args.context_length)
 
             log(f"フォルダ内に {len(epub_files)} 件の EPUB を検出")
             processed_count = 0
@@ -691,9 +1098,8 @@ def main() -> None:
                 if args.output and len(epub_files) == 1:
                     out = Path(args.output).expanduser().resolve()
 
-                # 変換済みスキップ: .progress が無く .md がある → 完了済み
-                progress_file = out.with_suffix(".progress")
-                if not progress_file.exists() and out.exists() and resume:
+                # 変換済みスキップ: 完了マーカーがある場合のみ完了済みとみなす
+                if is_conversion_complete(out) and resume:
                     char_count = len(out.read_text(errors="replace"))
                     log(f"スキップ: 変換済み ({out.name}, {char_count:,} 文字)")
                     log(f"{'='*60}")
@@ -705,7 +1111,7 @@ def main() -> None:
                     char_count = process_single_epub(
                         epub_path=epub,
                         output_path=out,
-                        model_name=args.model,
+                        model_name=model_name,
                         skip_blank=skip_blank,
                         resume=resume,
                         blank_threshold=args.blank_threshold,
@@ -735,13 +1141,14 @@ def main() -> None:
         if has_images:
             # 画像のみのディレクトリ → 従来通りOCR
             output_path = resolve_output_path(input_path, args.output)
-            log(f"LM Studio 接続チェック (モデル: {args.model})...")
-            check_lmstudio_connection(args.model, context_length=args.context_length)
+            model_name = resolve_model_name(args.model)
+            log(f"LM Studio 接続チェック (モデル: {model_name})...")
+            check_lmstudio_connection(model_name, context_length=args.context_length)
             image_files = collect_ordered_images(input_path, None)
             char_count = convert(
                 image_files=image_files,
                 output_path=output_path,
-                model_name=args.model,
+                model_name=model_name,
                 skip_blank=skip_blank,
                 resume=resume,
                 blank_threshold=args.blank_threshold,
@@ -758,20 +1165,20 @@ def main() -> None:
     # 単一 EPUB ファイル
     output_path = resolve_output_path(input_path, args.output)
 
-    # 変換済みスキップ: .progress が無く .md がある → 完了済み
-    progress_file = output_path.with_suffix(".progress")
-    if not progress_file.exists() and output_path.exists() and resume:
+    # 変換済みスキップ: 完了マーカーがある場合のみ完了済みとみなす
+    if is_conversion_complete(output_path) and resume:
         char_count = len(output_path.read_text(errors="replace"))
         log(f"スキップ: {input_path.name} は変換済みです ({output_path.name}, {char_count:,} 文字)")
         return
 
     check_pandoc()
-    log(f"LM Studio 接続チェック (モデル: {args.model})...")
-    check_lmstudio_connection(args.model, context_length=args.context_length)
+    model_name = resolve_model_name(args.model)
+    log(f"LM Studio 接続チェック (モデル: {model_name})...")
+    check_lmstudio_connection(model_name, context_length=args.context_length)
     char_count = process_single_epub(
         epub_path=input_path,
         output_path=output_path,
-        model_name=args.model,
+        model_name=model_name,
         skip_blank=skip_blank,
         resume=resume,
         blank_threshold=args.blank_threshold,
