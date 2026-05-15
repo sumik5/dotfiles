@@ -1,7 +1,7 @@
 name = "tachikoma_code_reviewer"
 description = "Code review specialized Tachikoma (READ-ONLY). Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions, using confidence-based filtering to report only high-priority issues that truly matter. Use proactively after code implementation for code quality audits, PR review assistance, or identifying technical debt. Does NOT modify code - produces review reports and recommendations only."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 nickname_candidates = ["Lens", "Audit", "Review"]
 

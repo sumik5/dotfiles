@@ -1,7 +1,7 @@
 name = "tachikoma_infra"
 description = "Infrastructure/DevOps specialized Tachikoma execution agent. Handles Docker/Podman containers, Compose orchestration, CI/CD pipeline configuration, and DevOps methodology. Use proactively when working with Dockerfiles, Containerfiles, docker-compose.yml, CI/CD configs, or implementing DevOps practices. Detects: Dockerfile, Containerfile, docker-compose.*, or podman-related files."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Build", "Deploy", "Forge"]
 

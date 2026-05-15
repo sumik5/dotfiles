@@ -1,7 +1,7 @@
 name = "tachikoma_go"
 description = "Go specialized Tachikoma execution agent. Handles Go development including clean code practices, GoF/concurrency/DDD design patterns, and Go internals (type system, memory, reflection). Use proactively when working on Go projects or writing Go code. Detects: go.mod."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Gopher", "Mutex", "Channel"]
 

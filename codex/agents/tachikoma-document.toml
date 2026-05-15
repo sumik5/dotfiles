@@ -1,7 +1,7 @@
 name = "tachikoma_document"
 description = "Documentation and technical writing specialized Tachikoma execution agent. Handles technical documentation (7Cs principle), README creation, LaTeX academic reports, Zenn tech articles, and AI-assisted copywriting. Use proactively when creating documentation, writing READMEs, writing tech blog posts, preparing academic reports, or crafting marketing copy. Does NOT write application code."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Draft", "Proof", "Index"]
 

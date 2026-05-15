@@ -1,7 +1,7 @@
 name = "tachikoma_ai_ml"
 description = "AI/ML development specialized Tachikoma execution agent. Handles Vercel AI SDK integration, LangChain.js, RAG system building, MCP server/client development, LLMOps operations, and AI-assisted development patterns. Use proactively when building AI-powered web features, RAG pipelines, MCP integrations, or LLM application deployment. Detects: ai/@vercel/ai/@langchain in package.json, google-adk in Python deps, or @modelcontextprotocol/sdk."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Vector", "Relay", "Flux"]
 

@@ -1,7 +1,7 @@
 name = "tachikoma_database"
 description = "Database specialized Tachikoma execution agent. Handles relational database design, normalization, SQL optimization, schema migrations, database testing, and database internals understanding. Use proactively when designing database schemas, writing complex SQL, optimizing queries, planning migrations, writing database tests, or troubleshooting database performance. Detects: .sql files, schema.prisma, or DB-related packages."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Index", "Query", "Schema"]
 

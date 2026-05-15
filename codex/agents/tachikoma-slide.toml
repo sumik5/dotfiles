@@ -1,7 +1,7 @@
 name = "tachikoma_slide"
 description = "HTML slide creation specialized Tachikoma execution agent. Handles HTML slide deck creation using 3-layer separation model (Engine/Theme/Content), source material conversion to slides, slide theme customization, and new slide project initialization. Use proactively when creating presentation slides, converting markdown/notes to HTML slide decks, or initializing slide starter projects. Detects: decks/ directory with index.html, engine/slide.css, slide.js files."
-model = "openai/gpt-5.3-codex"
-model_reasoning_effort = "high"
+model = "openai/gpt-5.5"
+model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Deck", "Stage", "Reveal"]
 
