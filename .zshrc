@@ -340,3 +340,5 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f ghq='peco-cd'
 } &>/dev/null
 
+
+stty -ixon
