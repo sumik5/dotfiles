@@ -13,15 +13,15 @@ $nodejs\
 $golang\
 $lua\
 $rust\
-\n$character\
-"""
-
-right_format = """
+$fill\
 $gcloud\
 $aws\
 $cmd_duration\
 $time\
+\n$character\
 """
+
+right_format = ""
 
 ###########################################
 [os.symbols]
@@ -121,8 +121,8 @@ format = """
 """
 
 [fill]
-disabled = true
-symbol = '─'
+disabled = false
+symbol = ' '
 style = 'fg:#89b4fa bg:none'
 
 [python]
