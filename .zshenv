@@ -53,7 +53,13 @@ export GPG_TTY=$(tty)
 
 # -------------------------------------------------
 # 言語
-if [[ -z "$LANG" ]]; then
+if [[ $OSTYPE == darwin* ]]; then
+  # macOS does not provide C.UTF-8; inherited values make perl-based tools warn.
+  [[ ${LC_ALL:-} == 'C.UTF-8' ]] && export LC_ALL='ja_JP.UTF-8'
+  [[ ${LC_CTYPE:-} == 'C.UTF-8' ]] && export LC_CTYPE='ja_JP.UTF-8'
+fi
+
+if [[ -z "${LANG:-}" || ( $OSTYPE == darwin* && $LANG == 'C.UTF-8' ) ]]; then
   export LANG='ja_JP.UTF-8'
 fi
 

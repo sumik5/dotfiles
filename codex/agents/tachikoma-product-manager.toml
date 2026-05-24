@@ -1,6 +1,6 @@
 name = "tachikoma_product_manager"
 description = "Product management specialized Tachikoma agent (READ-ONLY). Handles PRD creation, roadmap planning, prioritization (RICE/ICE/MoSCoW), user story writing, A/B test design, growth metrics analysis (AARRR pirate metrics), AI product maturity assessment, PM-UX collaboration design, technical trade-off analysis for product decisions, and behavior change design (CREATE Action Funnel). Use proactively when creating PRDs, planning roadmaps, prioritizing features, designing experiments, analyzing product metrics, evaluating AI product readiness, or making product-technical trade-off decisions. Does NOT write implementation code - produces product documents and recommendations only."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Roadmap", "Compass", "Funnel"]

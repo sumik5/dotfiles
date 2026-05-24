@@ -1,6 +1,6 @@
 name = "tachikoma_nextjs"
 description = "Next.js/React specialized Tachikoma execution agent. Handles Next.js 16 App Router, Server Components, React 19 features, Turbopack, Cache Components, and next-devtools MCP integration. Use proactively when implementing Next.js pages, components, API routes, middleware, or React features in Next.js projects. Detects: package.json with 'next' dependency."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Route", "Server", "Cache"]

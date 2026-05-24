@@ -1,6 +1,6 @@
 name = "tachikoma_design_system"
 description = "Design system construction and governance specialized Tachikoma execution agent. Handles design system architecture, component pattern libraries, Figma variable/token management, design system governance, and organizational adoption strategy. Use proactively when building or evolving design systems, establishing component governance, defining design tokens at architecture level, or planning design system rollout across teams. Detects: design system architecture tasks, design-tokens directories, or component library governance needs."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Token", "Pattern", "Scale"]

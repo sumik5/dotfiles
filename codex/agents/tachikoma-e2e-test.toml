@@ -1,6 +1,6 @@
 name = "tachikoma_e2e_test"
 description = "E2E testing and browser automation specialized Tachikoma execution agent. Handles Playwright test design, browser automation via agent-browser CLI, visual testing, accessibility testing, and CI/CD integration. Use proactively when writing E2E tests with Playwright, automating browser interactions, or setting up browser-based test infrastructure. Detects: playwright.config.* files."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Trace", "Pixel", "Replay"]

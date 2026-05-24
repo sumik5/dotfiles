@@ -1,6 +1,6 @@
 name = "tachikoma_typescript"
 description = "TypeScript specialized Tachikoma execution agent. Handles advanced type system patterns, generics, conditional types, GoF design patterns in TypeScript, and type-safe architecture. Use proactively when deep TypeScript expertise is needed: complex type definitions, type refactoring, generic utility creation, or migrating JavaScript to TypeScript. Detects: tsconfig.json."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Type", "Guard", "Infer"]

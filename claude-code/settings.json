@@ -46,6 +46,7 @@
     ],
     "defaultMode": "default"
   },
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -163,5 +164,8 @@
   "alwaysThinkingEnabled": true,
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-daltonized",
+  "editorMode": "vim",
+  "verbose": true,
   "teammateMode": "tmux"
 }

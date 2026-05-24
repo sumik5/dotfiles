@@ -1,6 +1,6 @@
 name = "tachikoma_frontend"
 description = "Frontend component implementation specialized Tachikoma execution agent. Handles component implementation with shadcn/ui, Storybook story creation and interaction testing, and data visualization (charts/dashboards). Use proactively when creating UI components with shadcn/ui, writing Storybook stories, building interactive interfaces, or creating data charts/dashboards. For design principles, Figma integration, design systems, or Tailwind CSS architecture, use タチコマ（デザイン） instead. Detects: components.json, .stories.tsx/.ts files."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Canvas", "Widget", "Signal"]

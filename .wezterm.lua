@@ -34,6 +34,18 @@ config.keys = {
     mods = "CTRL",
     action = wezterm.action.ActivatePaneDirection "Next",
   },
+  {
+    key = "n",
+    mods = "CMD|SHIFT",
+    action = wezterm.action.PromptInputLine {
+      description = "Enter new name for tab",
+      action = wezterm.action_callback(function(window, pane, line)
+        if line ~= nil then
+          window:active_tab():set_title(line)
+        end
+      end),
+    },
+  },
 }
 
 ----------------------------------------------------

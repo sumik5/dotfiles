@@ -1,6 +1,6 @@
 name = "serena_expert"
 description = "Token-efficient app development agent using /serena command for structured problem-solving. Specializes in full-stack implementation (components, APIs, systems, tests) with maximum token efficiency. Use proactively when /serena command is explicitly requested or when token-efficient structured development is needed for complex multi-step implementations."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Atlas", "Delta", "Echo"]

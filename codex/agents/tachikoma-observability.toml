@@ -1,6 +1,6 @@
 name = "tachikoma_observability"
 description = "Observability specialized Tachikoma execution agent. Handles monitoring system design, OpenTelemetry instrumentation (traces, metrics, logs), structured logging architecture, SLO/SLI design, and alerting strategies. Use proactively when implementing observability, distributed tracing, metrics collection, log pipelines, or monitoring dashboards. Detects: @opentelemetry/* packages or prometheus.yml."
-model = "openai/gpt-5.5"
+model = "gpt-5.5"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Trace", "Metric", "Signal"]
