@@ -8,10 +8,33 @@ config.font = wezterm.font_with_fallback({
   { family = "Moralerspace Argon HW" }
 })
 config.use_ime = true
-config.window_background_opacity = 0.5
+config.window_background_opacity = 0.9
 config.macos_window_background_blur = 10
+config.inactive_pane_hsb = {
+  saturation = 0.25,
+  brightness = 0.25,
+}
 -- config.window_decorations = "RESIZE"
 config.color_scheme = "iTerm2 Tango Dark"
+
+-- Pane
+config.keys = {
+  {
+    key = "|",
+    mods = "CMD|SHIFT",
+    action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
+  },
+  {
+    key = "-",
+    mods = "CMD|SHIFT",
+    action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" },
+  },
+  {
+    key = "o",
+    mods = "CTRL",
+    action = wezterm.action.ActivatePaneDirection "Next",
+  },
+}
 
 ----------------------------------------------------
 -- Tab
