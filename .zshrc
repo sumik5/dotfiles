@@ -342,3 +342,9 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
 
 
 stty -ixon
+
+
+# WezTerm tmux shim for Claude Code Agent Team
+if [[ -n "${WEZTERM_PANE:-}" ]] && [[ -z "${TMUX:-}" ]]; then
+  export TMUX="wezterm-shim/${WEZTERM_PANE}/0"
+fi
