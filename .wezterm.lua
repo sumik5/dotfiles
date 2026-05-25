@@ -8,7 +8,7 @@ config.font = wezterm.font_with_fallback({
   { family = "Moralerspace Argon HW" }
 })
 config.use_ime = true
-config.window_background_opacity = 0.9
+config.window_background_opacity = 0.75
 config.macos_window_background_blur = 10
 config.inactive_pane_hsb = {
   saturation = 0.25,
