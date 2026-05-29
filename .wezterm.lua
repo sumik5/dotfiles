@@ -48,7 +48,7 @@ config.keys = {
   },
   {
     key = "o",
-    mods = "CMD|SHIFT",
+    mods = "CTRL|SHIFT",
     action = wezterm.action.ActivateTabRelative(1),
   },
 }
