@@ -31,7 +31,7 @@ config.keys = {
   },
   {
     key = "o",
-    mods = "CTRL",
+    mods = "CMD",
     action = wezterm.action.ActivatePaneDirection "Next",
   },
   {
@@ -48,7 +48,7 @@ config.keys = {
   },
   {
     key = "o",
-    mods = "CTRL|SHIFT",
+    mods = "CMD|SHIFT",
     action = wezterm.action.ActivateTabRelative(1),
   },
 }
