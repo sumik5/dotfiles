@@ -477,13 +477,26 @@ def is_image_based_epub(epub_path: Path, work_dir: Path) -> tuple[bool, Path, li
     return is_image, md_path, order
 
 
+def natural_sort_key(path: Path) -> list[int | str]:
+    """ファイル名を数値部分で自然順ソートするためのキーを生成する。
+
+    辞書順では "1.jpg", "10.jpg", "100.jpg", "2.jpg" の順になってしまうため、
+    ファイル名を「非数字／数字」の交互トークンに分解し、数字トークンを int 化
+    することで "1, 2, ..., 10, ..., 100" の数値順に並べる。
+    """
+    return [
+        int(token) if token.isdigit() else token.lower()
+        for token in re.split(r"(\d+)", path.name)
+    ]
+
+
 def collect_ordered_images(
     img_dir: Path,
     page_order: list[str] | None,
 ) -> list[Path]:
     """ページ順リストに基づいて画像ファイルを収集する。
 
-    page_order が None の場合（ディレクトリ直接入力）はファイル名ソート。
+    page_order が None の場合（ディレクトリ直接入力）はファイル名の自然順ソート。
     """
     if page_order:
         files = []
@@ -494,10 +507,13 @@ def collect_ordered_images(
         if files:
             return files
 
-    # フォールバック: ファイル名ソート
+    # フォールバック: ファイル名の自然順ソート（数値を数値として比較）
     return sorted(
-        f for f in img_dir.iterdir()
-        if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+        (
+            f for f in img_dir.iterdir()
+            if f.is_file() and f.suffix.lower() in SUPPORTED_EXTENSIONS
+        ),
+        key=natural_sort_key,
     )
 
 
