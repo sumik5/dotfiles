@@ -21,22 +21,22 @@ config.color_scheme = "iTerm2 Tango Dark"
 config.keys = {
   {
     key = "|",
-    mods = "CMD|SHIFT",
+    mods = "CMD|CTRL",
     action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
   },
   {
     key = "-",
-    mods = "CMD|SHIFT",
+    mods = "CMD|CTRL",
     action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" },
   },
   {
     key = "o",
-    mods = "CMD",
+    mods = "CTRL",
     action = wezterm.action.ActivatePaneDirection "Next",
   },
   {
     key = "n",
-    mods = "CMD|SHIFT",
+    mods = "CMD|CTRL",
     action = wezterm.action.PromptInputLine {
       description = "Enter new name for tab",
       action = wezterm.action_callback(function(window, pane, line)
@@ -48,7 +48,7 @@ config.keys = {
   },
   {
     key = "o",
-    mods = "CMD|SHIFT",
+    mods = "CTRL|CMD",
     action = wezterm.action.ActivateTabRelative(1),
   },
 }
