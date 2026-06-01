@@ -517,6 +517,23 @@ def collect_ordered_images(
     )
 
 
+def collect_image_subdirectories(parent: Path) -> list[Path]:
+    """親ディレクトリ直下の、画像を含むサブディレクトリを自然順で返す。"""
+    subdirs: list[Path] = []
+    for entry in parent.iterdir():
+        if not entry.is_dir():
+            continue
+        if entry.name.startswith("."):
+            continue
+        has_image = any(
+            child.is_file() and child.suffix.lower() in SUPPORTED_EXTENSIONS
+            for child in entry.iterdir()
+        )
+        if has_image:
+            subdirs.append(entry)
+    return sorted(subdirs, key=natural_sort_key)
+
+
 # ---------------------------------------------------------------------------
 # OCR
 # ---------------------------------------------------------------------------
@@ -999,6 +1016,7 @@ def main() -> None:
             "  %(prog)s book.epub -o ~/Desktop/book.md  # 出力先指定\n"
             "  %(prog)s ./epub-folder/                  # フォルダ内の全EPUB\n"
             "  %(prog)s ./scanned-pages/                # 画像ディレクトリ\n"
+            "  %(prog)s ./parent-folder/                # サブフォルダ毎に.md化\n"
             "  %(prog)s book.epub --no-resume            # 最初からやり直し\n"
         ),
     )
@@ -1088,6 +1106,7 @@ def main() -> None:
     # ディレクトリ指定時: EPUB が含まれていれば各EPUBを個別処理
     if is_dir:
         epub_files = sorted(input_path.glob("*.epub"))
+        image_subdirs = collect_image_subdirectories(input_path)
         has_images = any(
             f.suffix.lower() in SUPPORTED_EXTENSIONS
             for f in input_path.iterdir() if f.is_file()
@@ -1152,6 +1171,69 @@ def main() -> None:
                 log("\n変換結果:")
                 for epub_name, md_name, chars in results:
                     log(f"  {epub_name} → {md_name} ({chars:,} 文字)")
+            return
+
+        if image_subdirs:
+            model_name = resolve_model_name(args.model)
+            log(f"LM Studio 接続チェック (モデル: {model_name})...")
+            check_lmstudio_connection(model_name, context_length=args.context_length)
+
+            log(f"フォルダ内に {len(image_subdirs)} 件の画像サブフォルダを検出")
+            processed_count = 0
+            skipped_done = 0
+            skipped_error = 0
+            skipped_no_image = 0
+            subdir_results: list[tuple[str, str, int]] = []
+
+            for idx, subdir in enumerate(image_subdirs, 1):
+                log(f"\n{'='*60}")
+                log(f"[{idx}/{len(image_subdirs)}] {subdir.name}")
+
+                out = input_path / f"{subdir.name}.md"
+
+                if is_conversion_complete(out) and resume:
+                    char_count = len(out.read_text(errors="replace"))
+                    log(f"スキップ: 変換済み ({out.name}, {char_count:,} 文字)")
+                    log(f"{'='*60}")
+                    skipped_done += 1
+                    subdir_results.append((subdir.name, out.name, char_count))
+                    continue
+
+                image_files = collect_ordered_images(subdir, None)
+                if not image_files:
+                    log(f"スキップ: {subdir.name} に画像がありません")
+                    log(f"{'='*60}")
+                    skipped_no_image += 1
+                    continue
+
+                try:
+                    char_count = convert(
+                        image_files=image_files,
+                        output_path=out,
+                        model_name=model_name,
+                        skip_blank=skip_blank,
+                        resume=resume,
+                        blank_threshold=args.blank_threshold,
+                        max_image_size=args.max_image_size,
+                        context_length=args.context_length,
+                    )
+                except Exception as exc:
+                    log(f"エラー: {exc}")
+                    log(f"{'='*60}")
+                    skipped_error += 1
+                    continue
+
+                log(f"{'='*60}")
+                processed_count += 1
+                subdir_results.append((subdir.name, out.name, char_count))
+
+            log(f"\n全 {len(image_subdirs)} 件完了 "
+                f"(OCR処理: {processed_count}, 変換済みスキップ: {skipped_done}, "
+                f"画像なしスキップ: {skipped_no_image}, エラースキップ: {skipped_error})")
+            if subdir_results:
+                log("\n変換結果:")
+                for subdir_name, md_name, chars in subdir_results:
+                    log(f"  {subdir_name}/ → {md_name} ({chars:,} 文字)")
             return
 
         if has_images:
