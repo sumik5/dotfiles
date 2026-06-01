@@ -199,17 +199,44 @@ handle_new_window() {
     esac
   done
 
-  local cmd=(wezterm cli spawn)
+  # tmux の new-window/new-session は WezTerm では「新しいタブ」になってしまうため、
+  # spawn ではなく split-pane を使い現在のタブ内に pane を作る。
+  # レイアウト: 右カラムが無ければ本体を右分割で新設、あれば右カラム最下部に縦積み。
+  local split_target="$WEZTERM_PANE"
+  local split_dir="--right"
+
+  local decision
+  decision=$(get_pane_list_json | python3 -c "
+import sys, json
+panes = json.load(sys.stdin)
+cur_id = '$WEZTERM_PANE'
+cur = next((p for p in panes if str(p['pane_id']) == cur_id), None)
+if cur is None:
+    sys.exit(1)
+tab = cur['tab_id']
+cur_left = cur['left_col']
+right_panes = [p for p in panes if p['tab_id'] == tab and p['left_col'] > cur_left]
+if not right_panes:
+    print(f'{cur_id} --right')
+else:
+    max_left = max(p['left_col'] for p in right_panes)
+    rightmost = [p for p in right_panes if p['left_col'] == max_left]
+    bottom = max(rightmost, key=lambda p: p['top_row'])
+    print(f\"{bottom['pane_id']} --bottom\")
+" 2>/dev/null)
+
+  if [[ -n "$decision" ]]; then
+    split_target="${decision%% *}"
+    split_dir="${decision##* }"
+  fi
+
+  local cmd=(wezterm cli split-pane "$split_dir" --pane-id "$split_target")
   if [[ ${#prog[@]} -gt 0 ]]; then
     cmd+=(-- "${prog[@]}")
   fi
 
   local new_pane_id
   new_pane_id=$("${cmd[@]}" 2>/dev/null)
-
-  if [[ -n "$name" ]]; then
-    wezterm cli set-tab-title "$name" --pane-id "$new_pane_id" 2>/dev/null || true
-  fi
 
   if [[ "$print_pane" == true ]]; then
     add_pane_prefix "$new_pane_id"
