@@ -347,4 +347,5 @@ stty -ixon
 # WezTerm tmux shim for Claude Code Agent Team
 if [[ -n "${WEZTERM_PANE:-}" ]] && [[ -z "${TMUX:-}" ]]; then
   export TMUX="wezterm-shim/${WEZTERM_PANE}/0"
+  export TMUX_PANE="%${WEZTERM_PANE}"
 fi
