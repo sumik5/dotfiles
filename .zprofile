@@ -16,6 +16,13 @@ if [ -f /usr/libexec/path_helper ]; then
 fi
 
 # -------------------------------------------------
+# WezTerm tmux shim を本物 tmux より優先
+# brew shellenv / path_helper が PATH を再構築し $HOME/dotfiles/bin を
+# /opt/homebrew/bin の後ろへ押しやるため、ここで先頭へ再宣言する。
+# （typeset -gU path により重複は自動排除される）
+path=("$HOME/dotfiles/bin" $path)
+
+# -------------------------------------------------
 # 一時ディレクトリ
 if [[ ! -d "$TMPDIR" ]]; then
   export TMPDIR="/tmp/$LOGNAME"

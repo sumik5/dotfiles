@@ -561,6 +561,23 @@ case "$cmd" in
     # No-op: WezTerm doesn't have layout algorithms like tmux
     exit 0
     ;;
+  set-option|set|set-window-option|setw|set-hook|set-environment|rename-window|rename-session|respawn-pane|pipe-pane|wait-for)
+    # No-op: these commands have no meaningful WezTerm equivalent
+    exit 0
+    ;;
+  list-windows)
+    # WezTerm のタブを tmux ウィンドウとして列挙（-a/-F/-t フラグは無視）
+    get_pane_list_json | python3 -c "
+import sys, json
+panes = json.load(sys.stdin)
+seen = set()
+for p in panes:
+    tid = p['tab_id']
+    if tid not in seen:
+        seen.add(tid)
+        print(f'@{tid}')
+"
+    ;;
   select-pane)
     handle_select_pane "$@"
     ;;
@@ -596,7 +613,7 @@ case "$cmd" in
     exit 0
     ;;
   *)
-    echo "tmux-shim: unsupported command: $cmd" >&2
-    exit 1
+    echo "tmux-shim: ignoring unsupported command: $cmd" >&2
+    exit 0
     ;;
 esac
