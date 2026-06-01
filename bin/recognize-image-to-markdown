@@ -37,6 +37,8 @@ from typing import TextIO
 SUPPORTED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".webp"}
 DEFAULT_BLANK_THRESHOLD = 15360  # 15KB
 DEFAULT_RECOGNITION_TIMEOUT = 240  # 4分
+DEFAULT_MAX_REPEAT = 4  # OCR反復崩壊検出: 同一行がこの回数以上連続したら崩壊とみなす
+DEFAULT_CONTAMINATION_THRESHOLD = 0.30  # 思考ログ汚染スコアがこの値以上なら再OCR
 
 
 class RecognitionTimeoutError(Exception):
@@ -47,8 +49,14 @@ def _timeout_handler(signum: int, frame: object) -> None:
     raise RecognitionTimeoutError("認識処理が2分を超えたため中断しました")
 
 RECOGNITION_PROMPT = (
-    "添付の画像を文字に変換し、markdown形式で返信してください。"
-    "前後の不要なシステムメッセージは不要であり、画像の内容のみ返信してください"
+    "添付の画像を、書かれている文字だけを忠実に Markdown に書き起こしてください。"
+    "次のルールを厳守してください。\n"
+    "1. 画像の内容のみを出力する。思考・推論・自己説明・前置き・後書きは一切書かない。\n"
+    "2. 画像に無い文字や内容を創作・補完しない。\n"
+    "3. 読み取れない文字は推測を繰り返さず、伏字「□」1文字に置き換える。\n"
+    "4. カタカナ「ア・イ・ウ・エ・オ」を漢字（工・才 等）に変換しない。カタカナはカタカナのまま書く。\n"
+    "5. 「○」「×」などの記号は画像のとおり正確に書き写す。\n"
+    "6. 表は Markdown のテーブル記法で書く。"
 )
 PAGE_SEPARATOR = "\n\n---\n\n"
 
@@ -345,6 +353,109 @@ def strip_think_tags(text: str) -> str:
     return text.strip()
 
 
+# ---------------------------------------------------------------------------
+# OCR 後処理: 反復崩壊・思考ログ汚染の検出（純粋関数・予防/一次治療）
+#   VLM が出力に混入させる思考ログ・無限ループ崩壊を「発生源に最も近い場所」で
+#   検出し、呼び出し側が再OCR(リトライ)を判断できるようシグナルを返す。
+#   ⚠️ CJK/カタカナ字形混同(エ→工 等)の機械置換はここで行わない。本文中の正規の
+#      「工」「才」を破壊する誤爆リスクが高く、文脈依存の正規化は消費側の責務とする。
+# ---------------------------------------------------------------------------
+
+# 思考ログの行頭アンカー（明確なメタ専用行のみ除去対象にする）
+_THINK_ANCHORS = [
+    # 英語メタ・システムプロンプト復唱
+    r"^\s*\d*\.?\s*\*{0,2}(?:Analyze the Request|Scan the Image|Transcribe Section|"
+    r"Final Formatting|Self-Correction|Mental Draft)",
+    r"^The user wants the text",
+    # 英語仮説検証ループ
+    r"^\s*\*{0,2}Hypothesis\s*\d*\s*[:：]",
+    r"^Let'?s look at (?:the|this) character",
+    r"^Testing the hypothesis",
+    r"^Confirming the reading",
+    # 日本語自問自答ループ
+    r"^(?:画像の(?:分析|文字)|いや、待て|よし、「.+?」|もう一度)",
+    # 三人称セルフ説明
+    r"^(?:ユーザーは.+画像|これは.+問題だと|実際には.+(?:右から|左から)|画像を拡大して)",
+]
+_THINK_RE = re.compile("|".join(_THINK_ANCHORS))
+# 簡体字トークン: 崩壊の補助シグナル（出現で加点。単独では除去しない）
+_SIMPLIFIED_RE = re.compile(r"一组|组")
+# ○×判定マーカー単独行: メタ除去から保護する
+_OXMARK_ONLY_RE = re.compile(r"^\s*[○×✕〇◯❌☓OXＯＸ]\s*$")
+
+
+def collapse_repeated_lines(
+    text: str, max_repeat: int = DEFAULT_MAX_REPEAT
+) -> tuple[str, bool]:
+    """同一（正規化）行が max_repeat 回以上連続する反復崩壊を 1 回に畳む。
+
+    正規化は strip + 連続空白の単一空白化で行い、末尾空白や全角・半角空白の
+    揺れで反復を取り逃さないようにする。崩壊を 1 箇所でも検出すれば collapsed=True。
+    検出した反復は破棄せず 1 回だけ残す（再OCR上限到達時も消費側がサルベージできる
+    余地を保つため）。空行は反復カウントの対象外。
+    """
+    lines = text.split("\n")
+    out: list[str] = []
+    collapsed = False
+    i = 0
+    n = len(lines)
+    while i < n:
+        norm = " ".join(lines[i].split())
+        j = i + 1
+        while j < n and " ".join(lines[j].split()) == norm:
+            j += 1
+        run = j - i
+        if norm != "" and run >= max_repeat:
+            collapsed = True
+            out.append(lines[i])  # 1 回だけ残す（破棄しない）
+        else:
+            out.extend(lines[i:j])
+        i = j
+    return "\n".join(out), collapsed
+
+
+def detect_thinking_contamination(text: str) -> tuple[str, float]:
+    """思考ログ混入を検出し、明確なメタ専用行のみ除去して汚染スコアを返す。
+
+    本文を巻き込む危険な除去はしない（アンカーに明確一致した行だけ削る）。
+    ○×判定マーカー単独行は除去対象から保護する。スコアはメタ行比率に簡体字
+    出現の加点を加えた 0.0〜1.0 の値で、呼び出し側が再OCR判断に使う。
+    """
+    lines = text.split("\n")
+    kept: list[str] = []
+    meta_hits = 0
+    nonblank = 0
+    for ln in lines:
+        if ln.strip() == "":
+            kept.append(ln)
+            continue
+        nonblank += 1
+        if _OXMARK_ONLY_RE.match(ln):  # 判定マーカーは保護（先に判定）
+            kept.append(ln)
+            continue
+        if _THINK_RE.search(ln):
+            meta_hits += 1
+            continue  # メタ専用行のみ除去
+        kept.append(ln)
+    base = (meta_hits / nonblank) if nonblank else 0.0
+    bonus = 0.15 if _SIMPLIFIED_RE.search(text) else 0.0
+    score = min(1.0, base + bonus)
+    return "\n".join(kept), score
+
+
+def postprocess_ocr_page(
+    text: str, max_repeat: int = DEFAULT_MAX_REPEAT
+) -> tuple[str, bool, float]:
+    """反復崩壊の圧縮 → 思考ログ検出 を順に適用する。
+
+    Returns:
+        (cleaned_text, collapsed, contamination_score)
+    """
+    text, collapsed = collapse_repeated_lines(text, max_repeat=max_repeat)
+    text, score = detect_thinking_contamination(text)
+    return text, collapsed, score
+
+
 def is_blank_image(path: Path, threshold: int = DEFAULT_BLANK_THRESHOLD) -> bool:
     return path.stat().st_size <= threshold
 
@@ -588,6 +699,9 @@ def recognize_single_image(
     max_image_size: int = 1280,
     context_length: int = 0,
     timeout: int = DEFAULT_RECOGNITION_TIMEOUT,
+    ocr_cleanup: bool = True,
+    max_repeat: int = DEFAULT_MAX_REPEAT,
+    contamination_threshold: float = DEFAULT_CONTAMINATION_THRESHOLD,
 ) -> str:
     import lmstudio as lms
 
@@ -612,7 +726,7 @@ def recognize_single_image(
                     chat = lms.Chat()
                     chat.add_user_message(RECOGNITION_PROMPT, images=[image_handle])
                     result = model.respond(chat)
-                    return strip_think_tags(result.content)
+                    text = strip_think_tags(result.content)
                 finally:
                     signal.alarm(0)
                     signal.signal(signal.SIGALRM, old_handler)
@@ -629,6 +743,29 @@ def recognize_single_image(
                     end="", file=sys.stderr, flush=True,
                 )
                 reload_model(model_name, context_length=context_length)
+                continue
+
+            # --- OCR 後処理: 反復崩壊・思考ログ検出 → 必要なら再OCR ---
+            if not ocr_cleanup:
+                return text
+            text, collapsed, score = postprocess_ocr_page(text, max_repeat=max_repeat)
+            contaminated = collapsed or score >= contamination_threshold
+            if contaminated and attempt < max_retries:
+                # 同一プロンプトで再OCR（VLMはサンプリングで毎回出力が変わるため、
+                # reload せず再試行する方が軽量。接続エラーのみ reload で対処する）
+                print(
+                    f"\033[2K\r  [ocr-cleanup] re-ocr {attempt + 1}/{max_retries} "
+                    f"(collapsed={collapsed}, score={score:.2f})",
+                    end="", file=sys.stderr, flush=True,
+                )
+                continue
+            if contaminated:
+                # 最終試行でも崩壊 → 圧縮済み本文を残して確定（破棄しない）
+                log(
+                    f"[ocr-cleanup] page UNRECOVERED after {max_retries} retries "
+                    f"(collapsed={collapsed}, score={score:.2f}); keeping compressed text"
+                )
+            return text
 
         # ここには到達しないが型チェッカーのために
         raise RuntimeError("予期しない状態: リトライループを抜けました")
@@ -844,6 +981,9 @@ def convert(
     blank_threshold: int = DEFAULT_BLANK_THRESHOLD,
     max_image_size: int = 1280,
     context_length: int = 0,
+    ocr_cleanup: bool = True,
+    max_repeat: int = DEFAULT_MAX_REPEAT,
+    contamination_threshold: float = DEFAULT_CONTAMINATION_THRESHOLD,
 ) -> int:
     total = len(image_files)
     if total == 0:
@@ -918,6 +1058,9 @@ def convert(
                     model_name, image_file,
                     max_image_size=max_image_size,
                     context_length=context_length,
+                    ocr_cleanup=ocr_cleanup,
+                    max_repeat=max_repeat,
+                    contamination_threshold=contamination_threshold,
                 )
             except Exception as exc:
                 print(file=sys.stderr)  # プログレスバー行を確定
@@ -966,6 +1109,9 @@ def process_single_epub(
     blank_threshold: int,
     max_image_size: int = 1280,
     context_length: int = 0,
+    ocr_cleanup: bool = True,
+    max_repeat: int = DEFAULT_MAX_REPEAT,
+    contamination_threshold: float = DEFAULT_CONTAMINATION_THRESHOLD,
 ) -> int | None:
     """1つのEPUBファイルを画像抽出→ページ順解析→OCR→Markdown保存する。
 
@@ -992,6 +1138,9 @@ def process_single_epub(
         blank_threshold=blank_threshold,
         max_image_size=max_image_size,
         context_length=context_length,
+        ocr_cleanup=ocr_cleanup,
+        max_repeat=max_repeat,
+        contamination_threshold=contamination_threshold,
     )
     return char_count
 
@@ -1064,6 +1213,24 @@ def main() -> None:
         default=4096,
         help="モデルリロード時のコンテキスト長を指定する (デフォルト: 4096, 0で指定なし)",
     )
+    parser.add_argument(
+        "--no-ocr-cleanup",
+        action="store_true",
+        default=False,
+        help="OCR後処理(反復崩壊・思考ログ検出・自動再OCR)を無効化する",
+    )
+    parser.add_argument(
+        "--max-repeat",
+        type=int,
+        default=DEFAULT_MAX_REPEAT,
+        help=f"反復崩壊と判定する同一行の連続回数 (デフォルト: {DEFAULT_MAX_REPEAT})",
+    )
+    parser.add_argument(
+        "--contamination-threshold",
+        type=float,
+        default=DEFAULT_CONTAMINATION_THRESHOLD,
+        help=f"思考ログ汚染スコアの再OCR閾値 (デフォルト: {DEFAULT_CONTAMINATION_THRESHOLD})",
+    )
     args = parser.parse_args()
 
     input_path = Path(args.input).expanduser().resolve()
@@ -1073,6 +1240,7 @@ def main() -> None:
 
     resume = not args.no_resume
     skip_blank = not args.no_skip_blank
+    ocr_cleanup = not args.no_ocr_cleanup
 
     # lmstudio / Pillow パッケージ確認
     ensure_lmstudio()
@@ -1093,6 +1261,9 @@ def main() -> None:
                 input_path,
                 max_image_size=args.max_image_size,
                 context_length=args.context_length,
+                ocr_cleanup=ocr_cleanup,
+                max_repeat=args.max_repeat,
+                contamination_threshold=args.contamination_threshold,
             )
             write_text_atomic(output_path, text)
             log(f"完了: {output_path}")
@@ -1152,6 +1323,9 @@ def main() -> None:
                         blank_threshold=args.blank_threshold,
                         max_image_size=args.max_image_size,
                         context_length=args.context_length,
+                        ocr_cleanup=ocr_cleanup,
+                        max_repeat=args.max_repeat,
+                        contamination_threshold=args.contamination_threshold,
                     )
                 except Exception as exc:
                     log(f"エラー: {exc}")
@@ -1216,6 +1390,9 @@ def main() -> None:
                         blank_threshold=args.blank_threshold,
                         max_image_size=args.max_image_size,
                         context_length=args.context_length,
+                        ocr_cleanup=ocr_cleanup,
+                        max_repeat=args.max_repeat,
+                        contamination_threshold=args.contamination_threshold,
                     )
                 except Exception as exc:
                     log(f"エラー: {exc}")
@@ -1252,6 +1429,9 @@ def main() -> None:
                 blank_threshold=args.blank_threshold,
                 max_image_size=args.max_image_size,
                 context_length=args.context_length,
+                ocr_cleanup=ocr_cleanup,
+                max_repeat=args.max_repeat,
+                contamination_threshold=args.contamination_threshold,
             )
             log("\n変換結果:")
             log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
@@ -1282,6 +1462,9 @@ def main() -> None:
         blank_threshold=args.blank_threshold,
         max_image_size=args.max_image_size,
         context_length=args.context_length,
+        ocr_cleanup=ocr_cleanup,
+        max_repeat=args.max_repeat,
+        contamination_threshold=args.contamination_threshold,
     )
     if char_count is not None:
         log("\n変換結果:")
