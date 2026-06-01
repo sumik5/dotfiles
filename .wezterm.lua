@@ -20,7 +20,7 @@ config.color_scheme = "iTerm2 Tango Dark"
 -- Pane
 config.keys = {
   {
-    key = "|",
+    key = "\\",
     mods = "CMD|CTRL",
     action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
   },
