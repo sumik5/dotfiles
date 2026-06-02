@@ -5,7 +5,7 @@
 | Agent | 役割 | 禁止 |
 |-------|------|------|
 | **本体（Opus）** | オーケストレーター: タスク分析・ルーティング・チーム編成・進捗監視・git操作・ユーザー対話 | ❌コード記述・ドキュメント作成 |
-| **専門タチコマ（25体）** | ドメイン特化の実装（スキルプリロード済み） | ❌git書込操作・ブランチ作成 |
+| **専門タチコマ（26体）** | ドメイン特化の実装（スキルプリロード済み） | ❌git書込操作・ブランチ作成 |
 | **汎用タチコマ** | 専門外タスクのフォールバック | 同上 |
 
 ## タスク分類と実行パス
@@ -14,7 +14,7 @@
 |------|--------|
 | 読み込み・質問・調査・CLAUDE.md管理 | 本体が直接実行 |
 | 軽微修正（typo・1行変更） | TeamCreate → 専門タチコマ1体（`team_name` + `run_in_background: true`）→ TeamDelete |
-| **上記以外すべて（デフォルト）** | `orchestrating-teams` スキルロード → TeamCreate → **planner**（タチコマ（プロダクトマネジメント）, Opus）が要件分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → CodeGuard → TeamDelete |
+| **上記以外すべて（デフォルト）** | `orchestrating-teams` スキルロード → TeamCreate → **planner**（tachikoma-str-product-mgr, Opus）が要件分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → CodeGuard → TeamDelete |
 
 ### 並列化条件（plannerの計画に基づく）
 
@@ -29,7 +29,7 @@
 ```
 1. ToolSearch("TeamCreate team")     ← 遅延ツールロード（省略不可）
 2. TeamCreate(team_name: "xxx")      ← チーム作成
-3. Agent(team_name + run_in_background: true, subagent_type: "sumik:タチコマ（...）")
+3. Agent(team_name + run_in_background: true, subagent_type: "sumik:tachikoma-{category}-{domain}")
 4. タチコマ完了待ち
 5. TeamDelete                        ← 1セッション1チーム制約
 ```
@@ -54,7 +54,7 @@
 
 | If X | then Y |
 |------|--------|
-| 別エージェント（codex / Cursor / 他Claude）への作業委譲時 | タチコマ（ドキュメント）に **自己完結ハンドオーバー文書** 作成委譲（必読ファイル・完了履歴・残作業表・厳守ルール・再利用パターン・品質ゲート・検証コマンド・起動プロンプトを内包） |
+| 別エージェント（codex / Cursor / 他Claude）への作業委譲時 | tachikoma-doc-documentに **自己完結ハンドオーバー文書** 作成委譲（必読ファイル・完了履歴・残作業表・厳守ルール・再利用パターン・品質ゲート・検証コマンド・起動プロンプトを内包） |
 | 委譲先が本セッション履歴を持たない | 文書1本で初見作業可能な完全性を担保（外部参照は最小化、コピペ可能なシェルコマンドで検証手順を提供） |
 
 ## タチコマへの依頼プロンプト構造
