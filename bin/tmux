@@ -6,12 +6,41 @@ set -euo pipefail
 
 REAL_TMUX=/opt/homebrew/bin/tmux
 
+# new-window の並列呼び出しを直列化するためのロックディレクトリ。
+# Agent Team が複数ペインを同時起動すると「レイアウト読取→判断→分割」が競合し、
+# 本体ペインが繰り返し横分割されて階段状に崩壊する。これを mkdir のアトミック性で防ぐ。
+NEWWIN_LOCK_DIR="${TMPDIR:-/tmp}/wezterm-tmux-shim-newwin.lock"
+_newwin_lock_held=false
+
 # If not in WezTerm, pass through to real tmux
 if [[ -z "${WEZTERM_PANE:-}" ]]; then
   exec "$REAL_TMUX" "$@"
 fi
 
 # --- Utility functions ---
+
+# new-window 用の排他ロックを取得（mkdir はアトミックなので成功した者だけが保持）
+acquire_newwin_lock() {
+  local waited=0
+  while ! mkdir "$NEWWIN_LOCK_DIR" 2>/dev/null; do
+    sleep 0.05
+    waited=$((waited + 1))
+    # 5秒(=100回)経っても取れない場合は stale lock とみなし強制解放してリトライ
+    if [[ $waited -ge 100 ]]; then
+      rmdir "$NEWWIN_LOCK_DIR" 2>/dev/null || true
+      waited=0
+    fi
+  done
+  _newwin_lock_held=true
+}
+
+# new-window 用の排他ロックを解放（_newwin_lock_held フラグで二重解放を防止）
+release_newwin_lock() {
+  if [[ "$_newwin_lock_held" == true ]]; then
+    rmdir "$NEWWIN_LOCK_DIR" 2>/dev/null || true
+    _newwin_lock_held=false
+  fi
+}
 
 # Strip % prefix from tmux pane ID to get WezTerm pane ID
 strip_pane_prefix() {
@@ -201,42 +230,60 @@ handle_new_window() {
 
   # tmux の new-window/new-session は WezTerm では「新しいタブ」になってしまうため、
   # spawn ではなく split-pane を使い現在のタブ内に pane を作る。
-  # レイアウト: 右カラムが無ければ本体を右分割で新設、あれば右カラム最下部に縦積み。
-  local split_target="$WEZTERM_PANE"
-  local split_dir="--right"
+  # レイアウト方針（右1列に縦積み）:
+  #   - 右に列が無ければ、本体を --right で分割して最初の列を作る
+  #   - 既に右に列があれば、その列の最下部に --bottom で縦積みしていく
+  # ※ WezTerm は二分木構造のため「列が埋まったらフルハイトの次列へ」は --top-level でも
+  #   安定しない（既存ツリーが複雑だと新 pane が意図せぬ位置に挿入され重なる）。
+  #   右1列への縦積みに限定することで、レースを直列化すれば確実に動作する。
+
+  # レイアウト読取〜split実行を排他化し、並列起動時の階段化（レース）を防ぐ
+  acquire_newwin_lock
+  trap release_newwin_lock RETURN EXIT
 
   local decision
-  decision=$(get_pane_list_json | python3 -c "
-import sys, json
+  decision=$(get_pane_list_json | CUR_ID="$WEZTERM_PANE" python3 -c "
+import sys, json, os
+from collections import defaultdict
 panes = json.load(sys.stdin)
-cur_id = '$WEZTERM_PANE'
+cur_id = os.environ['CUR_ID']
 cur = next((p for p in panes if str(p['pane_id']) == cur_id), None)
 if cur is None:
     sys.exit(1)
 tab = cur['tab_id']
-cur_left = cur['left_col']
-right_panes = [p for p in panes if p['tab_id'] == tab and p['left_col'] > cur_left]
+base_left = cur['left_col']
+# 本体より右にある（同じタブの）pane
+right_panes = [p for p in panes if p['tab_id'] == tab and p['left_col'] > base_left]
 if not right_panes:
-    print(f'{cur_id} --right')
-else:
-    max_left = max(p['left_col'] for p in right_panes)
-    rightmost = [p for p in right_panes if p['left_col'] == max_left]
-    bottom = max(rightmost, key=lambda p: p['top_row'])
-    print(f\"{bottom['pane_id']} --bottom\")
+    # 右にまだ列が無い → 本体を右分割して最初の列を作る
+    print('RIGHT')
+    sys.exit(0)
+# 右側の最右列の最下部の下へ縦積み（万一複数列が出来ても最右列に積む）
+cols = defaultdict(list)
+for p in right_panes:
+    cols[p['left_col']].append(p)
+rightmost = cols[max(cols.keys())]
+bottom = max(rightmost, key=lambda p: p['top_row'])
+print('BOTTOM %s' % bottom['pane_id'])
 " 2>/dev/null)
 
-  if [[ -n "$decision" ]]; then
-    split_target="${decision%% *}"
-    split_dir="${decision##* }"
+  local cmd
+  if [[ "$decision" == BOTTOM\ * ]]; then
+    cmd=(wezterm cli split-pane --bottom --pane-id "${decision##* }")
+  else
+    # RIGHT もしくは判定不能時のフォールバック（本体を右分割して列を新設）
+    cmd=(wezterm cli split-pane --right --pane-id "$WEZTERM_PANE")
   fi
 
-  local cmd=(wezterm cli split-pane "$split_dir" --pane-id "$split_target")
   if [[ ${#prog[@]} -gt 0 ]]; then
     cmd+=(-- "${prog[@]}")
   fi
 
   local new_pane_id
   new_pane_id=$("${cmd[@]}" 2>/dev/null)
+
+  release_newwin_lock
+  trap - RETURN EXIT
 
   if [[ "$print_pane" == true ]]; then
     add_pane_prefix "$new_pane_id"
