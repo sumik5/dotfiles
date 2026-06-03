@@ -106,16 +106,19 @@ sys.exit(1)
 # Resolve a window target to a tab_id
 resolve_window_target() {
   local target="$1"
-  # If it looks like a tmux session:window format, try to find matching tab
-  # For simplicity, use the current pane's tab if we can't resolve
-  if [[ "$target" == *:* ]]; then
-    # Extract window part
-    local window_part="${target##*:}"
-    # Try to find by tab index or just use current tab
-    get_tab_id_for_pane "$WEZTERM_PANE"
-  else
-    echo "$target"
+  # shim 自身が display-message / list-windows で出力する window ID 形式 "@N" を受け取った場合、
+  # @ を剥がして数値 tab_id を返す（例: @8 → 8）
+  if [[ "$target" == @* ]]; then
+    echo "${target#@}"
+    return
   fi
+  # tmux の session:window 形式はそのまま解決できないため、現在 pane の tab を返す
+  if [[ "$target" == *:* ]]; then
+    get_tab_id_for_pane "$WEZTERM_PANE"
+    return
+  fi
+  # それ以外はそのまま返す（数値 tab_id が直接渡された場合など）
+  echo "$target"
 }
 
 # --- Command handlers ---
@@ -322,8 +325,15 @@ handle_list_panes() {
     tab_id="$(get_tab_id_for_pane "$WEZTERM_PANE")"
   fi
 
+  # -t が指定されたにもかかわらず tab_id が非数値の場合、
+  # 全タブ汚染（tab_id=-1 フォールバック）を防ぐため現 pane の tab に補正する。
+  # 修正1（@N → N 変換）により通常は数値が入るが、防御的に二重チェックする。
+  if [[ -n "$target" && ( -z "$tab_id" || ! "$tab_id" =~ ^[0-9]+$ ) ]]; then
+    tab_id="$(get_tab_id_for_pane "$WEZTERM_PANE")"
+  fi
+
   if [[ "$all_flag" == true ]]; then
-    # List all panes across all tabs
+    # List all panes across all tabs（-a 明示指定時のみ全列挙）
     get_pane_list_json | python3 -c "
 import sys, json
 panes = json.load(sys.stdin)
