@@ -47,8 +47,8 @@
 | `researching-libraries` | 新機能実装前 |
 | `applying-semantic-versioning` | バージョン判断時 |
 | `writing-conventional-commits` | コミットメッセージ作成時 |
-| `searching-with-exa` | Web検索（第一優先。fallback: `searching-web`） |
+| `searching-web` | Web検索（Exa MCP第一優先・geminiフォールバックを内包） |
 
 ## オンデマンドスキル（明示的要求時のみ）
 
-フラッシュカード(`using-anki-mcp`) / プレゼン(`slidekit-create`, `generating-google-slides`) / 図表(`mermaid-diagrams`, `using-drawio-mcp`) / Codex(`using-codex`) / PM(`using-claude-code-as-pm`)
+フラッシュカード(`creating-flashcards`) / プレゼン(`creating-slides`, `gws-slides`) / 図表(`creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`practicing-product-management`)
