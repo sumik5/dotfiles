@@ -37,54 +37,65 @@
 | 8 | タチコマ（インフラ） | `tachikoma-infra.toml` | Dockerfile, docker-compose.yml, CI/CD設定 | Docker, Compose v2, マルチステージビルド, CI/CDパイプライン, DevOps | 実装 |
 | 9 | タチコマ（Terraform） | `tachikoma-terraform.toml` | `.tf` ファイル, `terragrunt.hcl` | HCL構文, モジュール設計, state管理, Terragruntパターン | 実装 |
 | 10 | タチコマ（AWS） | `tachikoma-aws.toml` | `cdk.json`, `samconfig.toml`, `@aws-sdk`, `boto3` | Lambda, API Gateway, DynamoDB, CDK, EKS, Bedrock, IAM, FinOps | 実装 |
-| 11 | タチコマ（Google Cloud） | `tachikoma-google-cloud.toml` | `cloudbuild.yaml`, `.gcloudignore`, `@google-cloud` | Cloud Run, BigQuery, VPC, Memorystore, GCPセキュリティ, データエンジニアリング | 実装 |
+| 11 | タチコマ（Google Cloud） | `tachikoma-google-cloud.toml` | `cloudbuild.yaml`, `.gcloudignore`, `@google-cloud`, `firebase.json`, `firestore.rules` | Cloud Run, BigQuery, VPC, Memorystore, Firebase(Auth/Firestore/Functions), GCPセキュリティ, データエンジニアリング | 実装 |
+
+### フロントエンド・デザイン
+
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
+|---|--------------|---------|---------|---------|-------|
+| 12 | タチコマ（Figma実装） | `tachikoma-figma-impl.toml` | Figma URL, `.figma`, Code Connect, トークン同期, Tailwind実装 | Figma MCP全13ツール, Code Connect, デザイントークン同期, Tailwind CSS, ビジュアル検証 | 実装 / high |
+| 13 | タチコマ（デザインシステム） | `tachikoma-design-system.toml` | DS構築, ガバナンス, パターンライブラリ, Figma変数管理 | DS3層アーキテクチャ, パターンライブラリ, Figma変数/トークン管理, ガバナンス, 組織導入 | 実装 / high |
+| 14 | タチコマ（UXデザイン） | `tachikoma-ux-design.toml` | UX戦略, デザイン思考, グラフィック, AIエクスペリエンス | UI/UX哲学, デザイン思考プロセス, グラフィック基礎, AI体験設計 | **コード非記述** / high |
 
 ### 設計・品質・セキュリティ
 
-| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード |
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
 |---|--------------|---------|---------|---------|-------|
-| 12 | タチコマ（アーキテクチャ） | `tachikoma-architecture.toml` | 設計/DDD/アーキテクチャ判断 | DDD戦略・戦術, CQRS, Event Sourcing, Sagaパターン, ADR, マルチテナントSaaS | **読取専用**（Opus） |
-| 13 | タチコマ（セキュリティ） | `tachikoma-security.toml` | セキュリティ監査/脆弱性分析 | OWASP Top 10, サーバーレスセキュリティ, 動的認可(ABAC/ReBAC/Cedar), Keycloak, AI開発セキュリティ | **読取専用**（Opus） |
-| 14 | タチコマ（データベース） | `tachikoma-database.toml` | `schema.prisma`, `.sql`, DB関連パッケージ | エンティティモデリング, 正規化, SQLアンチパターン, DBインターナル(B-tree/LSM/MVCC), インデックス設計 | 実装 |
+| 15 | タチコマ（アーキテクチャ） | `tachikoma-architecture.toml` | 設計/DDD/アーキテクチャ判断 | DDD戦略・戦術, CQRS, Event Sourcing, Sagaパターン, ADR, マルチテナントSaaS | **読取専用** / xhigh |
+| 16 | タチコマ（セキュリティ） | `tachikoma-security.toml` | セキュリティ監査/脆弱性分析 | OWASP Top 10, サーバーレスセキュリティ, 動的認可(ABAC/ReBAC/Cedar), Keycloak, AI開発セキュリティ | **読取専用** / xhigh |
+| 17 | タチコマ（コードレビュー） | `tachikoma-code-reviewer.toml` | コードレビュー/品質監査/PRレビュー | バグ・ロジックエラー・脆弱性・コード品質・プロジェクト規約の確認（信頼度フィルタで高優先度のみ報告） | **読取専用** / xhigh |
+| 18 | タチコマ（データベース） | `tachikoma-database.toml` | `schema.prisma`, `.sql`, DB関連パッケージ | エンティティモデリング, 正規化, SQLアンチパターン, DBインターナル(B-tree/LSM/MVCC), インデックス設計 | 実装 / high |
 
 ### テスト
 
-| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード |
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
 |---|--------------|---------|---------|---------|-------|
-| 15 | タチコマ（テスト） | `tachikoma-test.toml` | `*test*`, `*spec*`, `*_test.go`, `test_*.py` | TDD, AAAパターン, Vitest/Jest/RTL, Go testing, pytest, モック戦略 | 実装 |
-| 16 | タチコマ（E2Eテスト） | `tachikoma-e2e-test.toml` | Playwright, E2E, `playwright.config.*` | Playwright Test, POM, ビジュアルテスト, a11yテスト, CI/CD統合, Browser Agent CLI | 実装 |
+| 19 | タチコマ（テスト） | `tachikoma-test.toml` | `*test*`, `*spec*`, `*_test.go`, `test_*.py` | TDD, AAAパターン, Vitest/Jest/RTL, Go testing, pytest, モック戦略 | 実装 / high |
+| 20 | タチコマ（E2Eテスト） | `tachikoma-e2e-test.toml` | Playwright, E2E, `playwright.config.*` | Playwright Test, POM, ビジュアルテスト, a11yテスト, CI/CD統合, Browser Agent CLI | 実装 / high |
 
 ### AI・オブザーバビリティ
 
-| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード |
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
 |---|--------------|---------|---------|---------|-------|
-| 17 | タチコマ（AI/ML） | `tachikoma-ai-ml.toml` | AI/RAG/MCP/LLM関連コード | Vercel AI SDK, LangChain.js, RAGシステム, MCP開発, LLMOps | 実装 |
-| 18 | タチコマ（オブザーバビリティ） | `tachikoma-observability.toml` | `@opentelemetry/*`, `prometheus.yml` | 監視設計, OpenTelemetry計装, 構造化ログ, SLO/SLI, アラート設計 | 実装 |
+| 21 | タチコマ（AI/ML） | `tachikoma-ai-ml.toml` | AI/RAG/MCP/LLM関連コード | Vercel AI SDK, LangChain.js, RAGシステム, MCP開発, promptfoo評価, LLMOps | 実装 / high |
+| 22 | タチコマ（オブザーバビリティ） | `tachikoma-observability.toml` | `@opentelemetry/*`, `prometheus.yml` | 監視設計, OpenTelemetry計装, 構造化ログ, SLO/SLI, アラート設計 | 実装 / high |
 
-### デザイン・ドキュメント・研修
+### プロダクト・ドキュメント・研修
 
-| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード |
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
 |---|--------------|---------|---------|---------|-------|
-| 19 | タチコマ（デザイン） | `tachikoma-design.toml` | Figma URL, デザインシステム構築, Tailwind設計 | Figma MCP全13ツール, Code Connect, デザイントークン同期, デザインシステム構築, Tailwind CSS, UI/UX原則 | 実装 |
-| 20 | タチコマ（ドキュメント） | `tachikoma-document.toml` | 技術文書/記事/LaTeX | 文章基礎(7Cs), AI臭検出・除去, LaTeX, Zenn記事, コピーライティング | **コード非記述** |
-| 21 | タチコマ（研修・プレゼン） | `tachikoma-training-presenter.toml` | 研修設計/プレゼン改善/ワークショップ | ニーズ分析, インストラクショナルデザイン, 行動変容(CREATE), ストーリー構成, PUNCH原則 | **コード非記述**（自己進化型） |
+| 23 | タチコマ（プロダクトマネジメント） | `tachikoma-product-manager.toml` | PRD作成/ロードマップ/優先順位付け/A/Bテスト設計 | PRD, ロードマップ, 優先順位付け(RICE/ICE), A/Bテスト設計, 成長メトリクス, AIプロダクト成熟度評価 | **docs作成のみ** / xhigh |
+| 24 | タチコマ（ドキュメント） | `tachikoma-document.toml` | 技術文書/記事/LaTeX | 文章基礎(7Cs), AI臭検出・除去, LaTeX, Zenn記事, コピーライティング | **コード非記述** / high |
+| 25 | タチコマ（スライド） | `tachikoma-slide.toml` | HTMLスライドデッキ作成/ソース素材→スライド変換 | slides repo 3層分離モデル(Engine/Theme/Content), テーマカスタマイズ, ソース素材変換 | **コード非記述** / xhigh |
+| 26 | タチコマ（研修・プレゼン） | `tachikoma-training-presenter.toml` | 研修設計/プレゼン改善/ワークショップ | ニーズ分析, インストラクショナルデザイン, 行動変容(CREATE), ストーリー構成, PUNCH原則 | **コード非記述**（自己進化型） / high |
 
 ### 汎用・特殊
 
-| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード |
+| # | エージェント名 | ファイル | 検出条件 | 専門領域 | モード/effort |
 |---|--------------|---------|---------|---------|-------|
-| 22 | タチコマ（汎用） | `tachikoma.toml` | 上記以外すべて | 専門タチコマでカバーされない汎用タスク | 実装 |
-| 23 | Serena Expert | `serena-expert.toml` | `/serena` コマンド使用時 | トークン効率的な開発全般（Component/API/Test/System） | 実装 |
+| 27 | タチコマ（汎用） | `tachikoma.toml` | 上記以外すべて | 専門タチコマでカバーされない汎用タスク・複数ドメイン横断 | 実装 / high |
+| 28 | Serena Expert | `serena-expert.toml` | `/serena` コマンド使用時 | トークン効率的な開発全般（Component/API/Test/System） | 実装 / high |
 
 ---
 
 ## ルーティング判断のポイント
 
-- **タチコマ（デザイン） vs タチコマ（フロントエンド）**: Figma MCP・デザイントークン同期・Code Connect・デザインシステム構築・Tailwind CSS設計・UI/UX原則 → デザイン。shadcn/ui実装・Storybook・データビジュアライゼーション → フロントエンド
+- **デザイン3体 vs フロントエンド**: Figma→コード変換・Code Connect・トークン同期・Tailwind実装 → Figma実装(`tachikoma-figma-impl`)。DS構築・パターンライブラリ・ガバナンス・Figma変数管理 → デザインシステム(`tachikoma-design-system`)。UX戦略・デザイン思考・グラフィック・AI体験設計 → UXデザイン(`tachikoma-ux-design`)。shadcn/ui実装・Storybook・データビジュアライゼーション → フロントエンド(`tachikoma-frontend`)
 - **タチコマ（テスト） vs 言語別タチコマ**: テスト設計・カバレッジ改善・TDD・テストリファクタリングが主題 → テスト。機能実装の一部としてテストも書く → 言語別タチコマ
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → Next.js をメイン、フロントエンドをサブ）
 - **並列実行** → 異なる専門タチコマを同時起動可能（例: Next.js + E2Eテスト）。同一タチコマの複数起動も可能
-- **読取専用エージェント**（アーキテクチャ・セキュリティ）→ 設計ドキュメント・レポートのみ出力。実装コードは書かない
+- **読取専用エージェント**（アーキテクチャ・セキュリティ・コードレビュー）→ 設計ドキュメント・レポートのみ出力。実装コードは書かない。プロダクトマネジメント(`tachikoma-product-manager`)は PRD/docs のみ作成
+- **スキルの呼び出し**: 各エージェントは developer_instructions 末尾の「活用スキル」に列挙されたスキル群を、プラグイン(sumik@codex-plugin)経由で description 自動ロードする（手動の skills.config 登録は不要）
 
 ## 共通仕様
 

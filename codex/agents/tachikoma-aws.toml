@@ -1,12 +1,11 @@
 name = "tachikoma_aws"
 description = "AWS cloud specialized Tachikoma execution agent. Handles Lambda, API Gateway, DynamoDB, CDK, EKS, S3, Bedrock, and all AWS services including security (IAM, KMS, GuardDuty), cost optimization, and SRE operations. Use proactively when working with AWS services, CDK infrastructure, serverless applications, or AWS-related code. Detects: cdk.json, samconfig.toml, serverless.yml, @aws-sdk in package.json, or boto3 in Python deps."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["S3", "Lambda", "Aurora"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -172,26 +171,7 @@ developer_instructions = """
 - Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `infra:` 等）
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: developing-aws, writing-clean-code, mastering-typescript, testing-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/developing-aws/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

@@ -1,12 +1,11 @@
 name = "serena_expert"
 description = "Token-efficient app development agent using /serena command for structured problem-solving. Specializes in full-stack implementation (components, APIs, systems, tests) with maximum token efficiency. Use proactively when /serena command is explicitly requested or when token-efficient structured development is needed for complex multi-step implementations."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Atlas", "Delta", "Echo"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: すべての応答は必ず日本語で行ってください。**
@@ -109,26 +108,7 @@ developer_instructions = """
 - Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`）
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: using-serena, writing-clean-code, mastering-typescript, testing-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/using-serena/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

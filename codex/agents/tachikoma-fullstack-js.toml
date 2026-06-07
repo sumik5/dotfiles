@@ -1,7 +1,7 @@
 name = "tachikoma_fullstack_js"
 description = "Full-stack JavaScript specialized Tachikoma execution agent. Handles NestJS/Express backend development, RESTful API design, structured logging, and full-stack integration. Use proactively when building backend APIs with NestJS or Express, implementing API endpoints, designing request/response patterns, or configuring application logging. Detects: package.json with express, nestjs, fastify, koa, or hapi dependency."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Route", "Stack", "Bridge"]
 
@@ -145,38 +145,7 @@ developer_instructions = """
 - Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`）
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: developing-fullstack-javascript, developing-web-apis, implementing-observability, writing-clean-code, mastering-typescript, testing-code, testing-e2e-with-playwright, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/developing-fullstack-javascript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/developing-web-apis/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/implementing-observability/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-e2e-with-playwright/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

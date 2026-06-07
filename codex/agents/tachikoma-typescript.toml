@@ -1,7 +1,7 @@
 name = "tachikoma_typescript"
 description = "TypeScript specialized Tachikoma execution agent. Handles advanced type system patterns, generics, conditional types, GoF design patterns in TypeScript, and type-safe architecture. Use proactively when deep TypeScript expertise is needed: complex type definitions, type refactoring, generic utility creation, or migrating JavaScript to TypeScript. Detects: tsconfig.json."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Type", "Guard", "Infer"]
 
@@ -141,22 +141,7 @@ developer_instructions = """
 - Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`）
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: mastering-typescript, writing-clean-code, testing-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

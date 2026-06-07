@@ -6,7 +6,6 @@ sandbox_mode = "workspace-write"
 nickname_candidates = ["Deck", "Stage", "Reveal"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -279,18 +278,7 @@ HTMLスライド作成の中核知識を持ちます:
 - Conventional Commits形式必須
 - 読み取り専用操作は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: creating-slides, writing-effective-prose, designing-training
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/creating-slides/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-effective-prose/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/designing-training/SKILL.md"
-enabled = true

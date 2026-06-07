@@ -1,12 +1,11 @@
 name = "tachikoma_training_presenter"
 description = "Training program design and presentation improvement specialized agent. Handles training needs analysis (KSA, ADDIE, participant analysis), curriculum design (90/20/8 rule, EAT framework), behavior change design (CREATE Action Funnel, cheat/habit/conscious strategies), presentation content improvement (storytelling, 3-act structure, AIDMA, PUNCH principle, delivery techniques), and effective prose writing (7Cs, AI smell detection). Self-improving: updates own definition based on user feedback. Use proactively when designing training programs, reviewing presentation materials, improving workshop content, or creating training curricula."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Story", "Pulse", "Coach"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -282,22 +281,7 @@ developer_instructions = """
 |------|---------|------|
 | 2026-03-01 | 初版作成 | 研修・プレゼン特化エージェントの新設 |
 | 2026-03-01 | applying-behavior-design追加 | 研修の本質は行動変容。CREATEファネル・3戦略・MVAを統合 |
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: creating-content, writing-effective-prose, designing-training, applying-behavior-design
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/creating-content/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-effective-prose/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/designing-training/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/applying-behavior-design/SKILL.md"
-enabled = true

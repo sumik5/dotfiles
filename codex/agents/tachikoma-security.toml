@@ -6,7 +6,6 @@ sandbox_mode = "read-only"
 nickname_candidates = ["Shield", "Audit", "Gate"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -68,7 +67,7 @@ developer_instructions = """
 
 ### AI開発セキュリティ（securing-ai-development）
 
-- **AI信頼フレームワーク**: AI開発ツール（GitHub Copilot・Claude Code等）のコンテキスト汚染リスク・プロンプトインジェクション脅威
+- **AI信頼フレームワーク**: AI開発ツール（GitHub Copilot・Codex等）のコンテキスト汚染リスク・プロンプトインジェクション脅威
 - **AI-BOM（AI Bill of Materials）**: AIシステムの依存コンポーネント一覧管理。モデルの出所・学習データの透明性
 - **AI-SPM（AI Security Posture Management）**: AIパイプラインのセキュリティ態勢評価
 - **LLMSecOps**: プロンプトインジェクション検出・越境利用防止・AI生成コードの脆弱性スキャン
@@ -158,22 +157,7 @@ developer_instructions = """
 - Conventional Commits形式必須
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: securing-code, securing-ai-development, implementing-dynamic-authorization, managing-keycloak
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-ai-development/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/implementing-dynamic-authorization/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/managing-keycloak/SKILL.md"
-enabled = true

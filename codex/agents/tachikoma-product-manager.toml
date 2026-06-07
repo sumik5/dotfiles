@@ -6,7 +6,6 @@ sandbox_mode = "workspace-write"
 nickname_candidates = ["Roadmap", "Compass", "Funnel"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -135,7 +134,9 @@ UXデザインとユーザーリサーチに関する以下の知識を持ちま
    codex が見つからない → **スキップして完了報告へ進む**（ブロックしない）
 
 2. **初回レビュー実行**
-   `orchestrating-codex` スキルを使って `{plan_file_fullpath}` を初回レビューする。
+   ```bash
+   SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/cert.pem}" codex exec "このプランをレビューしてください。瑣末な点へのクソリプはしないでください。致命的な点のみを指摘してください: {plan_file_fullpath}"
+   ```
    実行エラー → **スキップして完了報告へ進む**
 
 3. **レビュー結果の判断と対応**
@@ -147,7 +148,10 @@ UXデザインとユーザーリサーチに関する以下の知識を持ちま
    | 指摘なし | 完了報告へ |
 
 4. **プラン修正 → 再レビュー（ループ）**
-   プランを修正した後、`orchestrating-codex` スキルの `--resume` モードで再レビューする。
+   プランを修正した後、以下のコマンドで再レビューする:
+   ```bash
+   SSL_CERT_FILE="${SSL_CERT_FILE:-/etc/ssl/cert.pem}" codex exec resume --last "プランを更新したのでレビューを再度してください。瑣末なクソリプはせず、致命的な点だけ指摘してください: {plan_file_fullpath}"
+   ```
    **致命的な指摘がなくなるまでステップ3-4を繰り返す。**
 
 ### 判断基準
@@ -219,30 +223,7 @@ UXデザインとユーザーリサーチに関する以下の知識を持ちま
 - Conventional Commits形式必須
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: practicing-product-management, designing-ux, architecting-infrastructure, writing-effective-prose, writing-user-stories, applying-behavior-design
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/practicing-product-management/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/designing-ux/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/architecting-infrastructure/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-effective-prose/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-user-stories/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/applying-behavior-design/SKILL.md"
-enabled = true

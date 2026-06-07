@@ -1,12 +1,11 @@
 name = "tachikoma_e2e_test"
 description = "E2E testing and browser automation specialized Tachikoma execution agent. Handles Playwright test design, browser automation via agent-browser CLI, visual testing, accessibility testing, and CI/CD integration. Use proactively when writing E2E tests with Playwright, automating browser interactions, or setting up browser-based test infrastructure. Detects: playwright.config.* files."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Trace", "Pixel", "Replay"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -174,26 +173,7 @@ developer_instructions = """
 - Conventional Commits形式必須
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: testing-e2e-with-playwright, automating-browser, writing-clean-code, mastering-typescript, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/testing-e2e-with-playwright/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/automating-browser/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

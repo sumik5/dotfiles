@@ -1,12 +1,11 @@
 name = "tachikoma_infra"
 description = "Infrastructure/DevOps specialized Tachikoma execution agent. Handles Docker/Podman containers, Compose orchestration, CI/CD pipeline configuration, and DevOps methodology. Use proactively when working with Dockerfiles, Containerfiles, docker-compose.yml, CI/CD configs, or implementing DevOps practices. Detects: Dockerfile, Containerfile, docker-compose.*, or podman-related files."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Build", "Deploy", "Forge"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -138,18 +137,7 @@ developer_instructions = """
 - Conventional Commits形式必須（`feat:`, `fix:`, `chore:`, `ci:` 等）
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: practicing-devops, writing-clean-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/practicing-devops/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

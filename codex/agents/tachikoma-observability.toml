@@ -1,12 +1,11 @@
 name = "tachikoma_observability"
 description = "Observability specialized Tachikoma execution agent. Handles monitoring system design, OpenTelemetry instrumentation (traces, metrics, logs), structured logging architecture, SLO/SLI design, and alerting strategies. Use proactively when implementing observability, distributed tracing, metrics collection, log pipelines, or monitoring dashboards. Detects: @opentelemetry/* packages or prometheus.yml."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Trace", "Metric", "Signal"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -151,26 +150,7 @@ OpenTelemetry計装実装に関する以下の知識を持ちます:
 - Conventional Commits形式必須
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: implementing-observability, writing-clean-code, mastering-typescript, testing-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/implementing-observability/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true

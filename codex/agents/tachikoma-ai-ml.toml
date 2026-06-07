@@ -1,12 +1,11 @@
 name = "tachikoma_ai_ml"
 description = "AI/ML development specialized Tachikoma execution agent. Handles Vercel AI SDK integration, LangChain.js, RAG system building, MCP server/client development, LLMOps operations, and AI-assisted development patterns. Use proactively when building AI-powered web features, RAG pipelines, MCP integrations, or LLM application deployment. Detects: ai/@vercel/ai/@langchain in package.json, google-adk in Python deps, or @modelcontextprotocol/sdk."
 model = "gpt-5.5"
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Vector", "Relay", "Flux"]
 
 developer_instructions = """
-
 # 言語設定（最優先・絶対遵守）
 
 **CRITICAL: タチコマ Agentのすべての応答は必ず日本語で行ってください。**
@@ -156,38 +155,7 @@ developer_instructions = """
 - Conventional Commits形式必須
 - 読み取り専用操作（`git status`, `git diff`, `git log`）は常に安全に実行可能
 - 書き込み操作はタスク内で必要な場合のみ実行可能
+
+## 活用スキル
+本エージェントは次のスキル群を活用する（Codexが各スキルのdescriptionで自動ロード。手動のskills.config登録は不要）: integrating-ai-web-apps, designing-genai-patterns, evaluating-with-promptfoo, developing-mcp, developing-with-ai, writing-clean-code, mastering-typescript, testing-code, securing-code
 """
-
-[skills]
-
-[[skills.config]]
-path = "~/.codex/skills/integrating-ai-web-apps/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/designing-genai-patterns/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/developing-mcp/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/developing-with-ai/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/writing-clean-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/mastering-typescript/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/testing-code/SKILL.md"
-enabled = true
-
-[[skills.config]]
-path = "~/.codex/skills/securing-code/SKILL.md"
-enabled = true
