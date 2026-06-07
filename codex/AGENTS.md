@@ -99,6 +99,20 @@
 
 ---
 
+## 📥 スキル改善提案 (inbox)
+
+sumik-claude-plugin スキルの改善提案キュー（Codex 版）。捕捉(C)→消費(D=`authoring-plugins` の「🔄 改善提案INTAKE」)を繋ぐ。Claude Code 側の `~/.claude/CLAUDE.md` inbox と**対になる Codex 側 inbox** で、INTAKE は両方を走査する。**openのみ保持**し、消費後は削除（本ファイルを肥大させない）。フォーマット全仕様は `authoring-plugins/references/IMPROVEMENT-INTAKE.md §2`。
+
+**捕捉ルール（発見時の振る舞い）**: sumik-claude-plugin スキルを読込/使用中に改善余地（description不正確・肥大・統合余地・知見追記漏れ・参照切れ・規約違反）を発見したら、**即編集せず**下記へ提案を1件追記する（軽微typoは即修正可）。①実際に読込/使用したスキルに限る（未読の推測提案禁止）②1スキル1セッション1件 ③確度=低は書かない ④具体的改善文/削除対象行を伴うもののみ（漠然とした感想不可）⑤作業主目的を中断せずタスク完了後に追記。
+
+各提案は `### [PROPOSAL] <skill> / <種別> / <日付>` 見出し＋ skill・種別(description改善/分割/統合/内容追記/参照修正/規約違反)・改善点・理由(書籍名禁止)・確度(高/中)・影響範囲・status を箇条書きで持つ。
+
+**発火**: open が3件以上、またはユーザーが「スキル改善まわして」と指示した時、`authoring-plugins` の INTAKE を起点に消費する。Codex のコミットは Jujutsu (jj) を使用（git原則禁止）。
+
+<!-- open な提案をここに追記。処理後はドレイン。Claude Code 側で気づいた提案は ~/.claude/CLAUDE.md の inbox に入る。 -->
+
+---
+
 # MCP 利用ガイド（この環境で有効なサーバ）
 
 このリポジトリでは `config.toml` の設定に基づき、以下の MCP サーバが有効です。用途に応じて最適なサーバを選び、不要なときは呼び出さない方針とします。
