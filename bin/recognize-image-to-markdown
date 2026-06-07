@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""画像ベース EPUB / 画像ディレクトリ → Markdown 変換ツール
+"""画像ベース EPUB / 画像ディレクトリ / PDF → Markdown 変換ツール
 
 LM Studio のローカル VLM (OCR) を使い、画像ベースの EPUB または画像
 ディレクトリを日本語テキスト (Markdown) に変換する。
+PDF ファイルはテキスト埋め込み型であれば pdftotext で直接変換（OCR不要）、
+スキャン画像ベース型であれば pdftoppm でラスタライズして OCR にフォールバックする。
 
 使用例:
   recognize-image-to-markdown book.epub
@@ -10,16 +12,21 @@ LM Studio のローカル VLM (OCR) を使い、画像ベースの EPUB また�
   recognize-image-to-markdown ./epub-folder/          # フォルダ内の全EPUBを処理
   recognize-image-to-markdown ./scanned-pages/        # 画像のみのフォルダ
   recognize-image-to-markdown book.epub --no-resume   # 最初からやり直し
+  recognize-image-to-markdown book.pdf                # テキストPDF → 直接Markdown化
+  recognize-image-to-markdown scanned.pdf --pdf-force-ocr  # スキャンPDF強制OCR
+  recognize-image-to-markdown ./pdf-folder/           # フォルダ内の全PDFを処理
 
 前提:
-  - LM Studio が起動し VLM モデルがロードされていること
-  - pandoc がインストールされていること (EPUB 入力時)
+  - テキストPDF変換: poppler (pdftotext) が必要（brew install poppler）
+  - スキャンPDF・画像変換: LM Studio が起動し VLM モデルがロードされていること
+  - pandoc 推奨（無い／失敗時は純Pythonフォールバックで継続） (EPUB 入力時)
   - Python 3.10+
 """
 
 import argparse
 from dataclasses import dataclass
 import os
+import posixpath
 import re
 import select
 import signal
@@ -346,6 +353,202 @@ def check_pandoc() -> None:
         sys.exit(1)
 
 
+def check_poppler(require_rasterize: bool = False) -> None:
+    """poppler ツール群の存在チェックを行う。
+
+    Args:
+        require_rasterize: True の場合は pdftoppm も必須チェックする（スキャンPDF時）
+    """
+    if shutil.which("pdftotext") is None:
+        log("エラー: pdftotext が見つかりません。brew install poppler でインストールしてください。")
+        sys.exit(1)
+    if require_rasterize and shutil.which("pdftoppm") is None:
+        log("エラー: pdftoppm が見つかりません。brew install poppler でインストールしてください。")
+        sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# PDF handling
+# ---------------------------------------------------------------------------
+
+def classify_pdf(
+    pdf_path: Path,
+    text_threshold: int = 50,
+) -> tuple[bool, int, int]:
+    """PDF がテキスト埋め込み型か画像ベース型かを判定する。
+
+    pdftotext で全文を抽出し、1 ページあたりの平均非空白文字数で判定する。
+    form feed (\\f) がページ区切りとして使われる。
+
+    Args:
+        pdf_path: 対象 PDF ファイルのパス
+        text_threshold: テキストベース判定の平均文字数閾値（デフォルト: 50）
+
+    Returns:
+        (is_text_based, page_count, total_text_chars)
+        - is_text_based: 1ページあたり平均文字数 >= 閾値なら True
+        - page_count: ページ数（\\f の個数 + 1）
+        - total_text_chars: 非空白文字数の合計
+    """
+    result = subprocess.run(
+        ["pdftotext", str(pdf_path), "-"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        log(
+            f"PDF分析: pdftotext 失敗 (exit {result.returncode}): "
+            f"{result.stderr.strip() or '(詳細なし)'}"
+        )
+        log("→ 画像ベースとして扱います")
+        return False, 0, 0
+
+    raw_text = result.stdout
+    # ページ数: form feed (\f) でページ区切り → ページ数 = \f の数 + 1
+    page_count = raw_text.count("\f") + 1
+    # 非空白文字数をカウント
+    total_text_chars = sum(1 for c in raw_text if not c.isspace())
+
+    avg_chars_per_page = total_text_chars / max(page_count, 1)
+    is_text_based = avg_chars_per_page >= text_threshold
+
+    log(
+        f"PDF分析: ページ数={page_count}, 総文字数={total_text_chars:,}, "
+        f"平均文字数/ページ={avg_chars_per_page:.1f}, 閾値={text_threshold} "
+        f"→ {'テキストベース' if is_text_based else '画像ベース'}"
+    )
+    return is_text_based, page_count, total_text_chars
+
+
+def convert_text_pdf(
+    pdf_path: Path,
+    output_path: Path,
+) -> int:
+    """テキスト埋め込み PDF を pdftotext で直接 Markdown 化する。
+
+    LM Studio / lmstudio パッケージ / Pillow を一切使用しない。
+    pdftotext の出力を form feed (\\f) でページ分割し、完全な空ページを除去した後
+    PAGE_SEPARATOR で結合して書き出す。
+
+    Args:
+        pdf_path: 入力 PDF ファイルのパス
+        output_path: 出力 Markdown ファイルのパス
+
+    Returns:
+        出力 Markdown の文字数
+    """
+    result = subprocess.run(
+        ["pdftotext", str(pdf_path), "-"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        log(
+            f"エラー: pdftotext 失敗 (exit {result.returncode}): "
+            f"{result.stderr.strip() or '(詳細なし)'}"
+        )
+        sys.exit(1)
+
+    raw_text = result.stdout
+    # form feed (\f) でページ分割 → strip → 完全な空ページは捨てる
+    pages = [page.strip() for page in raw_text.split("\f")]
+    non_empty_pages = [page for page in pages if page]
+
+    if not non_empty_pages:
+        log("警告: pdftotext でテキストが抽出されませんでした。空のファイルを出力します。")
+        non_empty_pages = [""]
+
+    markdown_text = PAGE_SEPARATOR.join(non_empty_pages)
+
+    write_text_atomic(output_path, markdown_text)
+    char_count = len(markdown_text)
+    mark_conversion_complete(output_path, len(non_empty_pages), char_count)
+
+    log(f"完了: {output_path}")
+    log(f"  ページ数: {len(non_empty_pages)}, 文字数: {char_count:,}")
+    return char_count
+
+
+def rasterize_and_convert_pdf(
+    pdf_path: Path,
+    output_path: Path,
+    model_name: str,
+    skip_blank: bool,
+    resume: bool,
+    dpi: int = 200,
+    blank_threshold: int = DEFAULT_BLANK_THRESHOLD,
+    max_image_size: int = 1280,
+    context_length: int = 0,
+    ocr_cleanup: bool = True,
+    max_repeat: int = DEFAULT_MAX_REPEAT,
+    contamination_threshold: float = DEFAULT_CONTAMINATION_THRESHOLD,
+) -> int:
+    """スキャン PDF を pdftoppm でラスタライズし、既存 OCR パイプラインに渡す。
+
+    tempfile.mkdtemp() に PNG を出力し、collect_ordered_images() で自然順に
+    並べた後 convert() に委譲する。temp ディレクトリは finally で必ず削除する。
+
+    Args:
+        pdf_path: 入力 PDF ファイルのパス
+        output_path: 出力 Markdown ファイルのパス
+        model_name: LM Studio モデル名
+        skip_blank: 空白ページスキップ
+        resume: 中断再開モード
+        dpi: ラスタライズ解像度（デフォルト: 200）
+        blank_threshold: 空白ページ判定バイト数閾値
+        max_image_size: VLM 送信前リサイズの長辺最大ピクセル数
+        context_length: モデルリロード時コンテキスト長
+        ocr_cleanup: OCR後処理（反復崩壊・思考ログ検出）の有効/無効
+        max_repeat: 反復崩壊判定の連続行数
+        contamination_threshold: 思考ログ汚染スコア再OCR閾値
+
+    Returns:
+        出力 Markdown の文字数
+    """
+    tmp_dir = Path(tempfile.mkdtemp(prefix="pdf-ocr-"))
+    try:
+        log(f"PDF ラスタライズ中 (DPI={dpi})...")
+        result = subprocess.run(
+            [
+                "pdftoppm",
+                "-png",
+                "-r", str(dpi),
+                str(pdf_path),
+                str(tmp_dir / "page"),
+            ],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            log(
+                f"エラー: pdftoppm 失敗 (exit {result.returncode}): "
+                f"{result.stderr.strip() or '(詳細なし)'}"
+            )
+            sys.exit(1)
+
+        image_files = collect_ordered_images(tmp_dir, None)
+        if not image_files:
+            log("エラー: pdftoppm が PNG ファイルを生成しませんでした。")
+            sys.exit(1)
+
+        log(f"ラスタライズ完了: {len(image_files)} ページ → OCR 開始")
+        return convert(
+            image_files=image_files,
+            output_path=output_path,
+            model_name=model_name,
+            skip_blank=skip_blank,
+            resume=resume,
+            blank_threshold=blank_threshold,
+            max_image_size=max_image_size,
+            context_length=context_length,
+            ocr_cleanup=ocr_cleanup,
+            max_repeat=max_repeat,
+            contamination_threshold=contamination_threshold,
+        )
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
 def strip_think_tags(text: str) -> str:
     text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
     if "</think>" in text:
@@ -526,8 +729,166 @@ def extract_epub_images(epub_path: Path, work_dir: Path) -> Path:
     return img_dir
 
 
+def _fallback_image_scan(epub_path: Path, md_path: Path) -> tuple[bool, Path, list[str]]:
+    """zipfile で画像エントリを直接走査し、自然順 basename リストを返す保険処理。
+
+    spine 解析に失敗したときの最終フォールバック。クラッシュせず合理的な値を返す。
+    """
+    page_order: list[str] = []
+    try:
+        with zipfile.ZipFile(epub_path, "r") as zf:
+            seen: set[str] = set()
+            for name in sorted(zf.namelist()):
+                basename = Path(name).name
+                ext = Path(name).suffix.lower()
+                if ext in SUPPORTED_EXTENSIONS and basename not in seen:
+                    seen.add(basename)
+                    page_order.append(basename)
+    except Exception as exc:
+        log(f"EPUB分析(画像直接走査): 例外発生 ({exc})。空リストで継続します。")
+
+    is_image = len(page_order) >= 10
+    log(
+        f"EPUB分析(画像直接走査フォールバック): 画像数={len(page_order)} "
+        f"→ {'画像ベース' if is_image else 'テキストベース'}"
+    )
+    return is_image, md_path, page_order
+
+
+def _analyze_epub_via_spine(epub_path: Path, work_dir: Path) -> tuple[bool, Path, list[str]]:
+    """純Pythonで EPUB の spine を解析し、読み順の画像リストと画像ベース判定を返す。
+
+    pandoc が Zip64 形式のアーカイブ（version-needed=45 等）で失敗した場合のフォールバック。
+    Python 標準ライブラリの zipfile を使用するため、該当エントリも正常に読める。
+    spine 解析が失敗した場合は _fallback_image_scan に委譲してクラッシュを防ぐ。
+
+    Returns:
+        (is_image_based, md_path, page_order)
+        - is_image_based: spineの大半ページが画像を参照していれば True
+        - md_path: 下流未使用だが型契約維持のための仮パス
+        - page_order: spine 読み順の画像 basename リスト（重複除去・順序維持）
+    """
+    md_path = work_dir / "pandoc-output.md"  # 下流未使用だが is_image_based_epub との型契約維持
+
+    try:
+        with zipfile.ZipFile(epub_path, "r") as zf:
+            # ① META-INF/container.xml から OPF パスを取得
+            try:
+                container_xml = zf.read("META-INF/container.xml").decode("utf-8", errors="replace")
+            except KeyError:
+                log("EPUB分析(Pythonフォールバック): META-INF/container.xml が見つかりません。画像直接走査に切り替えます。")
+                return _fallback_image_scan(epub_path, md_path)
+
+            opf_match = re.search(r'<rootfile\b[^>]+\bfull-path=["\']([^"\']+)["\']', container_xml)
+            if not opf_match:
+                log("EPUB分析(Pythonフォールバック): OPF パスが取得できません。画像直接走査に切り替えます。")
+                return _fallback_image_scan(epub_path, md_path)
+
+            opf_zip_path = opf_match.group(1)
+            opf_dir = posixpath.dirname(opf_zip_path)
+
+            # ② OPF を読み、manifest の id → href マップを構築
+            try:
+                opf_text = zf.read(opf_zip_path).decode("utf-8", errors="replace")
+            except KeyError:
+                log(f"EPUB分析(Pythonフォールバック): OPF ファイル {opf_zip_path!r} が見つかりません。画像直接走査に切り替えます。")
+                return _fallback_image_scan(epub_path, md_path)
+
+            # id/href の属性順序に依存しない堅牢な抽出
+            # <item href="..." id="..."/> の順序でも正しく動作する
+            manifest: dict[str, str] = {}
+            for item_tag in re.finditer(r'<item\b[^>]*>', opf_text, re.DOTALL):
+                tag = item_tag.group(0)
+                id_m = re.search(r'\bid=["\']([^"\']+)["\']', tag)
+                href_m = re.search(r'\bhref=["\']([^"\']+)["\']', tag)
+                if id_m and href_m:
+                    manifest[id_m.group(1)] = href_m.group(1)
+
+            # ③ spine の itemref を出現順に取得（= 読み順）
+            spine_match = re.search(r'<spine\b[^>]*>(.*?)</spine>', opf_text, re.DOTALL)
+            if not spine_match:
+                log("EPUB分析(Pythonフォールバック): spine が見つかりません。画像直接走査に切り替えます。")
+                return _fallback_image_scan(epub_path, md_path)
+
+            idrefs = re.findall(
+                r'<itemref\b[^>]*\bidref=["\']([^"\']+)["\']',
+                spine_match.group(1),
+            )
+            if not idrefs:
+                log("EPUB分析(Pythonフォールバック): spine に itemref がありません。画像直接走査に切り替えます。")
+                return _fallback_image_scan(epub_path, md_path)
+
+            # ④⑤ 各 xhtml を読み、画像参照を抽出
+            seen: set[str] = set()
+            page_order: list[str] = []
+            pages_total = 0
+            pages_with_image = 0
+
+            for idref in idrefs:
+                href = manifest.get(idref)
+                if href is None:
+                    continue
+                xhtml_zip_path = posixpath.normpath(posixpath.join(opf_dir, href))
+                try:
+                    xhtml_text = zf.read(xhtml_zip_path).decode("utf-8", errors="replace")
+                except KeyError:
+                    continue
+
+                pages_total += 1
+
+                # <img src="..."> を優先し、
+                # 固定レイアウト SVG 用の <image xlink:href="...">/<image href="..."> をフォールバックに使用
+                img_srcs: list[str] = re.findall(
+                    r'<img\b[^>]*\bsrc=["\']([^"\']+)["\']',
+                    xhtml_text,
+                    re.IGNORECASE,
+                )
+                if not img_srcs:
+                    img_srcs = re.findall(
+                        r'<image\b[^>]*\b(?:xlink:href|href)=["\']([^"\']+)["\']',
+                        xhtml_text,
+                        re.IGNORECASE,
+                    )
+
+                page_has_image = False
+                for src in img_srcs:
+                    basename = posixpath.basename(src)
+                    ext = Path(basename).suffix.lower()
+                    if ext in SUPPORTED_EXTENSIONS:
+                        if basename not in seen:
+                            seen.add(basename)
+                            page_order.append(basename)
+                        page_has_image = True
+
+                if page_has_image:
+                    pages_with_image += 1
+
+            # ⑥ 画像ベース判定
+            # 固定レイアウト EPUB には visibility:hidden の透明テキストレイヤーが存在するため
+            # テキスト量ではなく「spineの大半ページが画像を1枚以上参照しているか」で判定する
+            is_image = (
+                pages_total > 0
+                and pages_with_image / pages_total >= 0.5
+                and len(page_order) >= 10
+            )
+
+            log(
+                f"EPUB分析(Pythonフォールバック): spineページ={pages_total}, "
+                f"画像ありページ={pages_with_image}, 画像数={len(page_order)} "
+                f"→ {'画像ベース' if is_image else 'テキストベース'}"
+            )
+            return is_image, md_path, page_order
+
+    except Exception as exc:
+        log(f"EPUB分析(Pythonフォールバック): 例外発生 ({exc})。画像直接走査に切り替えます。")
+        return _fallback_image_scan(epub_path, md_path)
+
+
 def is_image_based_epub(epub_path: Path, work_dir: Path) -> tuple[bool, Path, list[str]]:
     """pandoc で EPUB → Markdown 変換し、画像ベースかどうか判定する。
+
+    pandoc が失敗した場合（Zip64 形式のアーカイブ等）は _analyze_epub_via_spine
+    による純Pythonフォールバックで処理を継続する。
 
     Returns:
         (is_image_based, md_path, page_order)
@@ -542,10 +903,10 @@ def is_image_based_epub(epub_path: Path, work_dir: Path) -> tuple[bool, Path, li
         text=True,
     )
     if result.returncode != 0:
-        raise RuntimeError(
-            f"pandoc 変換失敗 (exit {result.returncode}): "
-            f"{result.stderr.strip() or '(詳細なし)'}"
-        )
+        log(f"pandoc 変換失敗 (exit {result.returncode}): "
+            f"{result.stderr.strip() or '(詳細なし)'}")
+        log("→ 純PythonでEPUBを解析します（pandocフォールバック / Zip64対応）")
+        return _analyze_epub_via_spine(epub_path, work_dir)
 
     md_text = md_path.read_text(errors="replace")
     lines = md_text.splitlines()
@@ -1157,21 +1518,24 @@ def resolve_output_path(input_path: Path, output_arg: str | None) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="画像ベース EPUB / 画像ディレクトリを Markdown に変換",
+        description="画像ベース EPUB / 画像ディレクトリ / PDF → Markdown 変換",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "使用例:\n"
-            "  %(prog)s book.epub                      # 単一EPUB\n"
-            "  %(prog)s book.epub -o ~/Desktop/book.md  # 出力先指定\n"
-            "  %(prog)s ./epub-folder/                  # フォルダ内の全EPUB\n"
-            "  %(prog)s ./scanned-pages/                # 画像ディレクトリ\n"
-            "  %(prog)s ./parent-folder/                # サブフォルダ毎に.md化\n"
-            "  %(prog)s book.epub --no-resume            # 最初からやり直し\n"
+            "  %(prog)s book.epub                         # 単一EPUB\n"
+            "  %(prog)s book.epub -o ~/Desktop/book.md    # 出力先指定\n"
+            "  %(prog)s ./epub-folder/                    # フォルダ内の全EPUB\n"
+            "  %(prog)s ./scanned-pages/                  # 画像ディレクトリ\n"
+            "  %(prog)s ./parent-folder/                  # サブフォルダ毎に.md化\n"
+            "  %(prog)s book.epub --no-resume              # 最初からやり直し\n"
+            "  %(prog)s book.pdf                          # テキストPDF → 直接Markdown化\n"
+            "  %(prog)s scanned.pdf --pdf-force-ocr       # スキャンPDF強制OCR\n"
+            "  %(prog)s ./pdf-folder/                     # フォルダ内の全PDFを処理\n"
         ),
     )
     parser.add_argument(
         "input",
-        help="EPUB ファイルまたは画像を含むディレクトリ",
+        help="EPUB / PDF ファイルまたは画像・PDFを含むディレクトリ",
     )
     parser.add_argument(
         "-o", "--output",
@@ -1231,6 +1595,24 @@ def main() -> None:
         default=DEFAULT_CONTAMINATION_THRESHOLD,
         help=f"思考ログ汚染スコアの再OCR閾値 (デフォルト: {DEFAULT_CONTAMINATION_THRESHOLD})",
     )
+    parser.add_argument(
+        "--pdf-force-ocr",
+        action="store_true",
+        default=False,
+        help="テキスト埋め込みPDFでもOCRを強制する（デフォルト: テキストベースは直接変換）",
+    )
+    parser.add_argument(
+        "--pdf-dpi",
+        type=int,
+        default=200,
+        help="スキャンPDFのラスタライズ解像度 (デフォルト: 200)",
+    )
+    parser.add_argument(
+        "--pdf-text-threshold",
+        type=int,
+        default=50,
+        help="テキストベース判定の1ページあたり平均文字数閾値 (デフォルト: 50)",
+    )
     args = parser.parse_args()
 
     input_path = Path(args.input).expanduser().resolve()
@@ -1242,18 +1624,62 @@ def main() -> None:
     skip_blank = not args.no_skip_blank
     ocr_cleanup = not args.no_ocr_cleanup
 
-    # lmstudio / Pillow パッケージ確認
-    ensure_lmstudio()
-    if args.max_image_size > 0:
-        ensure_pillow()
-
     is_epub = input_path.is_file() and input_path.suffix.lower() == ".epub"
+    is_pdf = input_path.is_file() and input_path.suffix.lower() == ".pdf"
     is_dir = input_path.is_dir()
+
+    if is_pdf:
+        # 単一 PDF ファイルの処理
+        output_path = resolve_output_path(input_path, args.output)
+
+        if is_conversion_complete(output_path) and resume:
+            char_count = len(output_path.read_text(errors="replace"))
+            log(f"スキップ: {input_path.name} は変換済みです ({output_path.name}, {char_count:,} 文字)")
+            return
+
+        check_poppler()
+        is_text_based, _page_count, _total_chars = classify_pdf(
+            input_path, args.pdf_text_threshold
+        )
+
+        if is_text_based and not args.pdf_force_ocr:
+            # テキスト埋め込みPDF → LM Studio 不要で直接変換
+            char_count = convert_text_pdf(input_path, output_path)
+        else:
+            # スキャンPDF or --pdf-force-ocr → ラスタライズ + OCR
+            ensure_lmstudio()
+            if args.max_image_size > 0:
+                ensure_pillow()
+            check_poppler(require_rasterize=True)
+            model_name = resolve_model_name(args.model)
+            log(f"LM Studio 接続チェック (モデル: {model_name})...")
+            check_lmstudio_connection(model_name, context_length=args.context_length)
+            char_count = rasterize_and_convert_pdf(
+                pdf_path=input_path,
+                output_path=output_path,
+                model_name=model_name,
+                skip_blank=skip_blank,
+                resume=resume,
+                dpi=args.pdf_dpi,
+                blank_threshold=args.blank_threshold,
+                max_image_size=args.max_image_size,
+                context_length=args.context_length,
+                ocr_cleanup=ocr_cleanup,
+                max_repeat=args.max_repeat,
+                contamination_threshold=args.contamination_threshold,
+            )
+
+        log("\n変換結果:")
+        log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
+        return
 
     if not is_epub and not is_dir:
         # 単一画像ファイルの場合
         if input_path.suffix.lower() in SUPPORTED_EXTENSIONS:
             output_path = resolve_output_path(input_path, args.output)
+            ensure_lmstudio()
+            if args.max_image_size > 0:
+                ensure_pillow()
             model_name = resolve_model_name(args.model)
             check_lmstudio_connection(model_name, context_length=args.context_length)
             text = recognize_single_image(
@@ -1286,6 +1712,9 @@ def main() -> None:
         if epub_files:
             # EPUB が1つ以上ある → 各EPUBを個別処理
             check_pandoc()
+            ensure_lmstudio()
+            if args.max_image_size > 0:
+                ensure_pillow()
             model_name = resolve_model_name(args.model)
             log(f"LM Studio 接続チェック (モデル: {model_name})...")
             check_lmstudio_connection(model_name, context_length=args.context_length)
@@ -1348,6 +1777,9 @@ def main() -> None:
             return
 
         if image_subdirs:
+            ensure_lmstudio()
+            if args.max_image_size > 0:
+                ensure_pillow()
             model_name = resolve_model_name(args.model)
             log(f"LM Studio 接続チェック (モデル: {model_name})...")
             check_lmstudio_connection(model_name, context_length=args.context_length)
@@ -1416,6 +1848,9 @@ def main() -> None:
         if has_images:
             # 画像のみのディレクトリ → 従来通りOCR
             output_path = resolve_output_path(input_path, args.output)
+            ensure_lmstudio()
+            if args.max_image_size > 0:
+                ensure_pillow()
             model_name = resolve_model_name(args.model)
             log(f"LM Studio 接続チェック (モデル: {model_name})...")
             check_lmstudio_connection(model_name, context_length=args.context_length)
@@ -1437,7 +1872,90 @@ def main() -> None:
             log(f"  {input_path.name} → {output_path.name} ({char_count:,} 文字)")
             return
 
-        log(f"エラー: '{input_path}' に EPUB も画像も見つかりません。")
+        # PDF ファイルが含まれていれば各PDFを個別処理
+        pdf_files = sorted(input_path.glob("*.pdf"))
+        if pdf_files:
+            check_poppler()
+            log(f"フォルダ内に {len(pdf_files)} 件の PDF を検出")
+            processed_count = 0
+            skipped_text = 0
+            skipped_done = 0
+            skipped_error = 0
+            pdf_results: list[tuple[str, str, int]] = []
+            pdf_ocr_model: str | None = None  # スキャンPDF用モデル名（初回のみ解決）
+
+            for idx, pdf in enumerate(pdf_files, 1):
+                log(f"\n{'='*60}")
+                log(f"[{idx}/{len(pdf_files)}] {pdf.name}")
+                out = pdf.with_suffix(".md")
+                if args.output and len(pdf_files) == 1:
+                    out = Path(args.output).expanduser().resolve()
+
+                if is_conversion_complete(out) and resume:
+                    char_count = len(out.read_text(errors="replace"))
+                    log(f"スキップ: 変換済み ({out.name}, {char_count:,} 文字)")
+                    log(f"{'='*60}")
+                    skipped_done += 1
+                    pdf_results.append((pdf.name, out.name, char_count))
+                    continue
+
+                is_text_based, _page_count, _total_chars = classify_pdf(
+                    pdf, args.pdf_text_threshold
+                )
+
+                try:
+                    if is_text_based and not args.pdf_force_ocr:
+                        # テキスト埋め込みPDF → 直接変換
+                        char_count = convert_text_pdf(pdf, out)
+                        processed_count += 1
+                        pdf_results.append((pdf.name, out.name, char_count))
+                    else:
+                        # スキャンPDF or --pdf-force-ocr → ラスタライズ + OCR
+                        if pdf_ocr_model is None:
+                            ensure_lmstudio()
+                            if args.max_image_size > 0:
+                                ensure_pillow()
+                            check_poppler(require_rasterize=True)
+                            pdf_ocr_model = resolve_model_name(args.model)
+                            log(f"LM Studio 接続チェック (モデル: {pdf_ocr_model})...")
+                            check_lmstudio_connection(
+                                pdf_ocr_model, context_length=args.context_length
+                            )
+                        char_count = rasterize_and_convert_pdf(
+                            pdf_path=pdf,
+                            output_path=out,
+                            model_name=pdf_ocr_model,
+                            skip_blank=skip_blank,
+                            resume=resume,
+                            dpi=args.pdf_dpi,
+                            blank_threshold=args.blank_threshold,
+                            max_image_size=args.max_image_size,
+                            context_length=args.context_length,
+                            ocr_cleanup=ocr_cleanup,
+                            max_repeat=args.max_repeat,
+                            contamination_threshold=args.contamination_threshold,
+                        )
+                        processed_count += 1
+                        pdf_results.append((pdf.name, out.name, char_count))
+                except Exception as exc:
+                    log(f"エラー: {exc}")
+                    log(f"{'='*60}")
+                    skipped_error += 1
+                    continue
+                log(f"{'='*60}")
+
+            log(
+                f"\n全 {len(pdf_files)} 件完了 "
+                f"(処理: {processed_count}, 変換済みスキップ: {skipped_done}, "
+                f"テキストベーススキップ: {skipped_text}, エラースキップ: {skipped_error})"
+            )
+            if pdf_results:
+                log("\n変換結果:")
+                for pdf_name, md_name, chars in pdf_results:
+                    log(f"  {pdf_name} → {md_name} ({chars:,} 文字)")
+            return
+
+        log(f"エラー: '{input_path}' に EPUB も画像も PDF も見つかりません。")
         sys.exit(1)
 
     # 単一 EPUB ファイル
@@ -1450,6 +1968,9 @@ def main() -> None:
         return
 
     check_pandoc()
+    ensure_lmstudio()
+    if args.max_image_size > 0:
+        ensure_pillow()
     model_name = resolve_model_name(args.model)
     log(f"LM Studio 接続チェック (モデル: {model_name})...")
     check_lmstudio_connection(model_name, context_length=args.context_length)
