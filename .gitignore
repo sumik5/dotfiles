@@ -14,3 +14,4 @@ __pycache__/
 brew/Brewfile.lock.json
 HANDOVER.md
 .claude/settings.local.json
+.serena
