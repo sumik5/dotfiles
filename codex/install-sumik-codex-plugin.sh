@@ -22,8 +22,6 @@
 #   PLUGIN_NAME       インストールするプラグイン名（デフォルト: sumik-codex-plugins）
 #   GIT_SOURCE        Git ソース URL（デフォルト: GitHub の sumik-claude-plugin）
 #   GIT_REF           Git リファレンス（デフォルト: main）
-#   OLD_MARKETPLACE   移行掃除対象の旧マーケットプレイス名（デフォルト: codex-plugin）
-#   OLD_PLUGIN        移行掃除対象の旧プラグイン名（デフォルト: sumik）
 #   CODEX_HOME        symlink 先の Codex ホーム（デフォルト: ~/.codex）
 # =============================================================================
 
@@ -54,11 +52,9 @@ err() {
 # 設定パラメータ（環境変数で上書き可能）
 # ---------------------------------------------------------------------------
 : "${MARKETPLACE_NAME:=sumik-marketplace}"
-: "${PLUGIN_NAME:=sumik-codex-plugins}"
+: "${PLUGIN_NAME:=devkit}"
 : "${GIT_SOURCE:=https://github.com/sumik5/sumik-claude-plugin.git}"
 : "${GIT_REF:=main}"
-: "${OLD_MARKETPLACE:=codex-plugin}"
-: "${OLD_PLUGIN:=sumik}"
 : "${CODEX_HOME:=${HOME}/.codex}"
 
 # このスクリプト自身のディレクトリ（agents/ と AGENTS.md が同階層にある前提）
@@ -104,39 +100,6 @@ link_codex_assets() {
     mkdir -p "${CODEX_HOME}"
     link_one_asset "${SCRIPT_DIR}/agents"    "${CODEX_HOME}/agents"
     link_one_asset "${SCRIPT_DIR}/AGENTS.md" "${CODEX_HOME}/AGENTS.md"
-}
-
-# ---------------------------------------------------------------------------
-# 旧マーケットプレイス移行掃除（存在する場合のみ・冪等）
-# ---------------------------------------------------------------------------
-cleanup_old_marketplace() {
-    info "旧マーケットプレイス（${OLD_MARKETPLACE}）の確認中..."
-
-    local registered_names
-    registered_names=$(codex plugin marketplace list 2>/dev/null | awk 'NR>1{print $1}') || registered_names=""
-
-    local old_found=false
-    while IFS= read -r name; do
-        if [[ "${name}" == "${OLD_MARKETPLACE}" ]]; then
-            old_found=true
-            break
-        fi
-    done <<< "${registered_names}"
-
-    if [[ "${old_found}" == "true" ]]; then
-        warn "旧マーケットプレイス '${OLD_MARKETPLACE}' を検出。移行掃除を実行します。"
-
-        # 旧プラグインの削除（未インストールの場合は失敗を無視）
-        info "旧プラグイン '${OLD_PLUGIN}@${OLD_MARKETPLACE}' を削除中（エラーは無視）..."
-        codex plugin remove "${OLD_PLUGIN}@${OLD_MARKETPLACE}" 2>/dev/null || true
-
-        # 旧マーケットプレイスの削除
-        info "旧マーケットプレイス '${OLD_MARKETPLACE}' を削除中..."
-        codex plugin marketplace remove "${OLD_MARKETPLACE}"
-        info "旧マーケットプレイスの掃除が完了しました。"
-    else
-        info "旧マーケットプレイス '${OLD_MARKETPLACE}' は存在しません。スキップします。"
-    fi
 }
 
 # ---------------------------------------------------------------------------
@@ -231,9 +194,6 @@ main() {
     echo ""
 
     link_codex_assets
-    echo ""
-
-    cleanup_old_marketplace
     echo ""
 
     setup_marketplace
