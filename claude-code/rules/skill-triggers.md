@@ -19,9 +19,9 @@
 | Docker/CI-CD/DevOps/Podman | `sumik:tachikoma-cloud-infra` |
 | `.tf` / Terraform | `sumik:tachikoma-cloud-terraform` |
 | AWS (CDK/SAM/SDK/Bedrock) | `sumik:tachikoma-cloud-aws` |
-| GCP (Cloud Run/GKE) | `sumik:tachikoma-cloud-gcp` |
+| GCP (Cloud Run/GKE) / Firebase (Auth/Firestore/Functions・`firebase.json`/`firestore.rules`検出) | `sumik:tachikoma-cloud-gcp` |
 | DB/SQL/Prisma/マイグレーション | `sumik:tachikoma-data-database` |
-| AI/RAG/MCP/LLM | `sumik:tachikoma-data-ai-ml` |
+| AI/RAG/MCP/LLM / LLM評価・red-team（`promptfooconfig.yaml`） | `sumik:tachikoma-data-ai-ml` |
 | テストファイル（`*test*`, `*spec*`等） | `sumik:tachikoma-qa-test` |
 | Playwright/E2E | `sumik:tachikoma-qa-e2e-test` |
 | 監視/OTel/ログ | `sumik:tachikoma-qa-observability` |
@@ -29,7 +29,8 @@
 | 設計/DDD/アーキテクチャ | `sumik:tachikoma-str-architecture`（読取専用） |
 | セキュリティ監査 | `sumik:tachikoma-qa-security`（読取専用） |
 | コードレビュー主題（PR review・品質監査） | `sumik:tachikoma-qa-code-reviewer`（読取専用） |
-| 研修/プレゼン | `sumik:tachikoma-doc-training` |
+| 研修設計/プレゼン内容改善 | `sumik:tachikoma-doc-training` |
+| HTMLスライドデッキ作成（slides repo 3層モデル・テーマ・素材変換） | `sumik:tachikoma-doc-slide` |
 | 上記以外 | `sumik:tachikoma` |
 
 ### 判断ポイント
@@ -51,4 +52,6 @@
 
 ## オンデマンドスキル（明示的要求時のみ）
 
-フラッシュカード(`creating-flashcards`) / プレゼン(`creating-slides`, `gws-slides`) / 図表(`creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`practicing-product-management`)
+フラッシュカード(`creating-flashcards`) / プレゼン(`creating-slides`, `gws-slides`) / 図表(`creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`practicing-product-management`) / アルゴリズム(`solving-algorithms`・言語非依存リファレンス・特定agent非割当=意図的省略)
+
+> **スキル分割メモ**: `designing-ux` から `designing-ai-experiences`（AI体験設計）・`practicing-design-thinking`（デザイン思考プロセス・UXリサーチ）を分離。3スキルとも `tachikoma-fe-ux-design` が担当（上表「UX戦略/デザイン思考/AIエクスペリエンス」行に集約）。

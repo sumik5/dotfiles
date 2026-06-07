@@ -49,11 +49,43 @@
 | compaction後 | `/reload` でCLAUDE.md再読み込み |
 | 同じミスを2回繰り返した時 | If X then Y形式で罠を追記 |
 | ユーザーが訂正した時 | 訂正内容を追記提案（AskUserQuestionで確認） |
+| sumik-claude-plugin スキルを読込/使用中に改善余地を発見した時（description不正確・肥大・統合余地・知見追記漏れ・参照切れ・規約違反） | **即編集せず**下記「📥 スキル改善提案」へ所定フォーマットで1件追記（軽微typoは即修正可）。捕捉ルール厳守 |
+| スキル改善提案が溜まった時（open 3件以上 or「スキル改善まわして」） | `authoring-plugins` の「🔄 改善提案INTAKE」（`references/IMPROVEMENT-INTAKE.md`）を起点に消費→処理済みを📥からドレイン |
 
 ## セッション引き継ぎ
 
 - Named Session接頭辞: `feature-` / `bugfix-` / `refactor-` / `docs-` / `chore-`
 - 対象: `~/.claude/projects/{project-key}/sessions-index.json` の最新 `modified` エントリ
 - `/resume` で再開可能（`P` プレビュー、`/` 検索）
+
+## 📥 スキル改善提案 (inbox)
+
+sumik-claude-plugin スキルの改善提案キュー。捕捉(C)→消費(D=`authoring-plugins` の「🔄 改善提案INTAKE」)を繋ぐ単一キュー。**openのみ保持**し、消費後は削除（CLAUDE.md 300行原則を死守）。フォーマット全仕様は `authoring-plugins/references/IMPROVEMENT-INTAKE.md §2`。
+
+**捕捉ルール**: ①実際に読込/使用したスキルに限る（未読の推測提案禁止）②1スキル1セッション1件 ③確度=低は書かない ④具体的改善文/削除対象行を伴うもののみ（漠然とした感想不可）⑤作業主目的を中断せずタスク完了後に追記。各提案は `### [PROPOSAL] <skill> / <種別> / <日付>` 見出し＋ skill・種別(description改善/分割/統合/内容追記/参照修正/規約違反)・改善点・理由(書籍名禁止)・確度(高/中)・影響範囲・status を箇条書きで持つ。
+
+### [PROPOSAL] authoring-plugins / 規約違反 / 2026-06-07
+- skill: authoring-plugins / 種別: 規約違反（陳腐化した教材例）
+- 改善点: references/ の NAMING.md・NAMING-STRATEGY.md・TEMPLATES.md・SKILL-GUIDE.md が命名規則の例として廃止/改名済みスキル名（applying-design-guidelines・crafting-ai-copywriting・understanding-database-internals 等）を使用。現存スキル名へ差し替え。
+- 理由: 公開authoring guideが存在しないスキル名を例示すると誤誘導。pedagogical flowを壊さぬよう慎重に置換。
+- 確度: 中 / 影響範囲: 自スキルのみ / status: open
+
+### [PROPOSAL] developing-databases / 内容追記 / 2026-06-07
+- skill: developing-databases / 種別: 内容追記
+- 改善点: references/INTERNALS-*.md にOCR由来の文字化けテキストが散在。該当箇所を正しい技術記述に再生成。
+- 理由: 書籍ページ参照の除去は完了済みだが本文の文字化けは未修整で可読性を損なう。
+- 確度: 中 / 影響範囲: 自スキルのみ / status: open
+
+### [PROPOSAL] creating-flashcards / 分割 / 2026-06-07
+- skill: creating-flashcards / 種別: 分割
+- 改善点: INSTRUCTIONS.md が減量後も607行（500目安超）。CONTRACTブロック・Step6詳細コード仕様を別referenceへ退避できるか再構成検討。
+- 理由: 多言語/デッキ戦略の退避は完了したが本体がなお肥大。
+- 確度: 中 / 影響範囲: 自スキルのみ / status: open
+
+### [PROPOSAL] find-skills / 規約違反 / 2026-06-07
+- skill: find-skills / 種別: 規約違反
+- 改善点: SKILL.md本文が英語＋144行直書き（薄いSKILL.md+INSTRUCTIONS分離の規約違反、コーパスは日本語基本）。日本語化＋INSTRUCTIONS.md分離。
+- 理由: 兄弟スキル(searching-web等)と構造・記述言語が不一致。
+- 確度: 中 / 影響範囲: 自スキルのみ / status: open
 
 @RTK.md
