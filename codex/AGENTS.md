@@ -95,7 +95,7 @@
 - **複数の検出条件に該当** → より専門的な方を優先（例: Next.js + UI → Next.js をメイン、フロントエンドをサブ）
 - **並列実行** → 異なる専門タチコマを同時起動可能（例: Next.js + E2Eテスト）。同一タチコマの複数起動も可能
 - **読取専用エージェント**（アーキテクチャ・セキュリティ・コードレビュー）→ 設計ドキュメント・レポートのみ出力。実装コードは書かない。プロダクトマネジメント(`tachikoma-product-manager`)は PRD/docs のみ作成
-- **スキルの呼び出し**: 各エージェントは developer_instructions 末尾の「活用スキル」に列挙されたスキル群を、プラグイン(sumik@codex-plugin)経由で description 自動ロードする（手動の skills.config 登録は不要）
+- **スキルの呼び出し**: 各エージェントは developer_instructions 末尾の「活用スキル」に列挙されたスキル群を、プラグイン(devkit@sumik-marketplace)経由で description 自動ロードする（手動の skills.config 登録は不要）
 
 ## 共通仕様
 
