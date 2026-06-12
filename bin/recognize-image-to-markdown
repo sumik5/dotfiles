@@ -575,10 +575,27 @@ _THINK_ANCHORS = [
     r"^Let'?s look at (?:the|this) character",
     r"^Testing the hypothesis",
     r"^Confirming the reading",
+    # 英語メタ思考・整形計画・構造説明（日本語アンカーをすり抜けた英語変種。試験本文に出にくい語）
+    r"(?:Refine|Final|Initial|Self)[- ]?(?:Formatting|Scan|Correction|Draft)",
+    r"^\s*\d+\.\s*\*{0,2}(?:Refine|Identify|Analyze|Scan|Structure|Transcribe|Assemble|Body Text|Header|Footer)",
+    r"The (?:checkbox|checkboxes|sidebar|header|footer|image|main section|table|symbol)\b[^\n]{0,40}(?:look|appear|seem|is |are |shows?)",
+    r"\bI (?:will|'ll|should|need to|am going to)\s+(?:use|place|write|transcribe|output|describe|format|represent|structure|skip|include)\b",
+    r"(?:Let me|Let's)\s+(?:assemble|reconsider|structure|format|look at the|check the)",
+    r"\bProblem\s*\d+\s*[:：]",
     # 日本語自問自答ループ
     r"^(?:画像の(?:分析|文字)|いや、待て|よし、「.+?」|もう一度)",
     # 三人称セルフ説明
     r"^(?:ユーザーは.+画像|これは.+問題だと|実際には.+(?:右から|左から)|画像を拡大して)",
+    # 日本語メタ思考・画像構造説明・OCRルール復唱（識別性の高い語のみ＝試験本文に出にくい）
+    #   ※ search ベースなので行内一致可。汚染ブロックに頻出しスコアを閾値超へ押し上げる
+    r"画像の(?:構造|レイアウト|右上|左上|上部|下部|中央|内容)を",
+    r"(?:上部|その下|右上|左上|右下|左下|中央)に(?:「|あ(?:る|り)|配置|小さく)",
+    r"ルール\s*\d+\s*(?:に従|「)",
+    r"画像に(?:無い|ない)(?:文字|内容)",
+    r"テキスト化(?:する|の際|が難しい|すべき|を)",
+    r"(?:Body\s*Text|ヘッダー部分|赤い(?:背景|バナー)|チェックボックス(?:のような|のアイコン|が\s*[0-9０-９３]))",
+    r"^\s*\d+\.\s*\*{0,2}(?:画像|上部|その下|右上|構造|見出し|配置)",
+    r"(?:書き起こす際|テキストとして扱う|Unicode\s*を?\s*使|省略するか)",
 ]
 _THINK_RE = re.compile("|".join(_THINK_ANCHORS))
 # 簡体字トークン: 崩壊の補助シグナル（出現で加点。単独では除去しない）
