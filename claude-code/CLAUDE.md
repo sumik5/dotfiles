@@ -20,7 +20,7 @@
 | コミットメッセージ | Conventional Commits形式必須 |
 | 新機能実装前 | `researching-libraries` で既存ライブラリ調査 |
 | 複数ファイル変更前 | plannerが `docs/` に計画作成（軽微修正は例外） |
-| 実装完了後 | `/codeguard-security:software-security` 実行 |
+| 実装完了後 | `software-security` スキル（devkit / Project CodeGuard 日本語版）をロードしてセキュリティチェック |
 | Web検索時 | Exa MCP第一優先（fallback: gemini CLI） |
 | CLAUDE.md改善時 | `managing-claude-md` スキル参照 → If X then Y形式で追記提案 |
 

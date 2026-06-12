@@ -16,4 +16,4 @@ Red→Green→Refactor。AAAパターン必須。カバレッジ: ビジネス�
 
 ## セキュリティ → `securing-code` スキル参照
 
-実装完了後 `/codeguard-security:software-security` 必須実行。全外部入力検証・SQLi/XSS対策・機密情報は環境変数。
+実装完了後 `software-security` スキル（devkit / Project CodeGuard 日本語版）を必須ロード。全外部入力検証・SQLi/XSS対策・機密情報は環境変数。

@@ -16,7 +16,7 @@
 | `/reload` | CLAUDE.md再読み込み（compaction後） |
 | `/code-review` | PRコードレビュー |
 | `/feature-dev` | 機能開発ワークフロー |
-| `/codeguard-security:software-security` | 🔴 セキュリティチェック（実装後必須） |
+| `software-security` スキル | 🔴 セキュリティチェック（実装後必須・devkit / Project CodeGuard 日本語版） |
 | `/ralph-loop` / `/cancel-ralph` | 反復開発ループ |
 
 その他のコマンド・プラグインは `/skills` `/plugins` で確認可能。
