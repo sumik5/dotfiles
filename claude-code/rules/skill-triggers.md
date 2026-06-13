@@ -52,6 +52,6 @@
 
 ## オンデマンドスキル（明示的要求時のみ）
 
-フラッシュカード(`creating-flashcards`) / プレゼン(`creating-slides`, `gws-slides`) / 図表(`creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`practicing-product-management`) / アルゴリズム(`solving-algorithms`・言語非依存リファレンス・特定agent非割当=意図的省略)
+フラッシュカード(`studio:creating-flashcards`) / プレゼン(`studio:creating-slides`, `studio:gws-slides`) / 図表(`studio:creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`practicing-product-management`) / アルゴリズム(`solving-algorithms`・言語非依存リファレンス・特定agent非割当=意図的省略)
 
-> **スキル分割メモ**: `designing-ux` から `designing-ai-experiences`（AI体験設計）・`practicing-design-thinking`（デザイン思考プロセス・UXリサーチ）を分離。3スキルとも `tachikoma-fe-ux-design` が担当（上表「UX戦略/デザイン思考/AIエクスペリエンス」行に集約）。
+> **スキル分割メモ**: `design:designing-ux` から `design:designing-ai-experiences`（AI体験設計）・`design:practicing-design-thinking`（デザイン思考プロセス・UXリサーチ）を分離。3スキルとも `tachikoma-fe-ux-design` が担当（上表「UX戦略/デザイン思考/AIエクスペリエンス」行に集約）。

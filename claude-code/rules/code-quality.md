@@ -6,7 +6,7 @@
 
 S(単一責任) O(開放閉鎖) L(リスコフ置換) I(インターフェース分離) D(依存関係逆転)
 
-## 型安全性 → `mastering-typescript`（TS）・`developing-python`（Python）スキル参照
+## 型安全性 → `mastering-typescript`（TS）・`lang:developing-python`（Python）スキル参照
 
 ❌ `any`(TS)/`Any`(Python)禁止 → `unknown`+型ガード/ジェネリクス/Utility Types
 
