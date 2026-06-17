@@ -367,6 +367,15 @@ handle_send_keys() {
         literal=true
         shift
         ;;
+      --)
+        # tmux のオプション終端区切り。これ以降は全て送信するキー文字列。
+        # Claude Code は `send-keys -t <pane> -l -- "<command>"` 形式で teammate 起動
+        # コマンドを流し込む。実 tmux と同様、-- 自体は送信内容に含めず消費する
+        # （消費し損ねると先頭に "-- " が残り、ペインで "command not found: --" になる）。
+        shift
+        keys+=("$@")
+        break
+        ;;
       *)
         keys+=("$1")
         shift
