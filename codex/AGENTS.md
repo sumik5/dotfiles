@@ -8,9 +8,9 @@
 
 | 役割 | エージェント数 | モデル | 説明 |
 |------|-------------|--------|------|
-| **専門タチコマ** | 21体 | Sonnet/Opus | ドメイン特化の実装ワーカー（スキルプリロード済み） |
-| **汎用タチコマ** | 1体 | Sonnet | 専門タチコマでカバーされないタスクのフォールバック |
-| **Serena Expert** | 1体 | Sonnet | `/serena` コマンドによるトークン効率的な開発 |
+| **専門タチコマ** | 26体 | gpt-5.4 | ドメイン特化の実装ワーカー（スキルプリロード済み） |
+| **汎用タチコマ** | 1体 | gpt-5.4 | 専門タチコマでカバーされないタスクのフォールバック |
+| **Serena Expert** | 1体 | gpt-5.4 | `/serena` コマンドによるトークン効率的な開発 |
 
 ---
 
@@ -102,9 +102,9 @@
 すべてのタチコマは以下の共通仕様に従います:
 
 - **言語**: 日本語で応答（技術用語を除く）
-- **バージョン管理**: Jujutsu (jj) 使用（git原則禁止）
+- **バージョン管理**: Git 使用
 - **コミット**: Conventional Commits形式
-- **品質**: SOLID原則・型安全性（any禁止）・テスト（AAAパターン）・セキュリティチェック（CodeGuard）
+- **品質**: SOLID原則・型安全性（any禁止）・テスト（AAAパターン）・セキュリティチェック（実装完了後に `software-security` スキルをロード）
 - **報告**: 完了報告は【完了報告】フォーマットでCodex本体に送信
 - **並列実行**: `docs/plan-xxx.md` の担当セクションを正式な仕様書として参照
 
@@ -118,7 +118,7 @@ sumik-claude-plugin スキルの改善提案キュー（Codex 版）。捕捉(C)
 
 各提案は `### [PROPOSAL] <skill> / <種別> / <日付>` 見出し＋ skill・種別(description改善/分割/統合/内容追記/参照修正/規約違反)・改善点・理由(書籍名禁止)・確度(高/中)・影響範囲・status を箇条書きで持つ。
 
-**発火**: open が3件以上、またはユーザーが「スキル改善まわして」と指示した時、`authoring-plugins` の INTAKE を起点に消費する。Codex のコミットは Jujutsu (jj) を使用（git原則禁止）。
+**発火**: open が3件以上、またはユーザーが「スキル改善まわして」と指示した時、`authoring-plugins` の INTAKE を起点に消費する。Codex のコミットも Git を使用（Conventional Commits 形式）。
 
 <!-- open な提案をここに追記。処理後はドレイン。Claude Code 側で気づいた提案は ~/.claude/CLAUDE.md の inbox に入る。 -->
 
@@ -126,17 +126,19 @@ sumik-claude-plugin スキルの改善提案キュー（Codex 版）。捕捉(C)
 
 # MCP 利用ガイド（この環境で有効なサーバ）
 
-このリポジトリでは `config.toml` の設定に基づき、以下の MCP サーバが有効です。用途に応じて最適なサーバを選び、不要なときは呼び出さない方針とします。
+この環境では、`devkit@sumik-marketplace`・`studio@sumik-marketplace` 同梱の `.mcp-codex.json` および別途導入したプラグインを通じて、以下の MCP サーバが有効です（末尾の `（プラグイン名）` は同梱元）。用途に応じて最適なサーバを選び、不要なときは呼び出さない方針とします。
 
 ## MCP とは
 Model Context Protocol (MCP) は、LLM アプリケーションが外部ツールやデータソースと連携するためのオープンなプロトコルです。MCP サーバはツール群を提供し、クライアント（このエージェントなど）がそれらを呼び出します。
 
 ## 有効な MCP 一覧
-- serena
-- deepthinking
+- serena（devkit）
+- sequentialthinking（devkit）
+- chrome-devtools（devkit）
+- puppeteer（devkit）
 - next-devtools
 - context7
-- chrome-devtools
+- drawio（studio）
 
 ---
 
@@ -157,20 +159,20 @@ Serena は、シンボル単位の検索・編集など IDE 的な操作を MCP 
 
 ---
 
-## deepthinking（段階的な思考・比較・分岐の支援）
+## sequentialthinking（段階的な思考・比較・分岐の支援）
 **概要**
-DeepThinking は、順序立った思考プロセスを支援する MCP サーバです。複数の思考モード、セッション管理、可視化、テンプレートなどを提供します。
+Sequential Thinking は、順序立った思考プロセスを支援する MCP サーバです。思考ステップを分割・修正・分岐しながら、複雑な問題を構造的に整理します。`devkit` プラグインが同梱します。
 
 **使う場面**
 - 複数案の比較、分岐検討、逆算、仮説検証が必要な設計検討
 - 根拠を段階的に整理して結論を出したいとき
-- 長い思考をセッションとして保持・再利用したいとき
+- 思考の途中で前提を見直し、ステップを巻き戻したいとき
 
 **注意点**
 - 単純な作業には過剰になりやすい
 
 **参考**
-- PyPI: `https://pypi.org/project/DeepThinking/`
+- README: `https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking`
 
 ---
 
@@ -211,6 +213,41 @@ Context7 は、ライブラリや SDK の最新ドキュメントとコード例
 
 ---
 
+## puppeteer（ヘッドレスブラウザ自動操作）
+**概要**
+Puppeteer MCP は、ヘッドレス Chrome を通じてページ遷移・クリック・フォーム入力・スクリーンショット取得などのブラウザ操作を提供します。`devkit` プラグインが同梱します。
+
+**使う場面**
+- ページ遷移や DOM 操作を伴う自動化シナリオ
+- スクリーンショット取得や簡易的な動作確認
+- フォーム入力・要素選択などの定型ブラウザ操作
+
+**注意点**
+- 詳細な性能トレースやネットワーク解析は chrome-devtools の方が適する
+- ブラウザの内容が MCP クライアントに公開されるため、機密情報のあるページには注意
+
+**参考**
+- README: `https://github.com/modelcontextprotocol/servers/tree/main/src/puppeteer`
+
+---
+
+## drawio（ダイアグラム生成）
+**概要**
+drawio MCP は、XML・Mermaid・CSV などの記述から draw.io 形式の図を生成・編集するサーバです。`studio` プラグインが同梱します。
+
+**使う場面**
+- フローチャート・ER図・シーケンス図などのダイアグラム作成
+- Mermaid 記法や CSV から draw.io 図への変換
+- 設計ドキュメントへ添付する図の生成
+
+**注意点**
+- 図の生成・編集が主目的で、コード解析やブラウザ操作には用いない
+
+**参考**
+- README: `https://github.com/drawio/mcp`
+
+---
+
 ## chrome-devtools（ブラウザ実行/性能/ネットワーク調査）
 **概要**
 Chrome DevTools MCP は、Chrome の DevTools を通してブラウザの実行状態を検査し、性能トレースやネットワーク解析などを行います。
@@ -232,7 +269,9 @@ Chrome DevTools MCP は、Chrome の DevTools を通してブラウザの実行�
 
 ## 使い分けの指針（簡易）
 - **コードの探索/編集**: serena
-- **設計の比較や深い思考**: deepthinking
+- **設計の比較や深い思考**: sequentialthinking
 - **Next.js の実行時診断**: next-devtools
 - **ライブラリの最新ドキュメント**: context7
 - **ブラウザ挙動/性能解析**: chrome-devtools
+- **ブラウザ操作の自動化/スクリーンショット**: puppeteer
+- **ダイアグラム生成**: drawio

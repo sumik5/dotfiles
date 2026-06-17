@@ -1,6 +1,6 @@
 name = "tachikoma_terraform"
 description = "Terraform IaC specialized Tachikoma execution agent. Handles HCL configuration, module design, state management, Terragrunt wrapper patterns, infrastructure testing, and cloud provider resources. Use proactively when working with .tf files, terragrunt.hcl, or infrastructure as code definitions. Detects: .tf files or terragrunt.hcl."
-model = "gpt-5.5"
+model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["State", "Plan", "Module"]

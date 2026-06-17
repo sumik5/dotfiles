@@ -3,7 +3,7 @@
 # install-sumik-codex-plugin.sh
 #
 # 目的:
-#   sumik-claude-plugin リポジトリの Codex プラグインを
+#   sumik-llm-plugin リポジトリの Codex プラグインを
 #   git marketplace 経由で add（未登録時）/ update（登録済み時）する冪等スクリプト。
 #   併せて、本スクリプトと同階層の agents/ と AGENTS.md を ~/.codex/ 配下へ
 #   symlink する（既存は上書き）。何度実行しても安全。
@@ -19,8 +19,9 @@
 #
 # 環境変数（省略時はデフォルト値を使用）:
 #   MARKETPLACE_NAME  登録するマーケットプレイス名（デフォルト: sumik-marketplace）
-#   PLUGIN_NAME       インストールするプラグイン名（デフォルト: sumik-codex-plugins）
-#   GIT_SOURCE        Git ソース URL（デフォルト: GitHub の sumik-claude-plugin）
+#   PLUGIN_NAMES      インストールするプラグイン名（スペース区切り・デフォルト:
+#                     "devkit studio lang cloud ai design exam" の7プラグイン）
+#   GIT_SOURCE        Git ソース URL（デフォルト: GitHub の sumik-llm-plugin）
 #   GIT_REF           Git リファレンス（デフォルト: main）
 #   CODEX_HOME        symlink 先の Codex ホーム（デフォルト: ~/.codex）
 # =============================================================================
@@ -52,10 +53,19 @@ err() {
 # 設定パラメータ（環境変数で上書き可能）
 # ---------------------------------------------------------------------------
 : "${MARKETPLACE_NAME:=sumik-marketplace}"
-: "${PLUGIN_NAME:=devkit}"
-: "${GIT_SOURCE:=https://github.com/sumik5/sumik-claude-plugin.git}"
+: "${GIT_SOURCE:=https://github.com/sumik5/sumik-llm-plugin.git}"
 : "${GIT_REF:=main}"
 : "${CODEX_HOME:=${HOME}/.codex}"
+
+# インストール対象プラグイン一覧（bash 配列）。
+# 環境変数 PLUGIN_NAMES（スペース区切り）で上書き可能。
+# 注: スクリプト冒頭で IFS=$'\n\t'（スペース除外）のため、上書き時は
+#     read 実行中だけ IFS をスペースに戻して安全に分割する。
+if [[ -n "${PLUGIN_NAMES:-}" ]]; then
+    IFS=' ' read -r -a PLUGINS <<< "${PLUGIN_NAMES}"
+else
+    PLUGINS=(devkit studio lang cloud ai design exam)
+fi
 
 # このスクリプト自身のディレクトリ（agents/ と AGENTS.md が同階層にある前提）
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -134,9 +144,13 @@ setup_marketplace() {
 # プラグインのインストール / 更新
 # ---------------------------------------------------------------------------
 install_plugin() {
-    info "プラグイン '${PLUGIN_NAME}@${MARKETPLACE_NAME}' をインストール / 更新中..."
-    codex plugin add "${PLUGIN_NAME}@${MARKETPLACE_NAME}"
-    info "プラグインの add コマンドが完了しました。"
+    info "プラグイン ${#PLUGINS[@]} 件を ${MARKETPLACE_NAME} からインストール / 更新中..."
+    local plugin
+    for plugin in "${PLUGINS[@]}"; do
+        info "  -> '${plugin}@${MARKETPLACE_NAME}' を add..."
+        codex plugin add "${plugin}@${MARKETPLACE_NAME}"
+    done
+    info "全プラグインの add コマンドが完了しました。"
 }
 
 # ---------------------------------------------------------------------------
@@ -148,35 +162,44 @@ verify_installation() {
     local plugin_list
     plugin_list=$(codex plugin list 2>/dev/null) || plugin_list=""
 
-    # "installed" かつ対象プラグインが含まれるか確認
-    if ! echo "${plugin_list}" | grep -q "${PLUGIN_NAME}@${MARKETPLACE_NAME}"; then
-        err "検証失敗: '${PLUGIN_NAME}@${MARKETPLACE_NAME}' が plugin list に見つかりません。"
-        err "--- plugin list 出力 ---"
-        echo "${plugin_list}" >&2
-        exit 1
-    fi
+    local plugin ok_count=0
+    local summary_lines=()
+    for plugin in "${PLUGINS[@]}"; do
+        local ref="${plugin}@${MARKETPLACE_NAME}"
 
-    if ! echo "${plugin_list}" | grep "${PLUGIN_NAME}@${MARKETPLACE_NAME}" | grep -q "installed"; then
-        err "検証失敗: '${PLUGIN_NAME}@${MARKETPLACE_NAME}' のステータスが 'installed' ではありません。"
-        err "--- 該当行 ---"
-        echo "${plugin_list}" | grep "${PLUGIN_NAME}@${MARKETPLACE_NAME}" >&2
-        exit 1
-    fi
+        # "installed" かつ対象プラグインが含まれるか確認
+        if ! echo "${plugin_list}" | grep -q "${ref}"; then
+            err "検証失敗: '${ref}' が plugin list に見つかりません。"
+            err "--- plugin list 出力 ---"
+            echo "${plugin_list}" >&2
+            exit 1
+        fi
 
-    # バージョン抽出（VERSION 列を取得）
-    local version_line
-    version_line=$(echo "${plugin_list}" | grep "${PLUGIN_NAME}@${MARKETPLACE_NAME}")
-    local version
-    version=$(echo "${version_line}" | awk '{print $NF}') || version="(不明)"
+        if ! echo "${plugin_list}" | grep "${ref}" | grep -q "installed"; then
+            err "検証失敗: '${ref}' のステータスが 'installed' ではありません。"
+            err "--- 該当行 ---"
+            echo "${plugin_list}" | grep "${ref}" >&2
+            exit 1
+        fi
 
-    info "検証成功: プラグインは正常にインストールされています。"
+        # バージョン抽出（VERSION 列を取得）
+        local version
+        version=$(echo "${plugin_list}" | grep "${ref}" | awk '{print $NF}') || version="(不明)"
+        summary_lines+=("  ${plugin} : ${version}")
+        ok_count=$((ok_count + 1))
+    done
+
+    info "検証成功: ${ok_count} 件のプラグインが正常にインストールされています。"
     echo ""
     echo "============================================"
     echo "  完了サマリ"
     echo "============================================"
     echo "  marketplace : ${MARKETPLACE_NAME}"
-    echo "  plugin      : ${PLUGIN_NAME}"
-    echo "  version     : ${version}"
+    echo "  plugins     :"
+    local line
+    for line in "${summary_lines[@]}"; do
+        echo "  ${line}"
+    done
     echo "  agents      : ${CODEX_HOME}/agents -> ${SCRIPT_DIR}/agents"
     echo "  AGENTS.md   : ${CODEX_HOME}/AGENTS.md -> ${SCRIPT_DIR}/AGENTS.md"
     echo "============================================"

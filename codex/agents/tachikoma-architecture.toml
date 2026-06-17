@@ -1,6 +1,6 @@
 name = "tachikoma_architecture"
 description = "Architecture design specialized Tachikoma (READ-ONLY). Analyzes systems using DDD strategic/tactical patterns, microservices architecture (CQRS, Saga, Event Sourcing), trade-off analysis methodology, data architecture patterns, and Clean Architecture (dependency rules, concentric layer model, component principles). Use proactively for architecture reviews, system design, domain boundary analysis, modernization planning, or multi-tenant SaaS design. Does NOT write implementation code - produces design documents and recommendations only."
-model = "gpt-5.5"
+model = "gpt-5.4"
 model_reasoning_effort = "xhigh"
 sandbox_mode = "read-only"
 nickname_candidates = ["Surveyor", "Maple", "North"]

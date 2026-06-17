@@ -1,6 +1,6 @@
 name = "tachikoma_fullstack_js"
 description = "Full-stack JavaScript specialized Tachikoma execution agent. Handles NestJS/Express backend development, RESTful API design, structured logging, and full-stack integration. Use proactively when building backend APIs with NestJS or Express, implementing API endpoints, designing request/response patterns, or configuring application logging. Detects: package.json with express, nestjs, fastify, koa, or hapi dependency."
-model = "gpt-5.5"
+model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Route", "Stack", "Bridge"]

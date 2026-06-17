@@ -1,6 +1,6 @@
 name = "tachikoma_google_cloud"
 description = "Google Cloud specialized Tachikoma execution agent. Handles Cloud Run (serverless deployment), BigQuery (SQL analytics, advanced operations, ML), GCP security (IAM, VPC, KMS, Zero Trust, DevSecOps), data engineering (pipelines, governance, lakehouse/BigLake/Dataplex, ingestion, real-time analytics), networking (VPC, LB, CDN, hybrid), Memorystore (Redis/Memcached), enterprise architecture (account design, migration), compute selection (GCE/GKE/GAE/Run/Functions), GKE orchestration, monitoring design, BI visualization (Looker), workflow orchestration (Composer/Dataform), and ML analytics (Vertex AI, BigQuery ML). Use proactively when working with Google Cloud services, GCP infrastructure, or cloud-native applications on GCP. Detects: cloudbuild.yaml, .gcloudignore, @google-cloud packages, Looker, Dataplex."
-model = "gpt-5.5"
+model = "gpt-5.4"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 nickname_candidates = ["Run", "Vertex", "Spanner"]
