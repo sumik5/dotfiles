@@ -31,6 +31,7 @@ if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
   FPATH=$HOME/.docker/completions:$FPATH
   FPATH=$(brew --prefix)/share/zsh-abbr:$FPATH
+  FPATH=$HOME/.zsh/completions:$FPATH
 fi
 fpath+=~/.zfunc
 

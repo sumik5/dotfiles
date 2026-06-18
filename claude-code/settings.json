@@ -46,7 +46,6 @@
     ],
     "defaultMode": "default"
   },
-  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -146,10 +145,14 @@
   },
   "enabledPlugins": {
     "codeguard-security@project-codeguard": true,
-    "sumik@sumik": true,
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "devkit@sumik": true,
+    "ai@sumik": true,
+    "cloud@sumik": true,
+    "design@sumik": true,
+    "lang@sumik": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -157,6 +160,13 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    },
+    "sumik": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/sumik5/sumik-llm-plugin.git"
+      },
+      "autoUpdate": true
     }
   },
   "outputStyle": "Explanatory",
