@@ -49,6 +49,7 @@
 | `applying-semantic-versioning` | バージョン判断時 |
 | `writing-conventional-commits` | コミットメッセージ作成時 |
 | `searching-web` | Web検索（Exa MCP第一優先・geminiフォールバックを内包） |
+| `capturing-learnings` | ユーザー訂正・非自明エラー・機能要望・反復パターン発生時（`.learnings/`記録→memory/CLAUDE.md昇格）。詳細: `rules/capturing-learnings.md` |
 
 ## オンデマンドスキル（明示的要求時のみ）
 

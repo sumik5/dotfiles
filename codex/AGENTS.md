@@ -110,6 +110,39 @@
 
 ---
 
+## 🧠 継続的学習（capturing-learnings・常時オン）
+
+作業中に得た学び・エラー・ユーザー訂正・機能要望を `.learnings/` に構造化記録し、継続的改善につなげる。**Codex は hook が experimental（opt-in）のため、本セクションの記述が always-on の主機構**となる（Claude Code 側は devkit の hook が自動リマインドする）。エントリ書式・ID規則・解決フローの詳細は `capturing-learnings` スキル本体を参照。
+
+### 検出トリガー（If X then Y）
+
+| If X（トリガー） | then Y（行動） |
+|----------------|--------------|
+| ユーザーが訂正・誤りを指摘（「いや違う」「正しくは…」「それは古い」） | `.learnings/LEARNINGS.md` に `correction` で記録 |
+| 知らなかった情報の提供／参照ドキュメントが古い／APIの挙動が想定と異なる | `.learnings/LEARNINGS.md` に `knowledge_gap` で記録 |
+| 非自明なエラーを調査して解決（再発しうる） | `.learnings/ERRORS.md` に `[ERR-YYYYMMDD-XXX]` で記録 |
+| 存在しない機能を要望された（「〜もできる?」「〜できたらいいのに」） | `.learnings/FEATURE_REQUESTS.md` に記録 |
+| 反復タスクでより良い方法を発見 | `.learnings/LEARNINGS.md` に `best_practice` で記録 |
+| 大きな作業を始める前 | `.learnings/` を振り返り関連する過去の学びを確認 |
+
+### 昇格・ルーティング
+
+| 学びの性質 | 行き先 |
+|-----------|--------|
+| 一過性・そのプロジェクト限定 | `.learnings/`（留置） |
+| プロジェクト固有の事実・規約・落とし穴 | そのプロジェクトの `CLAUDE.md` / `AGENTS.md` |
+| ユーザー横断・複数セッションに渡る事実 | グローバル `~/dotfiles/codex/AGENTS.md`（Codex は memory システムを持たないため AGENTS.md に集約） |
+| **sumik-claude-plugin 自身のスキル改善** | 下記「📥 スキル改善提案 (inbox)」へ（`.learnings/` ではない） |
+| 汎用で再利用価値が高い | `authoring-plugins` で新スキル抽出を検討 |
+
+反復パターンの昇格条件: Recurrence-Count ≥ 3 ∧ 2タスク以上で観測 ∧ 30日以内。昇格文は「コーディング前/中に何をすべきか」の短い予防ルールで書く。
+
+### opt-in hook（自動化したい場合）
+
+`config.toml` に `codex_hooks = true` を設定し、`.codex/hooks.json` に UserPromptSubmit / PostToolUse を登録すると、Claude Code と同一スクリプト（stdin JSON・`additionalContext` 出力）で自動リマインドが効く。
+
+---
+
 ## 📥 スキル改善提案 (inbox)
 
 sumik-claude-plugin スキルの改善提案キュー（Codex 版）。捕捉(C)→消費(D=`authoring-plugins` の「🔄 改善提案INTAKE」)を繋ぐ。Claude Code 側の `~/.claude/CLAUDE.md` inbox と**対になる Codex 側 inbox** で、INTAKE は両方を走査する。**openのみ保持**し、消費後は削除（本ファイルを肥大させない）。フォーマット全仕様は `authoring-plugins/references/IMPROVEMENT-INTAKE.md §2`。

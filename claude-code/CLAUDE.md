@@ -23,6 +23,7 @@
 | 実装完了後 | `software-security` スキル（devkit / Project CodeGuard 日本語版）をロードしてセキュリティチェック |
 | Web検索時 | Exa MCP第一優先（fallback: gemini CLI） |
 | CLAUDE.md改善時 | `managing-claude-md` スキル参照 → If X then Y形式で追記提案 |
+| 作業中に学び・訂正・非自明なエラー・機能要望が生じた時 | `capturing-learnings` で `.learnings/` に記録（詳細: `rules/capturing-learnings.md`）。反復(Recurrence-Count≥3・2タスク以上・30日内)はmemory/CLAUDE.mdへ昇格 |
 
 ## 🎯 Quick Start
 
@@ -38,6 +39,7 @@
 | `rules/skill-triggers.md` | 専門タチコマ選択・ルーティング時 |
 | `rules/code-quality.md` | コード品質確認時 |
 | `rules/plugins-and-commands.md` | MCP・コマンド利用時 |
+| `rules/capturing-learnings.md` | 学び・エラー・訂正・機能要望の記録／`.learnings/`運用／メモリ昇格判断時 |
 
 ## 🔄 メンテナンス
 
@@ -48,7 +50,7 @@
 | 会話が長くなった時（compaction前） | `/handover` 実行 |
 | compaction後 | `/reload` でCLAUDE.md再読み込み |
 | 同じミスを2回繰り返した時 | If X then Y形式で罠を追記 |
-| ユーザーが訂正した時 | 訂正内容を追記提案（AskUserQuestionで確認） |
+| ユーザーが訂正した時 | `capturing-learnings` で `.learnings/LEARNINGS.md` に correction 記録 → 汎用的な訂正はCLAUDE.md/memoryへ追記提案（AskUserQuestionで確認） |
 | sumik-claude-plugin スキルを読込/使用中に改善余地を発見した時（description不正確・肥大・統合余地・知見追記漏れ・参照切れ・規約違反） | **即編集せず**下記「📥 スキル改善提案」へ所定フォーマットで1件追記（軽微typoは即修正可）。捕捉ルール厳守 |
 | スキル改善提案が溜まった時（open 3件以上 or「スキル改善まわして」） | `authoring-plugins` の「🔄 改善提案INTAKE」（`references/IMPROVEMENT-INTAKE.md`）を起点に消費→処理済みを📥からドレイン |
 
