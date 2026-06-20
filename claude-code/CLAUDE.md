@@ -21,6 +21,7 @@
 | 新機能実装前 | `researching-libraries` で既存ライブラリ調査 |
 | 複数ファイル変更前 | plannerが `docs/` に計画作成（軽微修正は例外） |
 | 実装完了後 | `software-security` スキル（devkit / Project CodeGuard 日本語版）をロードしてセキュリティチェック |
+| ファイル検索時（コード内容・ファイル名・複数識別子の探索） | **fff MCP 最優先**（devkit同梱・`grep`=内容/`find_files`=ファイル名/`multi_grep`=複数OR）。bare identifierで検索・regex回避・2回で打切りRead。serena(シンボル意味検索)/Glob(単純パス列挙)/rg(fff不在時)と棲み分け。詳細は `searching-files-with-fff` スキル参照 |
 | Web検索時 | Exa MCP第一優先（fallback: gemini CLI） |
 | CLAUDE.md改善時 | `managing-claude-md` スキル参照 → If X then Y形式で追記提案 |
 | 作業中に学び・訂正・非自明なエラー・機能要望が生じた時 | `capturing-learnings` で `.learnings/` に記録（詳細: `rules/capturing-learnings.md`）。反復(Recurrence-Count≥3・2タスク以上・30日内)はmemory/CLAUDE.mdへ昇格 |

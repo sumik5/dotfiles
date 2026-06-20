@@ -166,6 +166,7 @@ Model Context Protocol (MCP) は、LLM アプリケーションが外部ツー�
 
 ## 有効な MCP 一覧
 - serena（devkit）
+- fff（devkit）
 - sequentialthinking（devkit）
 - chrome-devtools（devkit）
 - puppeteer（devkit）
@@ -189,6 +190,30 @@ Serena は、シンボル単位の検索・編集など IDE 的な操作を MCP 
 
 **参考**
 - 概要/README: `https://raw.githubusercontent.com/oraios/serena/main/README.md`
+
+---
+
+## fff（高速ファイル検索）
+**概要**
+fff は Rust 製の常駐型ファイル検索エンジンです。warm cache とバックグラウンドのファイルシステム watcher により、ripgrep が数秒かかる大規模リポジトリでもミリ秒級で応答し、frecency（頻度・新しさ・git-dirty を加味）で結果を順位付けします。`devkit` プラグインがラッパー経由で同梱します。提供ツールは grep（内容検索・既定）/ find_files（ファイル名 fuzzy 検索）/ multi_grep（複数パターン OR 検索）の3つ。
+
+**使う場面**
+- コード内容のキーワード・識別子検索（最優先・最速）
+- ファイル名で目的のファイルを探すとき（find_files）
+- 命名規則違い（snake_case / PascalCase / camelCase）や複数識別子を一度に探すとき（multi_grep）
+
+**使い方の要点**
+- bare identifier 1つで検索する（例 `InProgressQuote`）。regex や複数トークンに跨るクエリは原則使わない（単一行マッチのため 0 件になりやすい）
+- 制約はクエリにインライン前置（`*.rs query`・`src/ query`・`!tests/`）。multi_grep は `constraints` 引数に渡す
+- grep は 2 回までで打ち切り、トップ結果を読む（grep 回数 ≠ 理解度）
+
+**注意点**
+- シンボル単位の意味的検索・参照検索・リネームは serena が適する（fff は「どこにあるか」を速く広く当てる用途）
+- 起動時の作業ディレクトリをインデックスするため、対象プロジェクトのルートでクライアントを起動すること
+
+**参考**
+- README: `https://github.com/dmtrKovalenko/fff.nvim`
+- 詳細スキル: `searching-files-with-fff`（devkit）
 
 ---
 
