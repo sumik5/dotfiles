@@ -109,3 +109,9 @@
 	postbuffer = 4M
 [coderabbit]
 	machineId = cli/82aa3c5ac85a4059a7fa6f6fa88f5732
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[gpg]
+	format = openpgp

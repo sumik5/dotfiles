@@ -64,7 +64,7 @@ err() {
 if [[ -n "${PLUGIN_NAMES:-}" ]]; then
     IFS=' ' read -r -a PLUGINS <<< "${PLUGIN_NAMES}"
 else
-    PLUGINS=(devkit studio lang cloud ai design exam)
+    PLUGINS=(devkit studio lang web cloud ai design product exam university)
 fi
 
 # このスクリプト自身のディレクトリ（agents/ と AGENTS.md が同階層にある前提）
