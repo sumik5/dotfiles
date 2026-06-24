@@ -74,6 +74,14 @@ git log への引数:
   スペース             1画面送り
   q                    終了
 
+対話モード(fzf)のキー操作:
+  ↑ / ↓                コミット一覧を移動
+  Ctrl-J / Ctrl-K      プレビュー(右側)を1行ずつスクロール
+  Ctrl-F / Ctrl-B      プレビュー(右側)を半画面スクロール
+  Ctrl-/               プレビューの表示/非表示を切り替え
+  Enter                選択して終了
+  Esc                  キャンセルして終了
+
 署名ステータスの意味(git の %G? が返す1文字に対応):
   ✅署名OK        有効な署名 (G: Good)
   ❌不正          不正な署名 (B: Bad)
@@ -195,22 +203,65 @@ fi
 
 if [ "$USE_INTERACTIVE" -eq 1 ]; then
   # === 対話モード(fzf 利用。デフォルト) ===
+  #
+  # fzf の --preview に処理を直接書くと、利用者のシェル(zsh)が
+  # sed の正規表現に含まれる角括弧 [0-9;] をグロブと誤解釈して
+  #   zsh:[:1: ']' expected
+  # のエラーを起こす。これを避けるため、プレビュー処理を独立した
+  # シェルスクリプト(#!/bin/sh)に書き出し、fzf からはそれを呼ぶだけにする。
+  #
+  # ヘルパーは mktemp で確実に存在するパスに作る($0 やインストール先に
+  # 依存しない)。fzf の実行中に消えないよう trap での自動削除はせず、
+  # fzf が終わった後に明示的に削除する。
+
+  # mktemp で一時ヘルパーを作成する(必ず実在するパスが返る)。
+  PREVIEW_HELPER="$(mktemp "${TMPDIR:-/tmp}/glogs-preview.XXXXXX")"
+
+  # ヘルパーの中身を書き出す。
+  #   $1 に fzf が選択行を渡す。
+  #   1) sed で ANSI 色コードを除去
+  #   2) grep でコミットハッシュ(7桁以上の16進)を1つ取り出す
+  #   3) ハッシュが取れたら git show で詳細を表示
+  cat > "$PREVIEW_HELPER" <<'EOS'
+#!/bin/sh
+line="$1"
+hash=$(printf '%s' "$line" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '[0-9a-f]{7,}' | head -1)
+if [ -n "$hash" ]; then
+  git show --color=always "$hash"
+fi
+EOS
+  chmod +x "$PREVIEW_HELPER"
 
   # fzf にログを流し込み、コミットを1件選べるようにする。
-  #   --ansi               : 色(ANSIエスケープ)をそのまま表示する
-  #   --no-sort            : 既にログ順に並んでいるので並べ替えない
-  #   --layout=reverse     : リストを上から下へ表示し、入力欄を上部に置く。
-  #                          これで git log の最新コミットが一番上に来る。
-  #                          (デフォルトの fzf は下が先頭=最新になり、上下が逆に見える)
-  #   --preview            : 選択中のコミットの詳細を右側にプレビュー表示
-  #     grep -o で行から7桁以上の16進(ハッシュ)を1つ取り出して show する。
-  #   --preview-window     : プレビューを右側60%幅で表示
-  run_git_log | fzf \
+  #   --ansi             : 色(ANSIエスケープ)をそのまま表示する
+  #   --no-sort          : 既にログ順に並んでいるので並べ替えない
+  #   --layout=reverse   : 最新コミットを一番上に表示する
+  #   --preview          : ヘルパーに選択行 {} を渡して詳細表示
+  #   --preview-window   : プレビューを右側60%幅で表示
+  #
+  # decorate を通してタブ(%x09)をスペースに変換してから fzf に渡す。
+  # タブが残ると fzf の {} 受け渡しで行が途中で切れることがあるため。
+  # || true: fzf を選択せず終了(Esc)すると終了コード130等を返すが、
+  #          set -e で止まらないよう吸収する。
+  #
+  # --bind: プレビュー(右側)をスクロールするキーを割り当てる。
+  #   ↑↓ や j/k はコミット一覧(左側)の移動に使うため、プレビューには
+  #   別のキーを割り当てる。
+  #     Ctrl-J / Ctrl-K        : プレビューを1行ずつ下/上にスクロール
+  #     Ctrl-F / Ctrl-B        : プレビューを半画面ずつ下/上にスクロール
+  #     Ctrl-/                 : プレビューの表示/非表示を切り替え
+  run_git_log | decorate | fzf \
     --ansi \
     --no-sort \
     --layout=reverse \
-    --preview 'git show --color=always $(echo {} | grep -oE "[0-9a-f]{7,}" | head -1)' \
-    --preview-window=right:60%
+    --preview "sh '$PREVIEW_HELPER' {}" \
+    --preview-window=right:60% \
+    --bind 'ctrl-j:preview-down,ctrl-k:preview-up' \
+    --bind 'ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up' \
+    --bind 'ctrl-/:toggle-preview' || true
+
+  # fzf が終了したのでヘルパーを削除する。
+  rm -f "$PREVIEW_HELPER"
 else
   # === スクロール表示モード ===
   # -s 指定時、fzf が無いとき、TTY でないとき(パイプ等)はこちら。
