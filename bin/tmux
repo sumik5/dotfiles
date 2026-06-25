@@ -181,6 +181,13 @@ handle_split_window() {
   if [[ ${#size_args[@]} -gt 0 ]]; then
     cmd+=("${size_args[@]}")
   fi
+  # Claude Code の teammate 起動は `split-window ... -- cat` でプレースホルダ pane を作り、直後に
+  # `respawn-pane -t <id> -- <実コマンド>` で中身を差し替える。WezTerm には respawn 等価の CLI が無く、
+  # pane id を維持する必要があるため、プレースホルダの cat はそのまま起動せずデフォルト shell で pane を
+  # 保持し、respawn-pane 側で send-text により実コマンドを注入する（handle_respawn_pane を参照）。
+  if [[ ${#prog[@]} -eq 1 && "${prog[0]}" == "cat" ]]; then
+    prog=()
+  fi
   if [[ ${#prog[@]} -gt 0 ]]; then
     cmd+=(-- "${prog[@]}")
   fi
@@ -546,6 +553,43 @@ handle_kill_pane() {
   wezterm cli kill-pane --pane-id "$target_pane" 2>/dev/null || true
 }
 
+# Claude Code teammate 起動の最終段階。split-window で確保したプレースホルダ pane（デフォルト shell）に、
+# 実際の起動コマンド行を send-text で流し込んで teammate プロセスを起動する。WezTerm には pane のプログラムを
+# 置換する CLI が無いため、pane id を維持したまま shell にコマンド行＋改行を送り前景実行させる方式を採る。
+handle_respawn_pane() {
+  local target_pane="$WEZTERM_PANE"
+  local prog=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -t)
+        target_pane="$(parse_target_pane "$2")"
+        shift 2
+        ;;
+      -k)
+        # 既存プログラムの kill 指定。プレースホルダ shell は待機中なので send-text で上書きすれば足りる。
+        shift
+        ;;
+      --)
+        shift
+        prog=("$@")
+        break
+        ;;
+      *)
+        shift
+        ;;
+    esac
+  done
+
+  if [[ ${#prog[@]} -gt 0 ]]; then
+    # split-pane で起動した shell が対話可能になるまで僅かに待ってからコマンド行を送る
+    # （早すぎると rc 読み込み中に入力が取りこぼされる）。
+    sleep 0.3
+    local cmdline="${prog[*]}"
+    wezterm cli send-text --pane-id "$target_pane" --no-paste -- "${cmdline}"$'\n' 2>/dev/null || true
+  fi
+}
+
 handle_kill_session() {
   local target=""
 
@@ -654,7 +698,10 @@ case "$cmd" in
     # No-op: WezTerm doesn't have layout algorithms like tmux
     exit 0
     ;;
-  set-option|set|set-window-option|setw|set-hook|set-environment|rename-window|rename-session|respawn-pane|pipe-pane|wait-for)
+  respawn-pane)
+    handle_respawn_pane "$@"
+    ;;
+  set-option|set|set-window-option|setw|set-hook|set-environment|rename-window|rename-session|pipe-pane|wait-for)
     # No-op: these commands have no meaningful WezTerm equivalent
     exit 0
     ;;
