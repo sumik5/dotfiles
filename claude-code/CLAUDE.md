@@ -5,7 +5,7 @@
 | If X | then Y |
 |------|--------|
 | すべての応答時 | 日本語で応答（技術用語・ライブラリ名は例外） |
-| コード変更（軽微: typo等） | TeamCreate → 専門タチコマ1体に委譲 → TeamDelete |
+| コード変更（軽微: typo等） | 専門タチコマ1体に委譲（`Agent` を `run_in_background: true` で起動。TeamCreate/TeamDelete は v2.1.178 で廃止＝不要） |
 | コード変更（上記以外=デフォルト） | `orchestrating-teams` スキル → planner-first パターン（詳細: `rules/tachikoma-system.md`） |
 | 本体の役割（🔴最重要） | **オーケストレーターに徹する** — コード記述・ドキュメント作成はタチコマに委譲。例外: CLAUDE.md管理・ファイル読み込み・質問回答・ライブラリ調査 |
 | git書込操作時 | ユーザー確認必須 |
@@ -36,7 +36,7 @@
 
 | ファイル | 参照タイミング |
 |---------|--------------|
-| `rules/tachikoma-system.md` | タチコマ委譲・並列実行・tmux pane起動時 |
+| `rules/tachikoma-system.md` | タチコマ委譲・並列実行・teammate起動時 |
 | `rules/skill-triggers.md` | 専門タチコマ選択・ルーティング時 |
 | `rules/code-quality.md` | コード品質確認時 |
 | `rules/plugins-and-commands.md` | MCP・コマンド利用時 |

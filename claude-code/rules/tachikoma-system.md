@@ -13,8 +13,8 @@
 | 分類 | フロー |
 |------|--------|
 | 読み込み・質問・調査・CLAUDE.md管理 | 本体が直接実行 |
-| 軽微修正（typo・1行変更） | TeamCreate → 専門タチコマ1体（`team_name` + `run_in_background: true`）→ TeamDelete |
-| **上記以外すべて（デフォルト）** | `orchestrating-teams` スキルロード → TeamCreate → **planner**（tachikoma-str-product-mgr, Opus）が要件分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → CodeGuard → TeamDelete |
+| 軽微修正（typo・1行変更） | 専門タチコマ1体を `Agent`（`run_in_background: true`）で起動 → 完了待ち（TeamCreate/TeamDelete 不要） |
+| **上記以外すべて（デフォルト）** | `orchestrating-teams` スキルロード → **planner**（tachikoma-str-product-mgr, Opus）を `Agent` で起動し要件分析・計画策定・docs/作成 → ユーザー確認 → **専門タチコマ**が実装 → CodeGuard（TeamCreate/TeamDelete 不要） |
 
 ### 並列化条件（plannerの計画に基づく）
 
@@ -22,26 +22,27 @@
 - 異なるドメインが含まれる（例: UI + API + テスト）
 - 同一ドメインの独立タスクが3つ以上（scale-out: 同一タチコマ複数起動可）
 
-## 🔴 tmux pane起動ルール
+## 🔴 teammate（タチコマ）起動ルール（Claude Code v2.1.178+）
 
-**Agent Teams APIツールは遅延ツール。** 使用前に `ToolSearch("TeamCreate team")` でロード必須。
+**`TeamCreate` / `TeamDelete` は v2.1.178 で廃止された**（`ToolSearch("TeamCreate team")` でも出ない＝"No matching deferred tools found"）。明示的なチーム作成/削除は不要で、セッション＝単一の暗黙的チーム（single implicit team）に自動固定される。
 
 ```
-1. ToolSearch("TeamCreate team")     ← 遅延ツールロード（省略不可）
-2. TeamCreate(team_name: "xxx")      ← チーム作成
-3. Agent(team_name + run_in_background: true, subagent_type: "sumik:tachikoma-{category}-{domain}")
-4. タチコマ完了待ち
-5. TeamDelete                        ← 1セッション1チーム制約
+1. Agent(subagent_type: "sumik:tachikoma-{category}-{domain}", run_in_background: true)
+   ← background teammate として起動（team_name は受け付けるが無視される＝書かなくてよい）
+2. SendMessage                       ← teammate との通信（指示・追加情報の送受信）
+3. Task系（TaskCreate / TaskList / TaskOutput / TaskStop）← 進捗確認・制御
+4. 後始末は自動                       ← TeamDelete 不要（セッション終了で自動解散）
 ```
 
-⚠️ `run_in_background: true` のみ（`team_name`なし）→ pane表示されない。**両方必須。**
+- 表示モードは settings.json の `"teammateMode"`（`auto` / `in-process` / `tmux` / `iterm2`、現在 `tmux`）で決まる。有効化フラグは `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。
+- 自然言語でも起動可（例:「3体のteammateを起動し security / performance / test を担当させろ」）→ Claude がチーム形成・タスク管理・通信・権限引き継ぎを自動実行。
 
-### シャットダウン・チーム解散
+### シャットダウン・teammate 解散
 
 | If X | then Y |
 |------|--------|
-| `TeamDelete` が「active member 残存」で失敗 | `SendMessage(message: {type: "shutdown_request"})` を再送 → `shutdown_approved` 受信後に `TeamDelete` 再試行（idle中タチコマは即時処理しない場合あり） |
-| 役目を終えた teammate が複数存在 | 不要メンバーから順次 `shutdown_request` を送り、`teammate_terminated` 通知でクローズを確認 |
+| 役目を終えた teammate を閉じたい | `SendMessage(message: {type: "shutdown_request"})` を送信 → `shutdown_approved` / `teammate_terminated` 通知でクローズ確認（idle中は即応しない場合あり→再送） |
+| teammate が複数残存 | 不要なものから順に `shutdown_request` を送り `teammate_terminated` を1体ずつ確認（`TeamDelete` は廃止済み・セッション終了でも自動解散） |
 
 ## 並列タチコマでの品質統一
 

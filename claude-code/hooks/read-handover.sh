@@ -2,7 +2,7 @@
 set -euo pipefail
 
 input=$(cat)
-cwd=$(echo "$input" | jq -r '.cwd // empty')
+cwd=$(echo "$input" | jq -r '.cwd // empty' 2>/dev/null || true)
 
 if [ -z "$cwd" ]; then
   cwd="${CLAUDE_PROJECT_DIR:-$HOME}"
@@ -21,7 +21,7 @@ fi
 HANDOVER_DIR="$cwd/.claude/handovers"
 if [ -d "$HANDOVER_DIR" ]; then
   # ファイル名でソートして最新を取得（YYYY-MM-DD_HHmm.md形式なのでソートで最新がわかる）
-  LATEST=$(ls -1 "$HANDOVER_DIR"/*.md 2>/dev/null | sort | tail -1)
+  LATEST=$(find "$HANDOVER_DIR" -maxdepth 1 -type f -name '*.md' 2>/dev/null | sort | tail -1)
   if [ -n "$LATEST" ] && [ -f "$LATEST" ]; then
     echo "## 最新セッション引き継ぎノート ($(basename "$LATEST"))"
     echo ""
