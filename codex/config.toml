@@ -1,5 +1,6 @@
 [features]
 multi_agent = true
+hooks = true  # devkit 同梱の plugin hook (hooks-codex.json) を有効化（旧 codex_hooks の正式名）
 
 [shell_environment_policy]
 inherit = "all"

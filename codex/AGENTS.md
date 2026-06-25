@@ -112,7 +112,7 @@
 
 ## 🧠 継続的学習（capturing-learnings・常時オン）
 
-作業中に得た学び・エラー・ユーザー訂正・機能要望を `.learnings/` に構造化記録し、継続的改善につなげる。**Codex は hook が experimental（opt-in）のため、本セクションの記述が always-on の主機構**となる（Claude Code 側は devkit の hook が自動リマインドする）。エントリ書式・ID規則・解決フローの詳細は `capturing-learnings` スキル本体を参照。
+作業中に得た学び・エラー・ユーザー訂正・機能要望を `.learnings/` に構造化記録し、継続的改善につなげる。**Codex は `[features] hooks = true` ＋ plugin hook の trust 承認で devkit 同梱の hook（`hooks-codex.json`）が有効化され、Claude Code 同様 UserPromptSubmit/PostToolUse で自動リマインドする**（未有効時は本セクションの記述が always-on の主機構となる）。エントリ書式・ID規則・解決フローの詳細は `capturing-learnings` スキル本体を参照。
 
 ### 検出トリガー（If X then Y）
 
@@ -137,9 +137,9 @@
 
 反復パターンの昇格条件: Recurrence-Count ≥ 3 ∧ 2タスク以上で観測 ∧ 30日以内。昇格文は「コーディング前/中に何をすべきか」の短い予防ルールで書く。
 
-### opt-in hook（自動化したい場合）
+### plugin hook（devkit 同梱・推奨）
 
-`config.toml` に `codex_hooks = true` を設定し、`.codex/hooks.json` に UserPromptSubmit / PostToolUse を登録すると、Claude Code と同一スクリプト（stdin JSON・`additionalContext` 出力）で自動リマインドが効く。
+`config.toml` の `[features]` に `hooks = true` を設定すると（旧 `codex_hooks` は deprecated alias）、devkit が同梱する plugin hook（repo root の `hooks-codex.json`・`SessionStart`/`UserPromptSubmit`/`PreToolUse`/`PostToolUse`/`Stop`/`SubagentStop`/`PreCompact`）が有効化され、Claude Code と同一スクリプト（stdin JSON・`additionalContext` 出力）で learnings リマインド等が自動で効く。plugin 同梱 hook は「非管理 hook」のため、初回は Codex 起動時に trust 承認が必要（`.codex/hooks.json` への手動登録はもう不要）。Codex は `Notification`/`SessionEnd`/`TeammateIdle` を非対応のため、それらに紐づく通知・retrospective は Claude Code 専用。
 
 ---
 
