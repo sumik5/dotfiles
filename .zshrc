@@ -339,6 +339,7 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f codex="codex --dangerously-bypass-approvals-and-sandbox --dangerously-bypass-hook-trust"
   abbr -S -f htop='sudo htop'
   abbr -S -f ghq='peco-cd'
+  abbr -S -f gpush='git push origin main && git push origin --tags'
 } &>/dev/null
 
 

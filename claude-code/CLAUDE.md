@@ -91,4 +91,10 @@ sumik-claude-plugin スキルの改善提案キュー。捕捉(C)→消費(D=`au
 - 理由: 兄弟スキル(searching-web等)と構造・記述言語が不一致。
 - 確度: 中 / 影響範囲: 自スキルのみ / status: open
 
+### [PROPOSAL] authoring-plugins / 内容追記 / 2026-06-25
+- skill: authoring-plugins / 種別: 内容追記（references/MANAGING-MULTI-PLUGIN.md）
+- 改善点: MCP 同梱プラグインを新規追加する手順を明文化する。①ランナー別 bin ラッパーを複製（npx→npx-mise.sh / uvx→uvx-mise.sh / pipx→pipx-mise.sh、Claude は `${CLAUDE_PLUGIN_ROOT}/bin/...`、Codex は `./bin/... + cwd "."`）②`.mcp.json`/`.mcp-codex.json` に env ブロックを置かず秘匿値はシェル環境の継承で供給（devkit/studio の全 MCP が env 無し＝確立済み慣習。`${VAR:-}` 展開は空文字が ADC 認証等を壊すリスクあり非推奨）。
+- 理由: 既存ガイドは「Codex で plugin-root 変数を使わない」までは記載するが、Python/pipx ランナーの扱いと env ブロック非設置の慣習が未明文化で、google プラグイン追加時に studio/devkit から都度導出する必要があった。
+- 確度: 中 / 影響範囲: 自スキルのみ（references/MANAGING-MULTI-PLUGIN.md） / status: open
+
 @RTK.md
