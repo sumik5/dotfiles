@@ -47,7 +47,7 @@
 | If X | then Y |
 |------|--------|
 | セッション開始時 | serena再アクティベート、handoversディレクトリ確認 |
-| 作業内容が明確になった時 | sessions-index.jsonの `summary` を `{prefix}-{english-slug}` 形式で更新 |
+| 作業内容が明確になった時 | sessions-index.jsonの `summary` を `{prefix}-{english-slug}` 形式で更新し、同一slugで `/rename {prefix}-{english-slug}` の実行をユーザーに提案（Claudeはスラッシュコマンドを自律実行不可＝**提案のみ**・1会話1回まで） |
 | 会話が長くなった時（compaction前） | `/handover` 実行 |
 | compaction後 | `/reload` でCLAUDE.md再読み込み |
 | 同じミスを2回繰り返した時 | If X then Y形式で罠を追記 |
