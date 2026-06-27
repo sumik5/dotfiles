@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+resolve_real_codex() {
+  if [[ -n "${CODEX_REAL_BINARY:-}" ]]; then
+    printf '%s\n' "$CODEX_REAL_BINARY"
+    return
+  fi
+
+  if command -v mise >/dev/null 2>&1; then
+    local mise_codex
+    mise_codex="$(mise which codex 2>/dev/null || true)"
+    if [[ -n "$mise_codex" ]]; then
+      printf '%s\n' "$mise_codex"
+      return
+    fi
+  fi
+
+  printf '%s\n' "/Users/sumik/.local/share/mise/shims/codex"
+}
+
+real_codex="$(resolve_real_codex)"
+if [[ ! -x "$real_codex" ]]; then
+  printf 'codex wrapper: real codex executable not found: %s\n' "$real_codex" >&2
+  exit 127
+fi
+
+if [[ "${CODEX_BYPASS_HOOK_TRUST:-1}" == "0" || "${CODEX_BYPASS_HOOK_TRUST:-}" == "false" ]]; then
+  exec "$real_codex" "$@"
+fi
+
+for arg in "$@"; do
+  if [[ "$arg" == "--dangerously-bypass-hook-trust" ]]; then
+    exec "$real_codex" "$@"
+  fi
+done
+
+exec "$real_codex" --dangerously-bypass-hook-trust "$@"
