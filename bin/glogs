@@ -76,7 +76,7 @@ git log への引数:
 
 対話モード(fzf)のキー操作:
   ↑ / ↓                コミット一覧を移動
-  Ctrl-J / Ctrl-K      プレビュー(右側)を1行ずつスクロール
+  Ctrl-J / Ctrl-K      コミット一覧を上下に移動
   Ctrl-F / Ctrl-B      プレビュー(右側)を半画面スクロール
   Ctrl-/               プレビューの表示/非表示を切り替え
   Enter                選択して終了
@@ -244,10 +244,8 @@ EOS
   # || true: fzf を選択せず終了(Esc)すると終了コード130等を返すが、
   #          set -e で止まらないよう吸収する。
   #
-  # --bind: プレビュー(右側)をスクロールするキーを割り当てる。
-  #   ↑↓ や j/k はコミット一覧(左側)の移動に使うため、プレビューには
-  #   別のキーを割り当てる。
-  #     Ctrl-J / Ctrl-K        : プレビューを1行ずつ下/上にスクロール
+  # --bind: コミット一覧(左側)とプレビュー(右側)の操作を割り当てる。
+  #     Ctrl-J / Ctrl-K        : コミット一覧を下/上に移動
   #     Ctrl-F / Ctrl-B        : プレビューを半画面ずつ下/上にスクロール
   #     Ctrl-/                 : プレビューの表示/非表示を切り替え
   run_git_log | decorate | fzf \
@@ -256,7 +254,7 @@ EOS
     --layout=reverse \
     --preview "sh '$PREVIEW_HELPER' {}" \
     --preview-window=right:60% \
-    --bind 'ctrl-j:preview-down,ctrl-k:preview-up' \
+    --bind 'ctrl-j:down,ctrl-k:up' \
     --bind 'ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up' \
     --bind 'ctrl-/:toggle-preview' || true
 
