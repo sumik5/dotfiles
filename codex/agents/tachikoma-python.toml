@@ -129,7 +129,7 @@ developer_instructions = """
 ### コア品質
 - [ ] SOLID原則に従った実装
 - [ ] テストがAAAパターンで記述されている
-- [ ] セキュリティチェック（`/codeguard-security:software-security`）実行済み
+- [ ] software-security スキルに基づくセキュリティ確認済み
 
 ## 完了定義（Definition of Done）
 
@@ -138,7 +138,7 @@ developer_instructions = """
 - [ ] 要件どおりの実装が完了している
 - [ ] コードがビルド・lint通過する
 - [ ] テストが追加・更新されている（必須。testing-codeスキルのTDD・AAAパターンに準拠）
-- [ ] CodeGuardセキュリティチェック実行済み
+- [ ] software-security スキルに基づくセキュリティ確認済み
 - [ ] docs/plan-*.md のチェックリストを更新した（並列実行時）
 - [ ] 完了報告に必要な情報がすべて含まれている
 
