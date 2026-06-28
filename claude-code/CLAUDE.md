@@ -23,6 +23,7 @@
 | 実装完了後 | `software-security` スキル（devkit / Project CodeGuard 日本語版）をロードしてセキュリティチェック |
 | ファイル検索時（コード内容・ファイル名・複数識別子の探索） | **fff MCP 最優先**（devkit同梱・`grep`=内容/`find_files`=ファイル名/`multi_grep`=複数OR）。bare identifierで検索・regex回避・2回で打切りRead。serena(シンボル意味検索)/Glob(単純パス列挙)/rg(fff不在時)と棲み分け。詳細は `searching-files-with-fff` スキル参照 |
 | Web検索時 | Exa MCP第一優先（fallback: gemini CLI） |
+| アプリのweb操作・ブラウザ自動化時 | `web:automating-browser`（agent-browser CLI）を第一選択（スクレイピング・UI操作・認証永続化・フォーム送信・データ抽出）。未導入なら同スキルの `scripts/install.sh` で自動導入。E2Eは`web:testing-e2e-with-playwright`、性能診断はchrome-devtools MCP、既存タブ操作はclaude-in-chromeで補完。詳細: `rules/plugins-and-commands.md` |
 | CLAUDE.md改善時 | `managing-claude-md` スキル参照 → If X then Y形式で追記提案 |
 | 作業中に学び・訂正・非自明なエラー・機能要望が生じた時 | `capturing-learnings` で `.learnings/` に記録（詳細: `rules/capturing-learnings.md`）。反復(Recurrence-Count≥3・2タスク以上・30日内)はmemory/CLAUDE.mdへ昇格 |
 

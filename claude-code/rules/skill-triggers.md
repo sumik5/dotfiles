@@ -24,6 +24,7 @@
 | AI/RAG/MCP/LLM / LLM評価・red-team（`promptfooconfig.yaml`） | `sumik:tachikoma-data-ai-ml` |
 | テストファイル（`*test*`, `*spec*`等） | `sumik:tachikoma-qa-test` |
 | Playwright/E2E | `sumik:tachikoma-qa-e2e-test` |
+| アプリのweb操作・ブラウザ自動化（スクレイピング/UI操作/認証永続化・非E2E） | 本体直接（`web:automating-browser` ロード）or `sumik:tachikoma-qa-e2e-test` |
 | 監視/OTel/ログ | `sumik:tachikoma-qa-observability` |
 | 技術文書/記事/LaTeX | `sumik:tachikoma-doc-document` |
 | 設計/DDD/アーキテクチャ | `sumik:tachikoma-str-architecture`（読取専用） |
@@ -50,6 +51,7 @@
 | `writing-conventional-commits` | コミットメッセージ作成時 |
 | `searching-web` | Web検索（Exa MCP第一優先・geminiフォールバックを内包） |
 | `capturing-learnings` | ユーザー訂正・非自明エラー・機能要望・反復パターン発生時（`.learnings/`記録→memory/CLAUDE.md昇格）。詳細: `rules/capturing-learnings.md` |
+| `web:automating-browser` | アプリのweb操作・ブラウザ自動化時（agent-browser CLI・第一選択。未導入なら同スキルの`scripts/install.sh`で自動導入）。E2Eは`tachikoma-qa-e2e-test`へ。詳細: `rules/plugins-and-commands.md` |
 
 ## オンデマンドスキル（明示的要求時のみ）
 

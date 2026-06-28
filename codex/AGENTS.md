@@ -281,6 +281,7 @@ Puppeteer MCP は、ヘッドレス Chrome を通じてページ遷移・クリ�
 - フォーム入力・要素選択などの定型ブラウザ操作
 
 **注意点**
+- 🔴 アプリの web 操作・ブラウザ自動化の第一選択は agent-browser CLI（`web:automating-browser` スキル）。Rust ネイティブ・CDP 直結で snapshot→ref・状態永続化・read/chat/batch/mcp をサポート。puppeteer はそれで代替できない場合のフォールバックに留める
 - 詳細な性能トレースやネットワーク解析は chrome-devtools の方が適する
 - ブラウザの内容が MCP クライアントに公開されるため、機密情報のあるページには注意
 
@@ -330,6 +331,7 @@ Chrome DevTools MCP は、Chrome の DevTools を通してブラウザの実行�
 - **設計の比較や深い思考**: sequentialthinking
 - **Next.js の実行時診断**: next-devtools
 - **ライブラリの最新ドキュメント**: context7
-- **ブラウザ挙動/性能解析**: chrome-devtools
-- **ブラウザ操作の自動化/スクリーンショット**: puppeteer
+- **アプリのweb操作・ブラウザ自動化**: `web:automating-browser`（agent-browser CLI・🔴第一選択。スクレイピング/UI操作フロー/認証永続化/フォーム送信/データ抽出。未導入なら同スキルの `scripts/install.sh` で自動導入＝`agent-browser install` が Chrome for Testing を取得）
+- **ブラウザ挙動/性能解析・Lighthouse**: chrome-devtools（診断補完）
+- **上記で代替できない軽量ブラウザ操作/スクリーンショット**: puppeteer（フォールバック）
 - **ダイアグラム生成**: drawio
