@@ -18,6 +18,18 @@
 4. **claude-in-chrome** — ユーザーの既存 Chrome タブ／ログイン済みセッションの操作。
 5. **puppeteer MCP** — 上記で代替できない軽量スクリプト操作のフォールバック。
 
+## herdr 環境での作業（ターミナル多重化）
+
+`HERDR_ENV=1` が設定されたセッション（herdr = terminal-native agent multiplexer 管理下のペイン）で作業する場合は、🔴 **`operating-herdr` スキルを必ずロードする**。herdr CLI（`herdr` バイナリ・ローカル unix socket 経由）で以下を制御する。
+
+1. **workspace / tab / pane 制御** — workspace（プロジェクト文脈）・tab（サブ文脈）・pane（端末分割）の list / create / focus / rename / close・`pane split`。
+2. **別ペインの観測** — `pane read`（`--source visible`/`recent`/`recent-unwrapped`）で隣接ペインの出力を読む。
+3. **待機** — `wait output`（`--match`/`--regex`/`--timeout`）で特定出力を、`wait agent-status`（`idle`/`working`/`blocked`/`done`）で他エージェント完了を待つ。
+4. **エージェント spawn / 協調** — `pane split` + `pane run` で別ペインにサーバ・テスト・エージェントを起動し協調する。
+
+- `HERDR_ENV` が `1` でない場合は**非適用**（herdr 外部から focused ペインを操作・検査しない）。
+- Claude Code 内の並列タチコマ編成（`orchestrating-teams`）とは別物。herdr は OS レベルの端末ペインをまたぐ制御を担う。
+
 ## 主要スラッシュコマンド
 
 | コマンド | 説明 |

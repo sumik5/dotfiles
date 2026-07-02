@@ -26,6 +26,7 @@
 | アプリのweb操作・ブラウザ自動化時 | `web:automating-browser`（agent-browser CLI）を第一選択（スクレイピング・UI操作・認証永続化・フォーム送信・データ抽出）。未導入なら同スキルの `scripts/install.sh` で自動導入。E2Eは`web:testing-e2e-with-playwright`、性能診断はchrome-devtools MCP、既存タブ操作はclaude-in-chromeで補完。詳細: `rules/plugins-and-commands.md` |
 | CLAUDE.md改善時 | `managing-claude-md` スキル参照 → If X then Y形式で追記提案 |
 | 作業中に学び・訂正・非自明なエラー・機能要望が生じた時 | `capturing-learnings` で `.learnings/` に記録（詳細: `rules/capturing-learnings.md`）。反復(Recurrence-Count≥3・2タスク以上・30日内)はmemory/CLAUDE.mdへ昇格 |
+| 🔴 herdr 環境（`HERDR_ENV=1`）で作業時 | **`operating-herdr` スキルを必ずロード**（herdr = terminal-native agent multiplexer）。workspace/tab/pane 制御・別ペイン出力読取・`wait output`/`wait agent-status` 待機・エージェント spawn/協調をCLIで実行。`HERDR_ENV` が `1` でなければ非適用（herdr 外部から focused ペインを操作しない）。詳細: `rules/plugins-and-commands.md` |
 
 ## 🎯 Quick Start
 
@@ -48,6 +49,7 @@
 | If X | then Y |
 |------|--------|
 | セッション開始時 | serena再アクティベート、handoversディレクトリ確認 |
+| セッション開始時に `HERDR_ENV=1` を検出 | 🔴 即座に `operating-herdr` スキルをロード（herdr 管理下のペインで作業中＝ペイン/エージェント制御が可能）。以降は素の tmux 感覚で操作せず herdr CLI を使う |
 | 作業内容が明確になった時 | sessions-index.jsonの `summary` を `{prefix}-{english-slug}` 形式で更新し、同一slugで `/rename {prefix}-{english-slug}` の実行をユーザーに提案（Claudeはスラッシュコマンドを自律実行不可＝**提案のみ**・1会話1回まで） |
 | 会話が長くなった時（compaction前） | `/handover` 実行 |
 | compaction後 | `/reload` でCLAUDE.md再読み込み |

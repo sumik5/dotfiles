@@ -52,6 +52,7 @@
 | `searching-web` | Web検索（Exa MCP第一優先・geminiフォールバックを内包） |
 | `capturing-learnings` | ユーザー訂正・非自明エラー・機能要望・反復パターン発生時（`.learnings/`記録→memory/CLAUDE.md昇格）。詳細: `rules/capturing-learnings.md` |
 | `web:automating-browser` | アプリのweb操作・ブラウザ自動化時（agent-browser CLI・第一選択。未導入なら同スキルの`scripts/install.sh`で自動導入）。E2Eは`tachikoma-qa-e2e-test`へ。詳細: `rules/plugins-and-commands.md` |
+| `operating-herdr` | 🔴 herdr 環境（`HERDR_ENV=1`）で作業時（**必ずロード**）。herdr = terminal-native agent multiplexer。workspace/tab/pane 制御・別ペイン出力読取・`wait output`/`wait agent-status` 待機・エージェント spawn/協調をCLIで行う。`HERDR_ENV` が `1` でなければ非適用（herdr 外部から focused ペインを操作しない）。詳細: `rules/plugins-and-commands.md` |
 
 ## オンデマンドスキル（明示的要求時のみ）
 
