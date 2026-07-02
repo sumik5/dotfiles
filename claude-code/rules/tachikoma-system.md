@@ -34,7 +34,7 @@
 4. 後始末は自動                       ← TeamDelete 不要（セッション終了で自動解散）
 ```
 
-- 表示モードは settings.json の `"teammateMode"`（`auto` / `in-process` / `tmux` / `iterm2`、現在 `tmux`）で決まる。有効化フラグは `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。
+- 表示モードは settings.json の `"teammateMode"` で決まる。🔴 **herdr 環境では `in-process` を使う**（herdr が PTY 上でペイン/タブ/ワークスペースを多重化＝tmux 代替のため、split-pane モード〈`tmux`/`iterm2`/`auto`〉は実 tmux セッションや iTerm2+`it2` CLI を要求し herdr のペイン管理と競合して spawn 失敗する）。`in-process` はペインを生成せず本体ターミナル内で teammate を実行＝Claude Code v2.1.179+ のデフォルト。複数エージェントを別ペインに出したい時は Claude の teammate ではなく herdr ネイティブ（`herdr agent start --split` / `herdr pane split`、詳細: `operating-herdr` スキル）で spawn する。有効化フラグは `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。
 - 自然言語でも起動可（例:「3体のteammateを起動し security / performance / test を担当させろ」）→ Claude がチーム形成・タスク管理・通信・権限引き継ぎを自動実行。
 
 ### シャットダウン・teammate 解散
