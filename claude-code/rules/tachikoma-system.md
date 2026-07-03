@@ -35,6 +35,7 @@
 ```
 
 - 表示モードは settings.json の `"teammateMode"` で決まる。🔴 **herdr 環境では `in-process` を使う**（herdr が PTY 上でペイン/タブ/ワークスペースを多重化＝tmux 代替のため、split-pane モード〈`tmux`/`iterm2`/`auto`〉は実 tmux セッションや iTerm2+`it2` CLI を要求し herdr のペイン管理と競合して spawn 失敗する）。`in-process` はペインを生成せず本体ターミナル内で teammate を実行＝Claude Code v2.1.179+ のデフォルト。複数エージェントを別ペインに出したい時は Claude の teammate ではなく herdr ネイティブ（`herdr agent start --split` / `herdr pane split`、詳細: `operating-herdr` スキル）で spawn する。有効化フラグは `env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1`。
+- 🔴 **`teammateMode` の変更はホットリロードされない**（hot-reload 対象は `model`/`outputStyle` 等に限られ `teammateMode` は含まれない）。settings.json を `in-process` にしても、**既に起動済みの Claude / Codex セッションは旧値のまま動き続ける**。iTerm2.app 内 ＋ PATH に `it2` CLI（mkusaka/it2）がある環境で旧値が `auto`/`iterm2` のままだと、teammate 起動時に it2 経由で **iTerm2 ネイティブペインが勝手に開き**、herdr の PTY ペイン管理と競合する（＝「削除したはずの iTerm2 制御が勝手に走る」の真因は旧 auto プロセスの残存）。**settings 変更後は全 Claude / Codex セッションを再起動して旧プロセスを一掃する**こと。teammateMode の有効値は `in-process`（既定）/ `tmux` / `iterm2` / `auto` の4つで、公式ドキュメント上、**`teammateMode` 以外に iTerm2 ペインを開く経路は存在しない**（worktree・remote control 等も iTerm2 を開かない）。二重の予防として it2 CLI 削除・iTerm2 Python API 無効化も有効だが他用途に注意。
 - 自然言語でも起動可（例:「3体のteammateを起動し security / performance / test を担当させろ」）→ Claude がチーム形成・タスク管理・通信・権限引き継ぎを自動実行。
 
 ### シャットダウン・teammate 解散

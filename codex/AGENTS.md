@@ -110,6 +110,25 @@
 
 ---
 
+## 🖥️ herdr 環境での運用（HERDR_ENV=1・ターミナル多重化）
+
+`HERDR_ENV=1`（herdr = terminal-native agent multiplexer の管理下ペイン）で動作する場合は、🔴 **`devkit:operating-herdr` スキルをロードし、ペイン/タブ/ワークスペース制御・別ペイン観測・エージェント協調を herdr CLI 経由で行う**。素の tmux 感覚で focused ペインを操作しない。
+
+| 用途 | コマンド |
+|------|---------|
+| 構成把握 | `herdr workspace list` / `herdr tab list --workspace w1` / `herdr pane list` / `herdr agent list` |
+| 別ペイン観測 | `herdr pane read <pane_id> --source visible\|recent\|recent-unwrapped [--lines N]` |
+| 出力待機 | `herdr wait output <pane_id> --match <text> [--regex] [--timeout MS]` |
+| エージェント完了待ち | `herdr wait agent-status <pane_id> --status idle\|working\|blocked\|done [--timeout MS]` |
+| ペイン分割で起動 | `herdr pane split <pane_id> --direction right\|down --no-focus` → `herdr pane run <new_pane> "<command>"` |
+| エージェント spawn | `herdr agent start <name> --split right --cwd <path> -- codex`（別ペインに codex/claude 等を起動） |
+
+- 🔴 **Codex は Claude Code の `teammateMode` を持たない**が、サブエージェント/マルチスレッドやサーバ・テスト・ログ監視の別ペイン展開は、素の tmux ではなく **herdr CLI に一本化**する。ペイン操作を herdr 以外（iTerm2 ネイティブ分割・osascript 等）で行わないこと。
+- herdr は iTerm2/tmux を制御しない（独自の Unix socket + PTY でペインを多重化する）。iTerm2.app 内で動く場合でも、ペイン生成は必ず herdr CLI で行う。
+- `HERDR_ENV` が `1` でなければ**非適用**（herdr 外部から focused ペインを操作・検査しない）。詳細な CLI リファレンスは `devkit:operating-herdr` スキル本体を参照。
+
+---
+
 ## 🧠 継続的学習（capturing-learnings・常時オン）
 
 作業中に得た学び・エラー・ユーザー訂正・機能要望を `.learnings/` に構造化記録し、継続的改善につなげる。**Codex は `[features] hooks = true` ＋ plugin hook の trust 承認で devkit 同梱の hook（`hooks-codex.json`）が有効化され、Claude Code 同様 UserPromptSubmit/PostToolUse で自動リマインドする**（未有効時は本セクションの記述が always-on の主機構となる）。エントリ書式・ID規則・解決フローの詳細は `capturing-learnings` スキル本体を参照。
