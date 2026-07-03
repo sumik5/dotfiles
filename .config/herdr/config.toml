@@ -29,3 +29,11 @@ navigate_pane_down = "ctrl+j"
 split_horizontal = "prefix+-"
 split_vertical = "prefix+|"
 cycle_pane_next = "ctrl+o"
+
+[theme]
+name = "tokyo-night"
+auto_switch = false
+
+[experimental]
+switch_ascii_input_source_in_prefix = true
+pane_history = true
