@@ -1,3 +1,4 @@
+onboarding = false
 
 [update]
 channel = "stable"
@@ -29,6 +30,8 @@ navigate_pane_down = "ctrl+j"
 split_horizontal = "prefix+-"
 split_vertical = "prefix+|"
 cycle_pane_next = "ctrl+o"
+new_workspace = "prefix+shift+c"
+rename_workspace = "prefix+shift+n"
 
 [theme]
 name = "tokyo-night"
@@ -37,3 +40,9 @@ auto_switch = false
 [experimental]
 switch_ascii_input_source_in_prefix = true
 pane_history = true
+
+[ui.toast]
+delivery = "terminal"
+
+[ui]
+show_agent_labels_on_pane_borders = true
