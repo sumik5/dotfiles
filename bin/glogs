@@ -6,7 +6,10 @@
 #   git log の出力に「グラフ」「日付」「署名検証ステータス」を付け、
 #   1文字のステータス記号(G/B/U/N/E)を絵文字ラベルに置き換えて表示する。
 #   デフォルトでは fzf による対話モードで起動し、コミットを選ぶと
-#   右側に詳細(git show)が表示される。
+#   右側に詳細(git show)がプレビュー表示される。
+#   Enter で確定すると、選んだコミットを hunk(review-first な TUI diff
+#   ビューア。https://github.com/modem-dev/hunk)で全画面表示する。
+#   hunk が無い環境では従来どおり git show にフォールバックする。
 #   fzf が無い、または端末(TTY)でない場合は、自動でページャ(less)による
 #   スクロール表示(↑↓ や j/k で移動)にフォールバックする。
 #
@@ -79,7 +82,7 @@ git log への引数:
   Ctrl-J / Ctrl-K      コミット一覧を上下に移動
   Ctrl-F / Ctrl-B      プレビュー(右側)を半画面スクロール
   Ctrl-/               プレビューの表示/非表示を切り替え
-  Enter                選択して終了
+  Enter                選択したコミットを hunk(無ければ git show)で全画面表示
   Esc                  キャンセルして終了
 
 署名ステータスの意味(git の %G? が返す1文字に対応):
@@ -168,6 +171,33 @@ decorate() {
     -e 's/\t/ /g'
 }
 
+# --- 選択したコミットを詳細表示する関数 ----------------------------------
+# fzf で選ばれた1行(ANSI色付き)からコミットハッシュを取り出し、hunk
+# (review-first な TUI diff ビューア)があれば hunk show で全画面表示する。
+# hunk が無ければ従来どおり git show(色付き)にフォールバックする。
+#   1) sed で ANSI 色コードを除去
+#   2) grep でコミットハッシュ(7桁以上の16進)を1つ取り出す
+#      ※ ANSI コードは短く [0-9a-f]{7,} にはマッチしないので抽出は安全
+#   3) hash が取れたら hunk show / git show で表示
+show_commit() {
+  # $1: fzf が返した選択行。未選択(Esc)なら空文字。
+  line="$1"
+  [ -n "$line" ] || return 0
+  hash=$(printf '%s' "$line" | sed 's/\x1b\[[0-9;]*m//g' | grep -oE '[0-9a-f]{7,}' | head -1)
+  [ -n "$hash" ] || return 0
+  if command -v hunk >/dev/null 2>&1; then
+    # hunk 0.16+: 指定コミットを全画面の対話レビューで開く
+    hunk show "$hash"
+  else
+    # hunk が無い環境: 従来の git show を less(色付き)で表示する
+    if command -v less >/dev/null 2>&1; then
+      git show --color=always "$hash" | less -R
+    else
+      git show --color=always "$hash"
+    fi
+  fi
+}
+
 # --- git log を実行する共通関数 ------------------------------------------
 # 引数を git log に渡し、整形済みのログを標準出力に返す。
 # --color=always : パイプ経由だと色が消えるので、強制的に色を付ける。
@@ -248,7 +278,7 @@ EOS
   #     Ctrl-J / Ctrl-K        : コミット一覧を下/上に移動
   #     Ctrl-F / Ctrl-B        : プレビューを半画面ずつ下/上にスクロール
   #     Ctrl-/                 : プレビューの表示/非表示を切り替え
-  run_git_log | decorate | fzf \
+  SELECTED_LINE="$(run_git_log | decorate | fzf \
     --ansi \
     --no-sort \
     --layout=reverse \
@@ -256,10 +286,14 @@ EOS
     --preview-window=right:60% \
     --bind 'ctrl-j:down,ctrl-k:up' \
     --bind 'ctrl-f:preview-half-page-down,ctrl-b:preview-half-page-up' \
-    --bind 'ctrl-/:toggle-preview' || true
+    --bind 'ctrl-/:toggle-preview')" || true
 
   # fzf が終了したのでヘルパーを削除する。
   rm -f "$PREVIEW_HELPER"
+
+  # 選んだコミットを hunk(無ければ git show)で全画面表示する。
+  # 未選択(Esc)の場合は SELECTED_LINE が空なので show_commit は何もしない。
+  show_commit "${SELECTED_LINE:-}"
 else
   # === スクロール表示モード ===
   # -s 指定時、fzf が無いとき、TTY でないとき(パイプ等)はこちら。
