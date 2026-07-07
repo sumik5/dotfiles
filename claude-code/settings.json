@@ -48,6 +48,9 @@
   },
   "hooks": {
   },
+  "worktree": {
+    "bgIsolation": "none"
+  },
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.py"
