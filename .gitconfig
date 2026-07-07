@@ -19,6 +19,7 @@
   excludesfile = ~/.gitignore
   ignorecase = false
   quotepath = false
+  pager = hunk pager
 [push]
   default = current
 [branch]
@@ -68,6 +69,8 @@
 	staash = stash --all
 	bb = !$HOME/dotfiles/bin/better-git-branch.sh
 	pushf = push --force-with-lease
+	hdiff = -c core.pager=\"hunk pager\" diff
+	hshow = -c core.pager=\"hunk pager\" show
 [credential]
   helper = osxkeychain
   #helper = cache --timeout=216000
