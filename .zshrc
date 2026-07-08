@@ -175,6 +175,12 @@ if command -v codex &> /dev/null; then
   eval "$(codex completion zsh)"
 fi
 
+# -------------------------------------------------
+# herdr
+if command -v herdr &> /dev/null; then
+  eval "$(herdr completion zsh)"
+fi
+
 #############################################
 # git auto status
 #############################################
