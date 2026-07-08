@@ -209,52 +209,6 @@ function git() {
   fi
 }
 
-#############################################
-# Homebrew 版 trash を優先
-#############################################
-
-# rm: -r がある時だけディレクトリ許可、ない時はファイル限定
-rm () {
-  local recursive=false
-  local targets=()
-
-  # 引数を解析
-  for arg in "$@"; do
-    case "$arg" in
-      -r|-rf|-fr) recursive=true ;;               # 再帰フラグ
-      --) shift; targets+=("$@"); break ;;        # -- 以降は全部パス
-      -*) echo "rm: 未対応オプション $arg" >&2; return 1 ;;
-      *)  targets+=("$arg") ;;
-    esac
-  done
-
-  [[ ${#targets[@]} -eq 0 ]] && {
-    echo "rm: 削除対象が指定されていません" >&2
-    return 1
-  }
-
-  # 判定と実行
-  if $recursive; then
-    # -r 付き → すべてディレクトリ想定
-    for p in "${targets[@]}"; do
-      [[ -d "$p" ]] || {
-        echo "⚠️  '$p' はディレクトリではありません (-r 不要)" >&2
-        return 1
-      }
-    done
-    /opt/homebrew/opt/trash/bin/trash -F -- "${targets[@]}"
-  else
-    # -r なし → すべてファイル想定
-    for p in "${targets[@]}"; do
-      [[ -f "$p" ]] || {
-        echo "⚠️  '$p' はファイルではありません。フォルダを消す場合は -r を付けてください。" >&2
-        return 1
-      }
-    done
-    /opt/homebrew/opt/trash/bin/trash -- "${targets[@]}"
-  fi
-}
-
 # =================================================
 # ghq + peco
 # =================================================
