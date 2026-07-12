@@ -70,34 +70,10 @@ sumik-claude-plugin スキルの改善提案キュー。捕捉(C)→消費(D=`au
 
 **捕捉ルール**: ①実際に読込/使用したスキルに限る（未読の推測提案禁止）②1スキル1セッション1件 ③確度=低は書かない ④具体的改善文/削除対象行を伴うもののみ（漠然とした感想不可）⑤作業主目的を中断せずタスク完了後に追記。各提案は `### [PROPOSAL] <skill> / <種別> / <日付>` 見出し＋ skill・種別(description改善/分割/統合/内容追記/参照修正/規約違反)・改善点・理由(書籍名禁止)・確度(高/中)・影響範囲・status を箇条書きで持つ。
 
-### [PROPOSAL] authoring-plugins / 規約違反 / 2026-06-07
-- skill: authoring-plugins / 種別: 規約違反（陳腐化した教材例）
-- 改善点: references/ の NAMING.md・NAMING-STRATEGY.md・TEMPLATES.md・SKILL-GUIDE.md が命名規則の例として廃止/改名済みスキル名（applying-design-guidelines・crafting-ai-copywriting・understanding-database-internals 等）を使用。現存スキル名へ差し替え。
-- 理由: 公開authoring guideが存在しないスキル名を例示すると誤誘導。pedagogical flowを壊さぬよう慎重に置換。
+### [PROPOSAL] developing-databases / 内容追記 / 2026-07-10
+- skill: developing-databases / 種別: 内容追記（OCR校正の残存・要技術裏取り）
+- 改善点: references/ の3点を裏取りのうえ修正。①INTERNALS-DBMS-ARCHITECTURE.md の行指向DB代表例に C-Store が列挙（C-Store は列指向のため内容誤りの疑い）②INTERNALS-FAILURE-DETECTION-LEADER-ELECTION.md の引用キー [MOLINAR82]（GARCIAMOLINA82 の誤変換疑い・コーパス引用キー慣行と突合）③図9-x/図10-x 等、存在しない図への宙参照の整理（削除 or 文章化）。
+- 理由: 2026-07-10 の INTERNALS 全15ファイル校正（inbox 5件消費の一環）で校正エージェントが「用語誤変換と違い内容判断・裏取りが必要」と保留報告した箇所。
 - 確度: 中 / 影響範囲: 自スキルのみ / status: open
-
-### [PROPOSAL] developing-databases / 内容追記 / 2026-06-07
-- skill: developing-databases / 種別: 内容追記
-- 改善点: references/INTERNALS-*.md にOCR由来の文字化けテキストが散在。該当箇所を正しい技術記述に再生成。
-- 理由: 書籍ページ参照の除去は完了済みだが本文の文字化けは未修整で可読性を損なう。
-- 確度: 中 / 影響範囲: 自スキルのみ / status: open
-
-### [PROPOSAL] creating-flashcards / 分割 / 2026-06-07
-- skill: creating-flashcards / 種別: 分割
-- 改善点: INSTRUCTIONS.md が減量後も607行（500目安超）。CONTRACTブロック・Step6詳細コード仕様を別referenceへ退避できるか再構成検討。
-- 理由: 多言語/デッキ戦略の退避は完了したが本体がなお肥大。
-- 確度: 中 / 影響範囲: 自スキルのみ / status: open
-
-### [PROPOSAL] find-skills / 規約違反 / 2026-06-07
-- skill: find-skills / 種別: 規約違反
-- 改善点: SKILL.md本文が英語＋144行直書き（薄いSKILL.md+INSTRUCTIONS分離の規約違反、コーパスは日本語基本）。日本語化＋INSTRUCTIONS.md分離。
-- 理由: 兄弟スキル(searching-web等)と構造・記述言語が不一致。
-- 確度: 中 / 影響範囲: 自スキルのみ / status: open
-
-### [PROPOSAL] authoring-plugins / 内容追記 / 2026-06-25
-- skill: authoring-plugins / 種別: 内容追記（references/MANAGING-MULTI-PLUGIN.md）
-- 改善点: MCP 同梱プラグインを新規追加する手順を明文化する。①ランナー別 bin ラッパーを複製（npx→npx-mise.sh / uvx→uvx-mise.sh / pipx→pipx-mise.sh、Claude は `${CLAUDE_PLUGIN_ROOT}/bin/...`、Codex は `./bin/... + cwd "."`）②`.mcp.json`/`.mcp-codex.json` に env ブロックを置かず秘匿値はシェル環境の継承で供給（devkit/studio の全 MCP が env 無し＝確立済み慣習。`${VAR:-}` 展開は空文字が ADC 認証等を壊すリスクあり非推奨）。
-- 理由: 既存ガイドは「Codex で plugin-root 変数を使わない」までは記載するが、Python/pipx ランナーの扱いと env ブロック非設置の慣習が未明文化で、google プラグイン追加時に studio/devkit から都度導出する必要があった。
-- 確度: 中 / 影響範囲: 自スキルのみ（references/MANAGING-MULTI-PLUGIN.md） / status: open
 
 @RTK.md
