@@ -6,33 +6,33 @@
 
 | 検出条件 | 委譲先 subagent_type |
 |---------|---------------------|
-| `package.json` に `next` | `sumik:tachikoma-fw-nextjs` |
-| Figma URL/.figma/Code Connect/トークン同期/Tailwind実装 | `sumik:tachikoma-fe-figma-impl` |
-| DS構築/ガバナンス/パターンライブラリ/Figma変数管理 | `sumik:tachikoma-fe-design-system` |
-| UX戦略/デザイン思考/グラフィック/AIエクスペリエンス | `sumik:tachikoma-fe-ux-design`（コード記述なし） |
-| shadcn/ui/Storybook/データチャート | `sumik:tachikoma-fe-frontend` |
-| NestJS/Express/Fastify | `sumik:tachikoma-fw-fullstack-js` |
-| TypeScript型設計・高度な型 | `sumik:tachikoma-lang-typescript` |
-| Python | `sumik:tachikoma-lang-python` |
-| Go | `sumik:tachikoma-lang-go` |
-| `.sh` / シェルスクリプト | `sumik:tachikoma-lang-bash` |
-| Docker/CI-CD/DevOps/Podman | `sumik:tachikoma-cloud-infra` |
-| `.tf` / Terraform | `sumik:tachikoma-cloud-terraform` |
-| AWS (CDK/SAM/SDK/Bedrock) | `sumik:tachikoma-cloud-aws` |
-| GCP (Cloud Run/GKE) / Firebase (Auth/Firestore/Functions・`firebase.json`/`firestore.rules`検出) | `sumik:tachikoma-cloud-gcp` |
-| DB/SQL/Prisma/マイグレーション | `sumik:tachikoma-data-database` |
-| AI/RAG/MCP/LLM / LLM評価・red-team（`promptfooconfig.yaml`） | `sumik:tachikoma-data-ai-ml` |
-| テストファイル（`*test*`, `*spec*`等） | `sumik:tachikoma-qa-test` |
-| Playwright/E2E | `sumik:tachikoma-qa-e2e-test` |
-| アプリのweb操作・ブラウザ自動化（スクレイピング/UI操作/認証永続化・非E2E） | 本体直接（`web:automating-browser` ロード）or `sumik:tachikoma-qa-e2e-test` |
-| 監視/OTel/ログ | `sumik:tachikoma-qa-observability` |
-| 技術文書/記事/LaTeX | `sumik:tachikoma-doc-document` |
-| 設計/DDD/アーキテクチャ | `sumik:tachikoma-str-architecture`（読取専用） |
-| セキュリティ監査 | `sumik:tachikoma-qa-security`（読取専用） |
-| コードレビュー主題（PR review・品質監査） | `sumik:tachikoma-qa-code-reviewer`（読取専用） |
-| 研修設計/プレゼン内容改善 | `sumik:tachikoma-doc-training` |
-| HTMLスライドデッキ作成（slides repo 3層モデル・テーマ・素材変換） | `sumik:tachikoma-doc-slide` |
-| 上記以外 | `sumik:tachikoma` |
+| `package.json` に `next` | `devkit:tachikoma-fw-nextjs` |
+| Figma URL/.figma/Code Connect/トークン同期/Tailwind実装 | `devkit:tachikoma-fe-figma-impl` |
+| DS構築/ガバナンス/パターンライブラリ/Figma変数管理 | `devkit:tachikoma-fe-design-system` |
+| UX戦略/デザイン思考/グラフィック/AIエクスペリエンス | `devkit:tachikoma-fe-ux-design`（コード記述なし） |
+| shadcn/ui/Storybook/データチャート | `devkit:tachikoma-fe-frontend` |
+| NestJS/Express/Fastify | `devkit:tachikoma-fw-fullstack-js` |
+| TypeScript型設計・高度な型 | `devkit:tachikoma-lang-typescript` |
+| Python | `devkit:tachikoma-lang-python` |
+| Go | `devkit:tachikoma-lang-go` |
+| `.sh` / シェルスクリプト | `devkit:tachikoma-lang-bash` |
+| Docker/CI-CD/DevOps/Podman | `devkit:tachikoma-cloud-infra` |
+| `.tf` / Terraform | `devkit:tachikoma-cloud-terraform` |
+| AWS (CDK/SAM/SDK/Bedrock) | `devkit:tachikoma-cloud-aws` |
+| GCP (Cloud Run/GKE) / Firebase (Auth/Firestore/Functions・`firebase.json`/`firestore.rules`検出) | `devkit:tachikoma-cloud-gcp` |
+| DB/SQL/Prisma/マイグレーション | `devkit:tachikoma-data-database` |
+| AI/RAG/MCP/LLM / LLM評価・red-team（`promptfooconfig.yaml`） | `devkit:tachikoma-data-ai-ml` |
+| テストファイル（`*test*`, `*spec*`等） | `devkit:tachikoma-qa-test` |
+| Playwright/E2E | `devkit:tachikoma-qa-e2e-test` |
+| アプリのweb操作・ブラウザ自動化（スクレイピング/UI操作/認証永続化・非E2E） | 本体直接（`web:automating-browser` ロード）or `devkit:tachikoma-qa-e2e-test` |
+| 監視/OTel/ログ | `devkit:tachikoma-qa-observability` |
+| 技術文書/記事/LaTeX | `devkit:tachikoma-doc-document` |
+| 設計/DDD/アーキテクチャ | `devkit:tachikoma-str-architecture`（読取専用） |
+| セキュリティ監査 | `devkit:tachikoma-qa-security`（読取専用） |
+| コードレビュー主題（PR review・品質監査） | `devkit:tachikoma-qa-code-reviewer`（読取専用） |
+| 研修設計/プレゼン内容改善 | `devkit:tachikoma-doc-training` |
+| HTMLスライドデッキ作成（slides repo 3層モデル・テーマ・素材変換） | `devkit:tachikoma-doc-slide` |
+| 上記以外 | `devkit:tachikoma` |
 
 ### 判断ポイント
 

@@ -27,7 +27,7 @@
 **`TeamCreate` / `TeamDelete` は v2.1.178 で廃止された**（`ToolSearch("TeamCreate team")` でも出ない＝"No matching deferred tools found"）。明示的なチーム作成/削除は不要で、セッション＝単一の暗黙的チーム（single implicit team）に自動固定される。
 
 ```
-1. Agent(subagent_type: "sumik:tachikoma-{category}-{domain}", run_in_background: true)
+1. Agent(subagent_type: "devkit:tachikoma-{category}-{domain}", run_in_background: true)
    ← background teammate として起動（team_name は受け付けるが無視される＝書かなくてよい）
 2. SendMessage                       ← teammate との通信（指示・追加情報の送受信）
 3. Task系（TaskCreate / TaskList / TaskOutput / TaskStop）← 進捗確認・制御
