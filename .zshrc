@@ -295,7 +295,7 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f vi="nvim"
   abbr -S -f vim="nvim"
   abbr -S -f code-review="coderabbit review --prompt-only"
-  abbr -S -f claude="claude --teammate-mode tmux --dangerously-skip-permissions"
+  abbr -S -f claude="claude --dangerously-skip-permissions"
   abbr -S -f codex="codex --dangerously-bypass-approvals-and-sandbox --dangerously-bypass-hook-trust"
   abbr -S -f htop='sudo htop'
   abbr -S -f ghq='peco-cd'
