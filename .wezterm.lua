@@ -18,40 +18,40 @@ config.inactive_pane_hsb = {
 config.color_scheme = "iTerm2 Tango Dark"
 
 -- Pane
-config.keys = {
-  {
-    key = "\\",
-    mods = "CMD|CTRL",
-    action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
-  },
-  {
-    key = "-",
-    mods = "CMD|CTRL",
-    action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" },
-  },
-  {
-    key = "o",
-    mods = "CTRL",
-    action = wezterm.action.ActivatePaneDirection "Next",
-  },
-  {
-    key = "n",
-    mods = "CMD|CTRL",
-    action = wezterm.action.PromptInputLine {
-      description = "Enter new name for tab",
-      action = wezterm.action_callback(function(window, pane, line)
-        if line ~= nil then
-          window:active_tab():set_title(line)
-        end
-      end),
-    },
-  },
-  {
-    key = "o",
-    mods = "CTRL|CMD",
-    action = wezterm.action.ActivateTabRelative(1),
-  },
-}
+--config.keys = {
+--  {
+--    key = "\\",
+--    mods = "CMD|CTRL",
+--    action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
+--  },
+--  {
+--    key = "-",
+--    mods = "CMD|CTRL",
+--    action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" },
+--  },
+--  {
+--    key = "o",
+--    mods = "CTRL",
+--    action = wezterm.action.ActivatePaneDirection "Next",
+--  },
+--  {
+--    key = "n",
+--    mods = "CMD|CTRL",
+--    action = wezterm.action.PromptInputLine {
+--      description = "Enter new name for tab",
+--      action = wezterm.action_callback(function(window, pane, line)
+--        if line ~= nil then
+--          window:active_tab():set_title(line)
+--        end
+--      end),
+--    },
+--  },
+--  {
+--    key = "o",
+--    mods = "CTRL|CMD",
+--    action = wezterm.action.ActivateTabRelative(1),
+--  },
+--}
 
 ----------------------------------------------------
 -- Tab
