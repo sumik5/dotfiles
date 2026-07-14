@@ -70,6 +70,23 @@ MANUAL_PROJECT_LABEL="✏️ プロジェクトIDを手動入力"
 #       無クォートで参照して除去する（${var%$CURRENT_MARKER}）。
 CURRENT_MARKER=" (現在)"
 
+# ─────────────────────────────────────────────
+# GOOGLE_APPLICATION_CREDENTIALS 検出ガード（開始時）
+#   本スクリプトは最終的に `gcloud auth application-default login` で ADC を
+#   既定パスへ書き込むが、GOOGLE_APPLICATION_CREDENTIALS がセットされていると
+#   Terraform / gcloud client libraries はそちらを優先し、整えた ADC が無視される
+#   （別プロジェクトの SA で操作して 403 になる原因）。実行型スクリプトのため
+#   親シェルの変数は unset できない。ここでは警告のみ行い unset を促す。
+# ─────────────────────────────────────────────
+if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]]; then
+    print_error "GOOGLE_APPLICATION_CREDENTIALS がセットされています:"
+    print_error "    ${GOOGLE_APPLICATION_CREDENTIALS}"
+    print_error "→ これは ADC を上書きし、Terraform / gcloud client libraries に優先されます。"
+    print_error "  このまま進めても、下で設定する ADC は無視されます。"
+    print_status "別シェルで次を実行してから使うことを推奨します: unset GOOGLE_APPLICATION_CREDENTIALS"
+    echo
+fi
+
 # 現在のアクティブアカウントを取得
 CURRENT_ACCOUNT=$(gcloud config get-value account 2>/dev/null || true)
 
@@ -342,3 +359,17 @@ echo "アクティブアカウント: $(gcloud config get-value account 2>/dev/n
 echo "プロジェクト (CLI)  : $(gcloud config get-value project 2>/dev/null)"
 echo "ADC quota project   : ${adc_quota_project:-（未設定）}"
 echo "----------------------------------------"
+
+# ─────────────────────────────────────────────
+# GOOGLE_APPLICATION_CREDENTIALS 再警告（終了時）
+#   ここまでで ADC を整えても、この変数が残っていると Terraform /
+#   gcloud client libraries は ADC を使わない。最後にもう一度、明示的に
+#   unset を促す（実行型スクリプトのため親シェルの変数は消せない）。
+# ─────────────────────────────────────────────
+if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]]; then
+    echo
+    print_error "⚠️  GOOGLE_APPLICATION_CREDENTIALS がまだセットされています:"
+    print_error "    ${GOOGLE_APPLICATION_CREDENTIALS}"
+    print_error "上で設定した ADC は Terraform / gcloud client libraries に使われません。"
+    print_error "次を実行して解除してください: unset GOOGLE_APPLICATION_CREDENTIALS"
+fi
