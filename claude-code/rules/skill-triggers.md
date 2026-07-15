@@ -32,6 +32,7 @@
 | コードレビュー主題（PR review・品質監査） | `devkit:tachikoma-qa-code-reviewer`（読取専用） |
 | 研修設計/プレゼン内容改善 | `devkit:tachikoma-doc-training` |
 | HTMLスライドデッキ作成（slides repo 3層モデル・テーマ・素材変換） | `devkit:tachikoma-doc-slide` |
+| iOS/iPadOS/macOSアプリ開発（Swift/SwiftUI/UIKit・`.xcodeproj`/`.xcworkspace`/`Package.swift`/`.swift`検出）・App Store審査対応監査 | `devkit:tachikoma-mobile-ios` |
 | 上記以外 | `devkit:tachikoma` |
 
 ### 判断ポイント

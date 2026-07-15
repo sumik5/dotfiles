@@ -20,7 +20,7 @@
 # 環境変数（省略時はデフォルト値を使用）:
 #   MARKETPLACE_NAME  登録するマーケットプレイス名（デフォルト: sumik-marketplace）
 #   PLUGIN_NAMES      インストールするプラグイン名（スペース区切り・デフォルト:
-#                     "devkit studio lang cloud ai design exam" の7プラグイン）
+#                     "devkit studio lang web cloud ai design product exam university google mobile" の12プラグイン）
 #   GIT_SOURCE        Git ソース URL（デフォルト: GitHub の sumik-llm-plugin）
 #   GIT_REF           Git リファレンス（デフォルト: main）
 #   CODEX_HOME        symlink 先の Codex ホーム（デフォルト: ~/.codex）
@@ -64,7 +64,7 @@ err() {
 if [[ -n "${PLUGIN_NAMES:-}" ]]; then
     IFS=' ' read -r -a PLUGINS <<< "${PLUGIN_NAMES}"
 else
-    PLUGINS=(devkit studio lang web cloud ai design product exam university)
+    PLUGINS=(devkit studio lang web cloud ai design product exam university google mobile)
 fi
 
 # このスクリプト自身のディレクトリ（agents/ と AGENTS.md が同階層にある前提）
