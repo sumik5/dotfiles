@@ -25,7 +25,7 @@
 1. **workspace / tab / pane 制御** — workspace（プロジェクト文脈）・tab（サブ文脈）・pane（端末分割）の list / create / focus / rename / close・`pane split`。
 2. **別ペインの観測** — `pane read`（`--source visible`/`recent`/`recent-unwrapped`）で隣接ペインの出力を読む。
 3. **待機** — `wait output`（`--match`/`--regex`/`--timeout`）で特定出力を、`wait agent-status`（`idle`/`working`/`blocked`/`done`）で他エージェント完了を待つ。
-4. **エージェント spawn / 協調** — エージェント起動は `herdr agent start <name> --split right -- claude`（herdr 0.7.1 の正式方式）。素のサーバ・テスト・ログ監視は `pane split` + `pane run` で別ペインに起動する。他エージェントの状態は `agent list` / `agent read` で観測し、`wait agent-status` で完了を待つ。
+4. **エージェント spawn / 協調** — エージェント起動は `herdr agent start <name> --split right -- claude`（herdr 0.7.1 の正式方式）。**`--split` は常に現在フォーカス中のpaneを分割するため、複数体を連続起動する場合は2体目以降で `herdr agent focus <直前のagent名>` してから `--split down` する**（詳細: `operating-herdr` スキルの「複数エージェントを整列よく起動する」）。素のサーバ・テスト・ログ監視は `pane split` + `pane run` で別ペインに起動する。他エージェントの状態は `agent list` / `agent read` で観測し、`wait agent-status` で完了を待つ。
 
 - `HERDR_ENV` が `1` でない場合は**非適用**（herdr 外部から focused ペインを操作・検査しない）。
 - Claude Code 内の並列タチコマ編成（`orchestrating-teams`）とは別物。herdr は OS レベルの端末ペインをまたぐ制御を担う。

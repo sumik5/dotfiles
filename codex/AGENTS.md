@@ -127,7 +127,7 @@
 | 出力待機 | `herdr wait output <pane_id> --match <text> [--regex] [--timeout MS]` |
 | エージェント完了待ち | `herdr wait agent-status <pane_id> --status idle\|working\|blocked\|done [--timeout MS]` |
 | ペイン分割で起動 | `herdr pane split <pane_id> --direction right\|down --no-focus` → `herdr pane run <new_pane> "<command>"` |
-| エージェント spawn | `herdr agent start <name> --split right --cwd <path> -- codex`（別ペインに codex/claude 等を起動） |
+| エージェント spawn | `herdr agent start <name> --split right --cwd <path> -- codex`（別ペインに codex/claude 等を起動）。**複数体連続起動時は2体目以降で `agent focus <直前のagent名>` の後 `--split down`**（詳細: `devkit:operating-herdr` スキル） |
 
 - 🔴 **Codex は Claude Code の `teammateMode` を持たない**が、サブエージェント/マルチスレッドやサーバ・テスト・ログ監視の別ペイン展開は、素の tmux ではなく **herdr CLI に一本化**する。ペイン操作を herdr 以外（iTerm2 ネイティブ分割・osascript 等）で行わないこと。
 - herdr は iTerm2/tmux を制御しない（独自の Unix socket + PTY でペインを多重化する）。iTerm2.app 内で動く場合でも、ペイン生成は必ず herdr CLI で行う。
