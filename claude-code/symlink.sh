@@ -28,7 +28,9 @@ echo ""
 # 各ファイル・ディレクトリのシンボリックリンクを作成
 create_symlink_if_not_exists "$DOTFILES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
 create_symlink_if_not_exists "$DOTFILES_DIR/settings.json" "$CLAUDE_DIR/settings.json"
-create_symlink_if_not_exists "$DOTFILES_DIR/hooks" "$CLAUDE_DIR/hooks"
+# $CLAUDE_DIR/hooks はsymlink化しない: herdr integration install 等が
+# herdr-agent-state.sh を直接生成・上書き管理するディレクトリのため、
+# dotfiles配下に置くとツールの自動更新のたびにgit差分ノイズが発生する。
 create_symlink_if_not_exists "$DOTFILES_DIR/commands" "$CLAUDE_DIR/commands"
 create_symlink_if_not_exists "$DOTFILES_DIR/rules" "$CLAUDE_DIR/rules"
 create_symlink_if_not_exists "$DOTFILES_DIR/statusline.sh" "$CLAUDE_DIR/statusline.sh"

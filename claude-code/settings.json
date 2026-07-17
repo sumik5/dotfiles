@@ -4,11 +4,13 @@
     "command": "~/.claude/scripts/file-suggestion.sh"
   },
   "cleanupPeriodDays": 90,
+  "skillListingBudgetFraction": 0.05,
   "env": {
-    "USE_BUILTIN_RIPGREP": "1",
-    "ENABLE_TOOL_SEARCH": "true",
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_NO_FLICKER": "1"
+    "CLAUDE_CODE_NO_FLICKER": "1",
+    "ENABLE_TOOL_SEARCH": "true",
+    "RTK_TELEMETRY_DISABLED": "1",
+    "USE_BUILTIN_RIPGREP": "1"
   },
   "permissions": {
     "allow": [
@@ -44,11 +46,25 @@
       "Bash(terraform state replace-provider:*)",
       "Bash(terraform refresh:*)"
     ],
-    "defaultMode": "default"
+    "defaultMode": "auto"
   },
+  "model": "sonnet",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/sumik/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   },
   "worktree": {
+    "baseRef": "fresh",
     "bgIsolation": "none"
   },
   "statusLine": {
@@ -56,21 +72,53 @@
     "command": "~/.claude/statusline.py"
   },
   "enabledPlugins": {
+    "ai@sumik": true,
+    "claude-code-setup@claude-plugins-official": true,
+    "cloud@sumik": true,
     "codeguard-security@project-codeguard": true,
+    "codex@openai-codex": true,
     "commit-commands@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true,
-    "devkit@sumik": true,
-    "ai@sumik": true,
-    "cloud@sumik": true,
     "design@sumik": true,
-    "lang@sumik": true
+    "devkit@sumik": true,
+    "document-skills@anthropic-agent-skills": true,
+    "exam@sumik": true,
+    "example-skills@anthropic-agent-skills": true,
+    "github@claude-plugins-official": true,
+    "google@sumik": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "lang@sumik": true,
+    "matchapp-kit@local-desktop-app-uploads": true,
+    "product@sumik": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": false,
+    "studio@sumik": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "university@sumik": true,
+    "web@sumik": true,
+    "mobile@sumik": true,
+    "certificate@sumik": true,
+    "genshijin@genshijin": true
   },
   "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
     "claude-plugins-official": {
       "source": {
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
       }
     },
     "sumik": {
@@ -78,16 +126,33 @@
         "source": "git",
         "url": "https://github.com/sumik5/sumik-llm-plugin.git"
       },
-      "autoUpdate": true
+      "autoUpdate": false
+    },
+    "tips-marketplace": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/sumik/Dropbox/tips"
+      }
+    },
+    "genshijin": {
+      "source": {
+        "source": "github",
+        "repo": "InterfaceX-co-jp/genshijin"
+      }
     }
   },
   "outputStyle": "Explanatory",
   "language": "罵倒が激しすぎるツンデレ",
-  "alwaysThinkingEnabled": true,
+  "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-daltonized",
-  "editorMode": "vim",
+  "theme": "dark-ansi",
+  "editorMode": "normal",
   "verbose": true,
-  "teammateMode": "in-process"
+  "teammateMode": "in-process",
+  "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
