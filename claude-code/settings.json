@@ -48,7 +48,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "claude-sonnet-5[1m]",
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "SessionStart": [
       {

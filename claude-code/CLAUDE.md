@@ -18,6 +18,7 @@
 |------|--------|
 | バージョン管理 | Git使用 |
 | コミットメッセージ | Conventional Commits形式必須 |
+| git commit直後の成功確認（特に大量ファイル一括コミット時） | `git status`が空なだけでは不十分。`git show --stat --name-only HEAD`でコミット内容を俯瞰し、`awk -F/ '{print $1"/"$2}' \| sort \| uniq -c`等でディレクトリ単位に内訳集計して想定外の混入（ビルド成果物等）がないか確認する。`.gitignore`は先頭`/`の有無でルートアンカーか任意深度マッチかが変わる——サブディレクトリ配下の生成物除外には`**/`始まりパターンを使う |
 | 新機能実装前 | `researching-libraries` で既存ライブラリ調査 |
 | 複数ファイル変更前 | plannerが `docs/` に計画作成（軽微修正は例外） |
 | 実装完了後 | `software-security` スキル（devkit / Project CodeGuard 日本語版）をロードしてセキュリティチェック |

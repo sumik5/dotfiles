@@ -38,6 +38,7 @@
 - 🔴 **`teammateMode` の変更はホットリロードされない**（hot-reload 対象は `model`/`outputStyle` 等に限られ `teammateMode` は含まれない）。settings.json を `in-process` にしても、**既に起動済みの Claude / Codex セッションは旧値のまま動き続ける**。iTerm2.app 内 ＋ PATH に `it2` CLI（mkusaka/it2）がある環境で旧値が `auto`/`iterm2` のままだと、teammate 起動時に it2 経由で **iTerm2 ネイティブペインが勝手に開き**、herdr の PTY ペイン管理と競合する（＝「削除したはずの iTerm2 制御が勝手に走る」の真因は旧 auto プロセスの残存）。**settings 変更後は全 Claude / Codex セッションを再起動して旧プロセスを一掃する**こと。teammateMode の有効値は `in-process`（既定）/ `tmux` / `iterm2` / `auto` の4つで、公式ドキュメント上、**`teammateMode` 以外に iTerm2 ペインを開く経路は存在しない**（worktree・remote control 等も iTerm2 を開かない）。二重の予防として it2 CLI 削除・iTerm2 Python API 無効化も有効だが他用途に注意。
 - 自然言語でも起動可（例:「3体のteammateを起動し security / performance / test を担当させろ」）→ Claude がチーム形成・タスク管理・通信・権限引き継ぎを自動実行。
 - 🔴 **herdr で `herdr agent start <name> ... -- claude --agent <agent>` を実行する際は `--permission-mode auto` を明示する**（省略すると起動先 `--cwd` の settings.json 解決結果に依存し既定値 `dontAsk` のまま起動することがあり、`Edit`/`Write`（一部の複合Bashコマンドも）が「ユーザーに確認できないため」黙って拒否される。`dontAsk` は「確認せず許可」ではなく「確認できないので拒否」という安全側の挙動）。`auto` は内蔵classifierが安全な操作を自動承認しつつ `git push`/`git reset`/`rm -rf` 等の危険操作は引き続きブロックする準自動モードで、`acceptEdits`（Edit/Write系のみ自動承認）より広く自動化しつつ `bypassPermissions`（全許可）より安全（詳細: `operating-herdr` スキル）。この拒否は `agent_status` が `working`→`idle` に正常遷移するため一見「完了」に見える——完了報告の中身（実際に修正できたか・実測結果があるか）を必ず確認すること。
+- 🔴 **`herdr agent start -- claude ...` が「staleシェル残存」等でサイレント失敗し（`agent_started` 応答自体は成功を返すため気づきにくい）、`herdr pane run` でのcd+claude直接起動へフォールバックする場合、この代替経路には `--permission-mode auto` を引き継ぐ仕組みが無い**（2026-07-20 実証）。フォールバック起動時は必ず `--permission-mode auto` を明示し直し、起動後・完了確認時に pane 最下部のステータス表示（`auto mode on` か `bypass permissions on` か）を目視確認する。`bypass permissions` のまま動いていた場合、危険操作（`git push`/`git reset`/`rm -rf` 等）が確認なしに実行されうる状態のため、その回のセッション中に危険操作が行われていないか `git status`/`git log` で必ず裏取りする。
 - 他 teammate との疎通確認をしたい時は、いきなり `SendMessage(to: "<相手>")` を送る前に `SendMessage(to: "main")` を自分自身に送ってみる。エラーになれば自分自身が "main"（最上位会話）＝他 teammate は現在このセッションで並列稼働していない可能性が高い。計画書に記載されたチーム構成は「実際にこのセッションで起動しているプロセス」を保証しない。
 
 ### シャットダウン・teammate 解散
@@ -53,6 +54,7 @@
 |------|--------|
 | 複数並列タチコマで実装パターン統一が必要 | 初回タスクで確立したパターン（CSS・コード断片・命名規則）を後続タチコマへ「テンプレート埋め込み式」プロンプトで配布（独自実装させない） |
 | 同一ドメインの独立タスク群（4並列以上） | 各タチコマに同一の品質ゲート（grep検証・整合性確認手順）を埋め込み、報告フォーマットも統一 |
+| 並列タチコマが「担当外ファイルに意図しない差分がある」ことを検知した | `git checkout --`等の巻き戻しを機械的に実行させない。ビルドツールの自動生成副作用（xcodebuildの.entitlements書き換え等）と、他の並行タチコマが正当に加えた変更は`git diff`の内容だけでは区別できないことがある（1件実証：C担当がR-1担当の正当な修正を「汚染」と誤認し巻き戻した）。判別できない場合は巻き戻さず本体へ報告させる |
 
 ## 外部エージェントへの委譲
 
