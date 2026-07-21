@@ -13,7 +13,8 @@
 | shadcn/ui/Storybook/データチャート | `devkit:tachikoma-fe-frontend` |
 | NestJS/Express/Fastify | `devkit:tachikoma-fw-fullstack-js` |
 | TypeScript型設計・高度な型 | `devkit:tachikoma-lang-typescript` |
-| Python | `devkit:tachikoma-lang-python` |
+| FastAPI（`pyproject.toml`/`requirements.txt` に fastapi 依存・Web API/サービス構築が主題） | `devkit:tachikoma-fw-fastapi` |
+| Python（上記以外の一般開発・CLI/ライブラリ/データ処理/Google ADK） | `devkit:tachikoma-lang-python` |
 | Go | `devkit:tachikoma-lang-go` |
 | `.sh` / シェルスクリプト | `devkit:tachikoma-lang-bash` |
 | Docker/CI-CD/DevOps/Podman | `devkit:tachikoma-cloud-infra` |
