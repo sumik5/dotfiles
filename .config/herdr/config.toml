@@ -46,3 +46,25 @@ delivery = "terminal"
 
 [ui]
 show_agent_labels_on_pane_borders = true
+
+[[keys.command]]
+key = "prefix+ctrl+h"
+type = "popup"
+command = "hunk diff"
+description = "Launch Hunk git diff TUI in a floating popup window"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+ctrl+g"
+command = "glogs"
+description = "Launch Hunk git logs TUI in a floating popup window"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+ctrl+t"
+command = "zsh"
+description = "Launch a zsh shell in a floating popup window"
+width = "85%"
+height = "85%"
