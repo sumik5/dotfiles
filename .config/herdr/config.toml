@@ -58,12 +58,14 @@ height = "85%"
 [[keys.command]]
 key = "prefix+l"
 command = "glogs"
-description = "Launch Hunk git logs TUI in a floating popup window"
+type = "popup"
+description = "Launch glogs TUI in a floating popup window"
 width = "85%"
 height = "85%"
 
 [[keys.command]]
 key = "prefix+z"
+type = "popup"
 command = "zsh"
 description = "Launch a zsh shell in a floating popup window"
 width = "85%"
