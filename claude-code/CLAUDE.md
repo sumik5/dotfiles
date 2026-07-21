@@ -17,7 +17,7 @@
 | If X | then Y |
 |------|--------|
 | バージョン管理 | Git使用 |
-| コミットメッセージ | Conventional Commits形式必須 |
+| コミットメッセージ | Conventional Commits形式必須。`Co-Authored-By: Claude ...` / `Claude-Session: ...` 等のAI帰属フッターは付与禁止（本体標準指示のデフォルトテンプレートより本項優先） |
 | git commit直後の成功確認（特に大量ファイル一括コミット時） | `git status`が空なだけでは不十分。`git show --stat --name-only HEAD`でコミット内容を俯瞰し、`awk -F/ '{print $1"/"$2}' \| sort \| uniq -c`等でディレクトリ単位に内訳集計して想定外の混入（ビルド成果物等）がないか確認する。`.gitignore`は先頭`/`の有無でルートアンカーか任意深度マッチかが変わる——サブディレクトリ配下の生成物除外には`**/`始まりパターンを使う |
 | 新機能実装前 | `researching-libraries` で既存ライブラリ調査 |
 | 複数ファイル変更前 | plannerが `docs/` に計画作成（軽微修正は例外） |
