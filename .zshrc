@@ -300,6 +300,7 @@ source /opt/homebrew/share/zsh-abbr/zsh-abbr.zsh
   abbr -S -f htop='sudo htop'
   abbr -S -f ghq='peco-cd'
   abbr -S -f gpush='git push origin main && git push origin --tags'
+  abbr -S -f gpull='git pull origin main && git pull origin --tags'
 } &>/dev/null
 
 
