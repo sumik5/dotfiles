@@ -40,12 +40,12 @@ OUTPUT_DIR="${OUTPUT_DIR:-$(pwd)}"
 mkdir -p -- "$OUTPUT_DIR"
 OUTPUT_DIR="$(cd -- "$OUTPUT_DIR" && pwd)"
 
-printf '%s' 'ダウンロード間隔（分）: ' >&2
-IFS= read -r INTERVAL_MINUTES
-[[ "$INTERVAL_MINUTES" =~ ^[0-9]+([.][0-9]+)?$ ]] || { printf '%s\n' 'エラー: 0以上の分数を指定してください' >&2; exit 1; }
-START_TIME=$(date +%s)
-MAX_RUNTIME_SECONDS=$((6 * 60 * 60))
-runtime_remaining(){ printf '%s' $((MAX_RUNTIME_SECONDS - $(date +%s) + START_TIME)); }
+printf '%s' '終了時刻（HH:MM）: ' >&2
+IFS= read -r END_CLOCK
+[[ "$END_CLOCK" =~ ^([01][0-9]|2[0-3]):[0-5][0-9]$ ]] || { printf '%s\n' 'エラー: HH:MM形式で指定してください' >&2; exit 1; }
+END_EPOCH=$(date -j -f '%Y-%m-%d %H:%M:%S' "$(date +%Y-%m-%d) ${END_CLOCK}:00" '+%s')
+(( END_EPOCH <= $(date +%s) )) && END_EPOCH=$((END_EPOCH + 24 * 60 * 60))
+runtime_remaining(){ printf '%s' $((END_EPOCH - $(date +%s))); }
 
 printf '%s' 'username: ' >&2
 IFS= read -r COLLECT_USERNAME
@@ -120,7 +120,7 @@ current_parent=''
 next_parent_number=0
 current_parent_count=0
 while IFS=$'\t' read -r parent link_name url; do
-  (( $(runtime_remaining) > 0 )) || { printf '[終了] 起動から6時間が経過しました\n' >&2; break; }
+  (( $(runtime_remaining) > 0 )) || { printf '[終了] 指定した終了時刻になりました\n' >&2; break; }
   ((n<total)) || break
   n=$((n+1))
   if [[ "$parent" != "$current_parent" ]]; then
@@ -161,11 +161,18 @@ while IFS=$'\t' read -r parent link_name url; do
     "$0" --download-one "$parent" "$link_name" "$media_url" "$OUTPUT_DIR" "$group_number" "$lesson_number" "$url"
     DOWNLOAD_COUNT=$((DOWNLOAD_COUNT + 1))
     printf '[download-count] 累計%d件\n' "$DOWNLOAD_COUNT" >&2
-    sleep_minutes=$(awk -v minutes="$INTERVAL_MINUTES" 'BEGIN { srand(); value=minutes+(rand()*10-5); if(value<0)value=0; printf "%.3f", value }')
-    sleep_seconds=$(awk -v minutes="$sleep_minutes" 'BEGIN { printf "%.3f", minutes*60 }')
-    printf '[wait] %.3f分後に次のレッスンを処理します\n' "$sleep_minutes" >&2
+    downloaded_path=$(awk -F '\t' -v target="$url" '$2 == target && $4 == "done" { path=$3 } END { print path }' "$STATUS_FILE")
+    if [[ -n "$downloaded_path" ]] && command -v ffprobe >/dev/null 2>&1; then
+      media_seconds=$(ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "$downloaded_path" 2>/dev/null | awk '{ printf "%.0f", $1 }')
+      [[ "$media_seconds" =~ ^[0-9]+$ ]] || media_seconds=0
+    else
+      media_seconds=0
+    fi
+    random_wait=$(awk 'BEGIN { srand(); printf "%.0f", 15 + rand() * 15 }')
+    sleep_seconds=$((media_seconds + random_wait))
+    printf '[wait] 動画時間%d秒 + ランダム待機%d秒、次のレッスンまで%d秒待機します\n' "$media_seconds" "$random_wait" "$sleep_seconds" >&2
     remaining_seconds=$(runtime_remaining)
-    (( remaining_seconds <= 0 )) && { printf '[終了] 起動から6時間が経過しました\n' >&2; break 2; }
+    (( remaining_seconds <= 0 )) && { printf '[終了] 指定した終了時刻になりました\n' >&2; break 2; }
     if awk -v requested="$sleep_seconds" -v remaining="$remaining_seconds" 'BEGIN { exit !(requested > remaining) }'; then sleep_seconds="$remaining_seconds"; fi
     [[ "$sleep_seconds" == "0.000" ]] || sleep "$sleep_seconds"
   done < <(printf '%s' "$sel" | jq -r '.[]')
