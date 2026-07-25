@@ -13,7 +13,7 @@ fi
 
 if [[ "${1:-}" == "--download-one" ]]; then
   parent="$2"; name="$3"; url="$4"; destination="$5"; group_number="${6:-1}"; lesson_number="${7:-1}"; lesson_url="${8:-$url}"
-  status_file="$(pwd)/video-download-status.tsv"
+  status_file="$destination/video-download-status.tsv"
   if [[ -f "$status_file" ]] && awk -F '\t' -v target="$lesson_url" '$2 == target && $4 == "done" { found=1 } END { exit found ? 0 : 1 }' "$status_file"; then
     printf '[skip] 取得済み: %s\n' "$name" >&2
     exit 0
@@ -40,6 +40,29 @@ OUTPUT_DIR="${OUTPUT_DIR:-$(pwd)}"
 mkdir -p -- "$OUTPUT_DIR"
 OUTPUT_DIR="$(cd -- "$OUTPUT_DIR" && pwd)"
 
+CONFIG_FILE="$OUTPUT_DIR/.collect-config"
+STATUS_FILE="$OUTPUT_DIR/video-download-status.tsv"
+if [[ -f "$CONFIG_FILE" ]]; then
+  log_config='保存先の設定ファイルを使用します'
+  printf '[config] %s\n' "$log_config" >&2
+  # shellcheck disable=SC1090
+  source "$CONFIG_FILE"
+  COLLECT_USERNAME="$CONFIG_USERNAME"
+  COLLECT_PASSWORD=$(printf '%s' "$CONFIG_PASSWORD_B64" | base64 --decode)
+  COURSE_URL="$CONFIG_COURSE_URL"
+else
+  printf '%s' 'username: ' >&2
+  IFS= read -r COLLECT_USERNAME
+  printf '%s' 'password: ' >&2
+  IFS= read -r -s COLLECT_PASSWORD
+  printf '\n' >&2
+  printf '%s' '取得対象URL: ' >&2
+  IFS= read -r COURSE_URL
+  printf 'CONFIG_USERNAME=%q\nCONFIG_PASSWORD_B64=%q\nCONFIG_COURSE_URL=%q\n' \
+    "$COLLECT_USERNAME" "$(printf '%s' "$COLLECT_PASSWORD" | base64)" "$COURSE_URL" > "$CONFIG_FILE"
+  chmod 600 "$CONFIG_FILE"
+fi
+
 printf '%s' '終了時刻（HH:MM）: ' >&2
 IFS= read -r END_CLOCK
 [[ "$END_CLOCK" =~ ^([01][0-9]|2[0-3]):[0-5][0-9]$ ]] || { printf '%s\n' 'エラー: HH:MM形式で指定してください' >&2; exit 1; }
@@ -47,13 +70,6 @@ END_EPOCH=$(date -j -f '%Y-%m-%d %H:%M:%S' "$(date +%Y-%m-%d) ${END_CLOCK}:00" '
 (( END_EPOCH <= $(date +%s) )) && END_EPOCH=$((END_EPOCH + 24 * 60 * 60))
 runtime_remaining(){ printf '%s' $((END_EPOCH - $(date +%s))); }
 
-printf '%s' 'username: ' >&2
-IFS= read -r COLLECT_USERNAME
-printf '%s' 'password: ' >&2
-IFS= read -r -s COLLECT_PASSWORD
-printf '\n' >&2
-printf '%s' '取得対象URL: ' >&2
-IFS= read -r COURSE_URL
 test -n "$COLLECT_USERNAME" || { printf '%s\n' 'エラー: usernameが空です' >&2; exit 1; }
 test -n "$COLLECT_PASSWORD" || { printf '%s\n' 'エラー: passwordが空です' >&2; exit 1; }
 test -n "$COURSE_URL" || { printf '%s\n' 'エラー: 取得対象URLが空です' >&2; exit 1; }
@@ -73,7 +89,6 @@ for value in "$COLLECT_MAX_N" "$COLLECT_WAIT_MIN_MS" "$COLLECT_WAIT_MAX_MS" "$CO
 [[ $COLLECT_AUTH_PROFILE =~ ^[A-Za-z0-9._-]+$ && $COLLECT_SESSION =~ ^[A-Za-z0-9._-]+$ ]] || { printf '%s\n' 'エラー: 名前が不正です' >&2; exit 1; }
 [[ -z $COLLECT_STATE_FILE || ! -L $COLLECT_STATE_FILE ]] || { printf '%s\n' 'エラー: stateにシンボリックリンクは指定できません' >&2; exit 1; }
 TMP_DIR=$(mktemp -d /tmp/collect-urls.XXXXXX); TEMP_AUTH_PROFILE=
-STATUS_FILE=$(pwd)/video-download-status.tsv
 if [[ ! -f "$STATUS_FILE" ]]; then printf '%s\n' $'name\turl\tpath\tstatus' > "$STATUS_FILE"; chmod 600 "$STATUS_FILE"; fi
 URL_COUNT=0
 DOWNLOAD_COUNT=0
@@ -123,8 +138,23 @@ while IFS=$'\t' read -r parent link_name url; do
   (( $(runtime_remaining) > 0 )) || { printf '[終了] 指定した終了時刻になりました\n' >&2; break; }
   ((n<total)) || break
   n=$((n+1))
+  if [[ "$link_name" == *-* ]]; then
+    parent="${link_name%%-*}"
+    parent=$(printf '%s' "$parent" | sed -E 's/[0-9]+$//')
+  fi
   if [[ "$parent" != "$current_parent" ]]; then
-    next_parent_number=$((next_parent_number+1))
+    existing_group_number=''
+    for existing_dir in "$OUTPUT_DIR"/??."$parent"; do
+      if [[ -d "$existing_dir" ]]; then
+        existing_group_number=$(basename "$existing_dir" | sed -E 's/^([0-9]{2})\..*/\1/')
+        break
+      fi
+    done
+    if [[ -n "$existing_group_number" ]]; then
+      next_parent_number=$((10#$existing_group_number))
+    else
+      next_parent_number=$((next_parent_number+1))
+    fi
     current_parent="$parent"
     current_parent_count=0
   fi
@@ -140,7 +170,10 @@ while IFS=$'\t' read -r parent link_name url; do
   ab open "$url" >/dev/null || continue
   lesson_name=$(printf '%s' '(()=>{const e=document.querySelector("h1,h2,.lesson-title,.title");return (e?.textContent||"").replace(/[\s\t\r\n]+/g," ").trim()})()' | ab eval --stdin 2>/dev/null | jq -r 'if type=="string" then . else (.value // "") end' 2>/dev/null || true)
   [[ -n "$lesson_name" && "$lesson_name" != *"マイページ"* ]] && link_name="$lesson_name"
-  if [[ "$link_name" == *-* ]]; then parent="${link_name%%-*}"; fi
+  if [[ "$link_name" == *-* ]]; then
+    parent="${link_name%%-*}"
+    parent=$(printf '%s' "$parent" | sed -E 's/[0-9]+$//')
+  fi
   elapsed=0
   sel='[]'
   while ((elapsed<=COLLECT_MEDIA_TIMEOUT_MS)); do
