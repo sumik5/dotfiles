@@ -26,7 +26,9 @@ if [[ "${1:-}" == "--download-one" ]]; then
   output="$destination/$group_prefix$parent/$lesson_prefix$name.mp4"
   [[ ! -e "$output" ]] || { printf '[skip] 保存済み: %s\n' "$output" >&2; exit 0; }
   temp=$(mktemp "$output.part.XXXXXX"); rm -f -- "$temp"
-  if ffmpeg -nostdin -hide_banner -loglevel error -y -i "$url" -c copy -f mp4 "$temp"; then
+  if ffmpeg -nostdin -hide_banner -loglevel error -y \
+    -user_agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' \
+    -i "$url" -c copy -f mp4 "$temp"; then
     mv -- "$temp" "$output"
     printf '%s\t%s\t%s\tdone\n' "$name" "$lesson_url" "$output" >> "$status_file"
     printf '[saved] %s\n' "$output" >&2
@@ -167,7 +169,10 @@ while IFS=$'\t' read -r parent link_name url; do
   fi
   log "[info] レッスン $n/$total"
   ab network requests --clear >/dev/null 2>&1 || true
+  printf '[browser] レッスンページへ移動: %s\n' "$url" >&2
   ab open "$url" >/dev/null || continue
+  ab wait 1000 >/dev/null
+  printf '[browser] ページ移動完了。動画URLを確認します\n' >&2
   lesson_name=$(printf '%s' '(()=>{const e=document.querySelector("h1,h2,.lesson-title,.title");return (e?.textContent||"").replace(/[\s\t\r\n]+/g," ").trim()})()' | ab eval --stdin 2>/dev/null | jq -r 'if type=="string" then . else (.value // "") end' 2>/dev/null || true)
   [[ -n "$lesson_name" && "$lesson_name" != *"マイページ"* ]] && link_name="$lesson_name"
   if [[ "$link_name" == *-* ]]; then
