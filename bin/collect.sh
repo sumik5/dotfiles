@@ -12,7 +12,7 @@ fi
 [[ "${1:-}" == "--download-one" || "$#" -eq 0 ]] || { printf '%s\n' '引数は指定せずに実行してください' >&2; exit 1; }
 
 if [[ "${1:-}" == "--download-one" ]]; then
-  parent="$2"; name="$3"; url="$4"; destination="$5"; number="${6:-1}"; lesson_url="${7:-$url}"
+  parent="$2"; name="$3"; url="$4"; destination="$5"; group_number="${6:-1}"; lesson_number="${7:-1}"; lesson_url="${8:-$url}"
   status_file="$(pwd)/video-download-status.tsv"
   if [[ -f "$status_file" ]] && awk -F '\t' -v target="$lesson_url" '$2 == target && $4 == "done" { found=1 } END { exit found ? 0 : 1 }' "$status_file"; then
     printf '[skip] 取得済み: %s\n' "$name" >&2
@@ -20,10 +20,11 @@ if [[ "${1:-}" == "--download-one" ]]; then
   fi
   clean_name() { printf '%s' "$1" | tr '\n\r\t' '   ' | sed -E 's#[/\\:*?"<>|]+#_#g; s/[[:space:]]+/_/g; s/_+/_/g; s/^_+//; s/_+$//'; }
   parent=$(clean_name "$parent"); name=$(clean_name "$name"); [[ -n "$parent" ]] || parent=video; [[ -n "$name" ]] || name=video
-  prefix=$(printf '%02d.' "$number")
-  mkdir -p -- "$destination/$prefix$parent"
-  output="$destination/$prefix$parent/$prefix$name.mp4"
-  [[ ! -e "$output" ]] || output="$destination/$prefix$parent/$prefix$name-$(date +%s).mp4"
+  group_prefix=$(printf '%02d.' "$group_number")
+  lesson_prefix=$(printf '%02d.' "$lesson_number")
+  mkdir -p -- "$destination/$group_prefix$parent"
+  output="$destination/$group_prefix$parent/$lesson_prefix$name.mp4"
+  [[ ! -e "$output" ]] || { printf '[skip] 保存済み: %s\n' "$output" >&2; exit 0; }
   temp=$(mktemp "$output.part.XXXXXX"); rm -f -- "$temp"
   if ffmpeg -nostdin -hide_banner -loglevel error -y -i "$url" -c copy -f mp4 "$temp"; then
     mv -- "$temp" "$output"
@@ -72,7 +73,6 @@ for value in "$COLLECT_MAX_N" "$COLLECT_WAIT_MIN_MS" "$COLLECT_WAIT_MAX_MS" "$CO
 [[ $COLLECT_AUTH_PROFILE =~ ^[A-Za-z0-9._-]+$ && $COLLECT_SESSION =~ ^[A-Za-z0-9._-]+$ ]] || { printf '%s\n' 'エラー: 名前が不正です' >&2; exit 1; }
 [[ -z $COLLECT_STATE_FILE || ! -L $COLLECT_STATE_FILE ]] || { printf '%s\n' 'エラー: stateにシンボリックリンクは指定できません' >&2; exit 1; }
 TMP_DIR=$(mktemp -d /tmp/collect-urls.XXXXXX); TEMP_AUTH_PROFILE=
-OUTPUT_FILE=$(pwd)/video-urls.txt
 STATUS_FILE=$(pwd)/video-download-status.tsv
 if [[ ! -f "$STATUS_FILE" ]]; then printf '%s\n' $'name\turl\tpath\tstatus' > "$STATUS_FILE"; chmod 600 "$STATUS_FILE"; fi
 URL_COUNT=0
@@ -109,17 +109,28 @@ while ((elapsed<=COLLECT_MEDIA_TIMEOUT_MS)); do
   sleep "$(awk -v m="$COLLECT_MEDIA_POLL_MS" 'BEGIN{printf "%.3f",m/1000}')"
   elapsed=$((elapsed+COLLECT_MEDIA_POLL_MS))
 done
-((count>0))||{ printf '%s\n' 'エラー: レッスンリンクを検出できませんでした' >&2; exit 1; };total=$count;((COLLECT_MAX_N>0&&COLLECT_MAX_N<total))&&total=$COLLECT_MAX_N;: >"$OUTPUT_FILE";log "[3/4] ${total}件のレッスンを検出しました。順次処理します";n=0
+((count>0))||{ printf '%s\n' 'エラー: レッスンリンクを検出できませんでした' >&2; exit 1; };total=$count;((COLLECT_MAX_N>0&&COLLECT_MAX_N<total))&&total=$COLLECT_MAX_N;log "[3/4] ${total}件のレッスンを検出しました。順次処理します";n=0
 while IFS=$'\t' read -r _ waiting_name waiting_url; do
   [[ -n "$waiting_url" ]] || continue
   if ! awk -F '\t' -v target="$waiting_url" '$2 == target { found=1 } END { exit found ? 0 : 1 }' "$STATUS_FILE"; then
     printf '%s\t%s\t\twaiting\n' "$waiting_name" "$waiting_url" >> "$STATUS_FILE"
   fi
 done < <(printf '%s' "$links" | jq -r '.urls[] | [(.parent // ""), (.name // ""), .url] | @tsv')
+current_parent=''
+next_parent_number=0
+current_parent_count=0
 while IFS=$'\t' read -r parent link_name url; do
   (( $(runtime_remaining) > 0 )) || { printf '[終了] 起動から6時間が経過しました\n' >&2; break; }
   ((n<total)) || break
   n=$((n+1))
+  if [[ "$parent" != "$current_parent" ]]; then
+    next_parent_number=$((next_parent_number+1))
+    current_parent="$parent"
+    current_parent_count=0
+  fi
+  current_parent_count=$((current_parent_count+1))
+  group_number=$next_parent_number
+  lesson_number=$current_parent_count
   if awk -F '\t' -v target="$url" '$2 == target && $4 == "done" { found=1 } END { exit found ? 0 : 1 }' "$STATUS_FILE" 2>/dev/null; then
     printf '[skip] レッスン取得済み: %s\n' "$link_name" >&2
     continue
@@ -146,13 +157,8 @@ while IFS=$'\t' read -r parent link_name url; do
     [[ -n "$media_url" ]] || continue
     URL_COUNT=$((URL_COUNT + 1))
     printf '[url] %d件目を取得: %s\n' "$URL_COUNT" "$media_url" >&2
-    record=$(printf '%s\t%s' "$link_name" "$media_url")
-    if ! grep -Fqx -- "$record" "$OUTPUT_FILE"; then
-      printf '%s\n' "$record" >>"$OUTPUT_FILE"
-      log "[info] URLを保存しました（$(wc -l <"$OUTPUT_FILE" | tr -d ' ')件）"
-    fi
     printf '[download-start] %s/%s\n' "$parent" "$link_name" >&2
-    "$0" --download-one "$parent" "$link_name" "$media_url" "$OUTPUT_DIR" "$n" "$url"
+    "$0" --download-one "$parent" "$link_name" "$media_url" "$OUTPUT_DIR" "$group_number" "$lesson_number" "$url"
     DOWNLOAD_COUNT=$((DOWNLOAD_COUNT + 1))
     printf '[download-count] 累計%d件\n' "$DOWNLOAD_COUNT" >&2
     sleep_minutes=$(awk -v minutes="$INTERVAL_MINUTES" 'BEGIN { srand(); value=minutes+(rand()*10-5); if(value<0)value=0; printf "%.3f", value }')
