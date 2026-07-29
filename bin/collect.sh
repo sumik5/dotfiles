@@ -14,6 +14,7 @@ fi
 if [[ "${1:-}" == "--download-one" ]]; then
   parent="$2"; name="$3"; url="$4"; destination="$5"; group_number="${6:-1}"; lesson_number="${7:-1}"; lesson_url="${8:-$url}"
   status_file="$destination/video-download-status.tsv"
+  cookie_file="$destination/.browser-cookies"
   if [[ -f "$status_file" ]] && awk -F '\t' -v target="$lesson_url" '$2 == target && $4 == "done" { found=1 } END { exit found ? 0 : 1 }' "$status_file"; then
     printf '[skip] 取得済み: %s\n' "$name" >&2
     exit 0
@@ -26,8 +27,13 @@ if [[ "${1:-}" == "--download-one" ]]; then
   output="$destination/$group_prefix$parent/$lesson_prefix$name.mp4"
   [[ ! -e "$output" ]] || { printf '[skip] 保存済み: %s\n' "$output" >&2; exit 0; }
   temp=$(mktemp "$output.part.XXXXXX"); rm -f -- "$temp"
+  cookie_args=()
+  [[ -s "$cookie_file" ]] && cookie_args=(-cookies "$(cat "$cookie_file")")
   if ffmpeg -nostdin -hide_banner -loglevel error -y \
     -user_agent 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36' \
+    -referer "$lesson_url" \
+    -headers "Origin: $(printf '%s' "$lesson_url" | sed -E 's#^(https://[^/]+).*#\1#')\r\n" \
+    "${cookie_args[@]}" \
     -i "$url" -c copy -f mp4 "$temp"; then
     mv -- "$temp" "$output"
     printf '%s\t%s\t%s\tdone\n' "$name" "$lesson_url" "$output" >> "$status_file"
@@ -117,6 +123,12 @@ log '[2/4] ログイン状態を確認しています'
 if ! wait_login;then log '[2/4] ログイン処理を開始します'; profile=$COLLECT_AUTH_PROFILE;if [[ -n $COLLECT_USERNAME || -n $COLLECT_PASSWORD ]];then [[ -n $COLLECT_USERNAME && -n $COLLECT_PASSWORD ]]||{ printf '%s\n' 'エラー: 資格情報は両方指定してください' >&2; exit 1; };TEMP_AUTH_PROFILE=video-url-$COURSE_ID-$$;printf '%s' "$COLLECT_PASSWORD"|"$AGENT_BROWSER" auth save "$TEMP_AUTH_PROFILE" --url "$LOGIN_URL" --username "$COLLECT_USERNAME" --password-stdin --username-selector 'input[type="email"]' --password-selector 'input[type="password"]' --submit-selector 'a.text_submit' >/dev/null;unset COLLECT_PASSWORD;profile=$TEMP_AUTH_PROFILE;else "$AGENT_BROWSER" auth show "$profile" >/dev/null 2>&1||{ printf '%s\n' "エラー: Auth Vaultプロファイルが見つかりません: $profile" >&2; exit 1; };fi;ab auth login "$profile" --username-selector 'input[type="email"]' --password-selector 'input[type="password"]' --submit-selector 'a.text_submit' >/dev/null;ab wait 1000 >/dev/null;ab open "$COURSE_URL" >/dev/null;wait_login||{ printf '%s\n' 'エラー: ログイン後にコースページを確認できませんでした' >&2; exit 1; };fi
 log '[3/4] レッスン一覧を取得しています'
 ab open "$COURSE_URL" >/dev/null;wait_login||{ printf '%s\n' 'エラー: コースページの読み込みを確認できませんでした' >&2; exit 1; }
+COOKIE_FILE="$OUTPUT_DIR/.browser-cookies"
+if cookies_json=$(ab cookies get --json 2>/dev/null); then
+  printf '%s' "$cookies_json" | jq -r '[.cookies[]? | "\(.name)=\(.value)"] | join("; ")' > "$COOKIE_FILE"
+  chmod 600 "$COOKIE_FILE"
+  printf '[browser] Cookieを取得しました\n' >&2
+fi
 links='{"urls":[]}'; count=0; elapsed=0
 while ((elapsed<=COLLECT_MEDIA_TIMEOUT_MS)); do
   links=$(ab eval --stdin <"$TMP_DIR/links.js" 2>/dev/null || printf '{"urls":[]}')
