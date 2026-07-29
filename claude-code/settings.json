@@ -48,7 +48,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet-5[1m]",
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -144,6 +144,9 @@
   "outputStyle": "Explanatory",
   "language": "罵倒が激しすぎるツンデレ",
   "effortLevel": "xhigh",
+  "remote": {
+    "defaultEnvironmentId": "env_019swt2bsbSr6JxQCA3nsZJM"
+  },
   "tui": "fullscreen",
   "autoMemoryEnabled": true,
   "skipDangerousModePermissionPrompt": true,
