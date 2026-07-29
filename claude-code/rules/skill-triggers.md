@@ -57,6 +57,8 @@
 | `web:automating-browser` | アプリのweb操作・ブラウザ自動化時（agent-browser CLI・第一選択。未導入なら同スキルの`scripts/install.sh`で自動導入）。E2Eは`tachikoma-qa-e2e-test`へ。詳細: `rules/plugins-and-commands.md` |
 | `operating-herdr` | 🔴 herdr 環境（`HERDR_ENV=1`）で作業時（**必ずロード**）。herdr = terminal-native agent multiplexer。workspace/tab/pane 制御・別ペイン出力読取・`wait output`/`wait agent-status` 待機・エージェント spawn/協調をCLIで行う。`HERDR_ENV` が `1` でなければ非適用（herdr 外部から focused ペインを操作しない）。詳細: `rules/plugins-and-commands.md` |
 
+> `orchestrating-teams`/`orchestrating-codex` が `docs/` に生成する計画書・PRD・監査レポート等のレビュー資材は、Markdownに加え同名HTMLも併用生成される（中央変換方式。詳細は `orchestrating-teams` の `WORKFLOW-GUIDE.md` 参照）。
+
 ## オンデマンドスキル（明示的要求時のみ）
 
 フラッシュカード(`certificate:creating-flashcards`) / プレゼン(`studio:creating-slides`, `studio:gws-slides`) / 図表(`studio:creating-diagrams`) / Codex(`orchestrating-codex`) / PM(`product:practicing-product-management`) / アルゴリズム(`lang:solving-algorithms`・言語非依存リファレンス・特定agent非割当=意図的省略)
