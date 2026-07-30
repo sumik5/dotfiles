@@ -29,7 +29,7 @@
 | 一過性・そのプロジェクト限定の作業メモ | `.learnings/`（留置） |
 | プロジェクト固有の事実・規約・落とし穴 | そのプロジェクトの `CLAUDE.md` |
 | ユーザー横断・複数セッションに渡る事実 | Claude Code memory（配置先の memory 規約に従う・1ファイル1事実＋`MEMORY.md`索引） |
-| sumik-claude-plugin 自身のスキル改善 | CLAUDE.md「📥 スキル改善提案 (inbox)」へ（`.learnings/` ではない・`authoring-plugins` の IMPROVEMENT-INTAKE が消費） |
+| sumik-claude-plugin 自身のスキル改善 | `~/.claude/.learnings/SKILL-IMPROVEMENTS.md` へ（実行中プロジェクトの `.learnings/` ではない・CWD非依存の単一グローバルキュー・`authoring-plugins` の IMPROVEMENT-INTAKE が消費） |
 | 汎用で再利用価値が高い | `authoring-plugins` で新スキル抽出を検討 |
 
 ## 昇格ルール（反復パターン）
@@ -41,8 +41,8 @@
 | 機構 | 対象 |
 |------|------|
 | `capturing-learnings`（本ルール） | **あらゆるプロジェクトの作業全般**の学び（汎用 `.learnings/` キャプチャ） |
-| CLAUDE.md inbox → `authoring-plugins` IMPROVEMENT-INTAKE | **sumik-claude-plugin 自身のスキル**の改善（[PROPOSAL] 捕捉→消費） |
+| `~/.claude/.learnings/SKILL-IMPROVEMENTS.md` → `authoring-plugins` IMPROVEMENT-INTAKE | **sumik-claude-plugin 自身のスキル**の改善（[PROPOSAL] 捕捉→消費・CWD非依存） |
 | `authoring-plugins` USAGE-REVIEW | スキルポートフォリオの定期棚卸し（月次/四半期） |
 | `managing-claude-md` | CLAUDE.md という生きたドキュメントの整備 |
 
-取り違え禁止: 「プラグインのスキルを直す学び」は inbox、それ以外の学びは `.learnings/`。
+取り違え禁止: 「プラグインのスキルを直す学び」は `~/.claude/.learnings/SKILL-IMPROVEMENTS.md`、それ以外の学びは実行中プロジェクトの `.learnings/`。
