@@ -41,7 +41,9 @@ pick_one() {
     local selected=""
     if command -v peco >/dev/null 2>&1; then
         # peco: キャンセル (ESC) 時は空文字・終了コード非0 を返す
-        selected=$(printf '%s\n' "${items[@]}" | peco --prompt "$prompt" 2>/dev/null || true)
+        # --initial-index 0: 呼び出し側が「現在の項目」を配列先頭に
+        # 並べ替えてから渡す設計のため、常に0番目を初期選択する
+        selected=$(printf '%s\n' "${items[@]}" | peco --prompt "$prompt" --initial-index 0 2>/dev/null || true)
     else
         print_status "peco が見つかりません。select メニューを使用します。" >&2
         local PS3="番号を入力してください: "
@@ -111,16 +113,27 @@ if [[ ${#accounts[@]} -eq 0 ]]; then
     fi
 else
     # ─────────────────────────────────────────────
-    # メニュー候補を構築（現在アカウントに目印を付与）
+    # メニュー候補を構築（現在アカウントに目印を付与し先頭へ並べ替え）
+    #   peco の --initial-index 0 で初期カーソルが現在項目に合うよう、
+    #   現在アカウントを配列先頭へ配置してから他のアカウントを続ける。
     # ─────────────────────────────────────────────
-    menu_items=()
+    current_account_item=""
+    other_accounts=()
     for account in "${accounts[@]}"; do
         if [[ "$account" == "$CURRENT_ACCOUNT" ]]; then
-            menu_items+=("${account}${CURRENT_MARKER}")
+            current_account_item="${account}${CURRENT_MARKER}"
         else
-            menu_items+=("$account")
+            other_accounts+=("$account")
         fi
     done
+
+    menu_items=()
+    if [[ -n "$current_account_item" ]]; then
+        menu_items+=("$current_account_item")
+    fi
+    if [[ ${#other_accounts[@]} -gt 0 ]]; then
+        menu_items+=("${other_accounts[@]}")
+    fi
     menu_items+=("$NEW_ACCOUNT_LABEL")
 
     # ─────────────────────────────────────────────
@@ -183,15 +196,22 @@ else
 fi
 
 # ─────────────────────────────────────────────
-# ADC (Application Default Credentials) を実行
+# ADC (Application Default Credentials) 検証 + 自動 reauth
+# CLIトークン検証と同様に、print-access-token で ADC の有効性を確認する。
+# 失敗（非0終了）= トークン切れ/reauth 要求とみなして再認証を実行。
 # ─────────────────────────────────────────────
 echo
-print_status "Application Default 認証を実行中..."
-if gcloud auth application-default login; then
-    print_success "Application Default 認証成功"
+print_status "Application Default 認証の有効性を確認中..."
+if ! gcloud auth application-default print-access-token >/dev/null 2>&1; then
+    print_status "Application Default 認証の再認証が必要です。ブラウザ認証を開始します..."
+    if gcloud auth application-default login; then
+        print_success "Application Default 認証成功"
+    else
+        print_error "Application Default 認証に失敗しました"
+        exit 1
+    fi
 else
-    print_error "Application Default 認証に失敗しました"
-    exit 1
+    print_success "Application Default 認証は有効です"
 fi
 
 # ─────────────────────────────────────────────
@@ -289,15 +309,26 @@ else
     else
         CURRENT_PROJECT=$(gcloud config get-value project 2>/dev/null || true)
 
-        # メニュー候補を構築（現在プロジェクトに目印を付与）
-        project_menu=()
+        # メニュー候補を構築（現在プロジェクトに目印を付与し先頭へ並べ替え）
+        #   peco の --initial-index 0 で初期カーソルが現在項目に合うよう、
+        #   現在プロジェクトを配列先頭へ配置してから他のプロジェクトを続ける。
+        current_project_item=""
+        other_projects=()
         for project in "${projects[@]}"; do
             if [[ "$project" == "$CURRENT_PROJECT" ]]; then
-                project_menu+=("${project}${CURRENT_MARKER}")
+                current_project_item="${project}${CURRENT_MARKER}"
             else
-                project_menu+=("$project")
+                other_projects+=("$project")
             fi
         done
+
+        project_menu=()
+        if [[ -n "$current_project_item" ]]; then
+            project_menu+=("$current_project_item")
+        fi
+        if [[ ${#other_projects[@]} -gt 0 ]]; then
+            project_menu+=("${other_projects[@]}")
+        fi
         project_menu+=("$MANUAL_PROJECT_LABEL")
 
         # 共通関数 pick_one でプロジェクト選択
