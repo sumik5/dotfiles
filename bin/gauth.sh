@@ -180,10 +180,24 @@ fi
 # アカウント確定後（新規追加・既存切替どちらの経路でも）に
 # print-access-token でトークン有効性を確認する。
 # 失敗（非0終了）= トークン切れ/reauth 要求とみなして再認証を実行。
+#
+# 注意: Google Workspace のセッション期限ポリシーでリフレッシュトークンが
+# 失効すると、print-access-token はブラウザ経由のOIDCフローとは別に
+# 「Reauthentication required. Please enter your password:」という
+# パスワード対話プロンプトをターミナルへ直接出す（gcloud CLI既知の挙動）。
+# </dev/null で stdin を閉じ、対話待ちで固まらず即時 EOF で打ち切らせる。
+# また既知バグ (https://github.com/twistedpair/google-cloud-sdk/issues/11)
+# により reauth 失敗時でも exit code が偽の 0 を返すことがあるため、
+# exit code だけでは不十分。出力内容も grep で検査して判定する
+# （組織/プロジェクト一覧取得と同じ防御パターン）。
 # ─────────────────────────────────────────────
 echo
 print_status "CLIトークンの有効性を確認中..."
-if ! gcloud auth print-access-token "${CURRENT_ACCOUNT}" >/dev/null 2>&1; then
+cli_token_output=""
+cli_token_exit=0
+cli_token_output=$(gcloud auth print-access-token "${CURRENT_ACCOUNT}" 2>&1 </dev/null) || cli_token_exit=$?
+
+if [[ $cli_token_exit -ne 0 ]] || echo "$cli_token_output" | grep -q -i "reauthentication\|invalid_grant\|credentials"; then
     print_status "CLIトークンの再認証が必要です。ブラウザ認証を開始します..."
     if gcloud auth login "${CURRENT_ACCOUNT}"; then
         print_success "CLI再認証成功"
@@ -199,10 +213,17 @@ fi
 # ADC (Application Default Credentials) 検証 + 自動 reauth
 # CLIトークン検証と同様に、print-access-token で ADC の有効性を確認する。
 # 失敗（非0終了）= トークン切れ/reauth 要求とみなして再認証を実行。
+# CLIトークン検証と同じ理由（reauthのパスワード対話プロンプト・
+# exit code偽装バグ）により </dev/null でstdinを閉じ、exit codeと
+# 出力内容の両方で判定する。
 # ─────────────────────────────────────────────
 echo
 print_status "Application Default 認証の有効性を確認中..."
-if ! gcloud auth application-default print-access-token >/dev/null 2>&1; then
+adc_token_output=""
+adc_token_exit=0
+adc_token_output=$(gcloud auth application-default print-access-token 2>&1 </dev/null) || adc_token_exit=$?
+
+if [[ $adc_token_exit -ne 0 ]] || echo "$adc_token_output" | grep -q -i "reauthentication\|invalid_grant\|credentials"; then
     print_status "Application Default 認証の再認証が必要です。ブラウザ認証を開始します..."
     if gcloud auth application-default login; then
         print_success "Application Default 認証成功"
