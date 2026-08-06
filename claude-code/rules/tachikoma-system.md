@@ -48,6 +48,12 @@
 | 役目を終えた teammate を閉じたい | `SendMessage(message: {type: "shutdown_request"})` を送信 → `shutdown_approved` / `teammate_terminated` 通知でクローズ確認（idle中は即応しない場合あり→再送） |
 | teammate が複数残存 | 不要なものから順に `shutdown_request` を送り `teammate_terminated` を1体ずつ確認（`TeamDelete` は廃止済み・セッション終了でも自動解散） |
 
+### 不可逆操作の承認伝達（forked/background agent）
+
+| If X | then Y |
+|------|--------|
+| forked/background agent が不可逆操作（実受験権消費・金銭操作・データ削除等）を伴うタスクで「coordinator経由の SendMessage では本人確認を検証不能」と拒否する | 安全側の正しい判断として扱う。同じ経路で追加の証跡（`AskUserQuestion` の tool_result 生ログを引用する等）を送っても解決しない——agent 自身が `AskUserQuestion` のようなブロッキング対話ツールを持たない設計（background 起動）である限り、「本人の直接入力」と「coordinator の要約・引用」を技術的に区別する手段が存在せず、無限に押し返されるだけ。深追いを打ち切り、本体（coordinator）が実行主体を引き取る（`Skill` ツール経由は自動的に forked 実行されるため使わず、`claude-in-chrome` MCP または対象 CLI を `Bash` で本体が直接叩く。既存の認証 state・投入スクリプト等スキルが蓄積したノウハウはそのまま流用してよい——委譲を諦めるのではなく実行主体だけを切り替える）|
+
 ## 並列タチコマでの品質統一
 
 | If X | then Y |
