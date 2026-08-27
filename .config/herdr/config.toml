@@ -50,7 +50,7 @@ delivery = "terminal"
 show_agent_labels_on_pane_borders = true
 
 [[keys.command]]
-key = "prefix+d"
+key = "prefix+shift+h"
 type = "popup"
 command = "hunk diff"
 description = "Launch Hunk git diff TUI in a floating popup window"
@@ -58,7 +58,7 @@ width = "95%"
 height = "95%"
 
 [[keys.command]]
-key = "prefix+l"
+key = "prefix+shift+l"
 command = "glogs"
 type = "popup"
 description = "Launch glogs TUI in a floating popup window"
@@ -66,7 +66,7 @@ width = "95%"
 height = "95%"
 
 [[keys.command]]
-key = "prefix+z"
+key = "prefix+shift+z"
 type = "popup"
 command = "zsh"
 description = "Launch a zsh shell in a floating popup window"
@@ -84,3 +84,8 @@ key = "prefix+shift+b"
 type = "shell"
 command = '"${HERDR_BIN_PATH}" plugin pane open --plugin official.browser --entrypoint browser --placement overlay --focus'
 description = "open browser overlay"
+
+[[keys.command]]
+key = "prefix+shift+r"
+type = "shell"
+command = "exec $SHELL -l"
