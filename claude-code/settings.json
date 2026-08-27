@@ -17,12 +17,9 @@
       "Bash(rg:*)",
       "Read(~/.claude/agents/*)",
       "Read(~/repo/*)",
-      "Bash(rm -rf .next:*)",
-      "Bash(rm -rf */.next:*)",
       "Bash(rmdir:*)",
       "Bash(mkdir:*)",
       "Bash(find:*)",
-      "Bash(rm:*)",
       "Bash(npm run build:*)",
       "Bash(grep:*)",
       "Bash(tree:*)",
@@ -126,7 +123,7 @@
         "source": "git",
         "url": "https://github.com/sumik5/sumik-llm-plugin.git"
       },
-      "autoUpdate": false
+      "autoUpdate": true
     },
     "tips-marketplace": {
       "source": {
@@ -157,5 +154,46 @@
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "allow": [
+      "$defaults",
+      "Bash(terraform plan:*) in /Users/sumik/repo/catenas-g/catenas-gcp-services/catenas-intra-service-terraform",
+      "Bash(gcloud config list:*)",
+      "Bash(bq ls:*)",
+      "Bash(pwd:*)"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "Bash(terraform apply:*) against catenas-intra-service without an explicit plan review",
+      "Bash(gcloud sql instances delete:*)",
+      "Bash(gsutil rm -r gs://catenas-intra-service-tfstate/*)"
+    ],
+    "environment": [
+      "### Org-wide",
+      "**Organization**: catenas-g (GitHub org; repo `catenas-g/catenas-intra-service-terraform`)",
+      "**Cloud provider(s)**: Google Cloud Platform (GCP project: catenas-intra-service)",
+      "**Repository visibility**: assume private (not queryable via gh; SSH remote alias `shivase.github.com:catenas-g/...` gives no visibility signal; treating as private per default heuristic)",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: GCP Secret Manager (referenced in `03-redash/04-secret-manager.tf`, `03-redash/10-secret-manager.tf`, `04-keycloak/10-secret-manager.tf`, `05-wikijs/12-secret-manager.tf`)",
+      "**Default / protected branches**: main (default branch per repo facts; protection status not queryable via gh — treat as unknown/unverified, do not assume unprotected)",
+      "**CI/CD deploy targets**: GitHub Actions workflow `.github/workflows/terraform-checks.yml` (Terraform checks against catenas-intra-service GCP project)",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo (catenas-g/catenas-intra-service-terraform) and its origin remote only",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: catenas-intra-service-tfstate (Terraform state bucket; usage-corroborated via project transcript bucket-touch count and repo README)",
+      "**Key internal services**: monitoring.googleapis.com, bigquery.googleapis.com, sqladmin.googleapis.com, asia-northeast1-catenas-intra-service.cloudfunctions.net (contacted in this project's transcripts)",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: Terraform state files (`.terraform/terraform.tfstate` under 01-infra, 02-n8n, 03-redash, 04-keycloak, 05-wikijs), Secret Manager resource definitions, and database/service-account configs in this repo — share only with engineers cleared for CATENAS intra-service infra",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment; GCP project catenas-intra-service and its Cloud SQL/Redis/Cloud Run resources treated as sensitive infra regardless of naming",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment; additionally treat 01-infra/11-service-account.tf, 02-n8n/04-service-account.tf, 03-redash/05-service-account.tf, 04-keycloak/11-service-account.tf (IAM/service-account definitions) as protected IaC scope",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (Terraform/GCP infrastructure management)",
+      "**Trusted repo**: /Users/sumik/repo/catenas-g/catenas-gcp-services/catenas-intra-service-terraform and its origin remote (shivase.github.com:catenas-g/catenas-intra-service-terraform.git)",
+      "**Org-specific CLIs**: gcloud, bq, gsutil, terraform, trivy (GCP/Terraform toolchain used routinely in this project)",
+      "No routine under <user>/ prefix qualifiers found"
+    ]
+  }
 }
