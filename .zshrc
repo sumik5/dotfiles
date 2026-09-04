@@ -312,3 +312,5 @@ if [[ -n "${WEZTERM_PANE:-}" ]] && [[ -z "${TMUX:-}" ]]; then
   export TMUX="wezterm-shim/${WEZTERM_PANE}/0"
   export TMUX_PANE="%${WEZTERM_PANE}"
 fi
+
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=248000
